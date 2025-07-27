@@ -1,0 +1,33 @@
+	1.	       Index.html
+	2.	       Carrello.html
+	3.	       About.html
+	4.	       Aggiunta_carrello.html
+	5.	       Footer.html
+	6.	       header.html
+	7.	       Login.html
+	8.	       Signup.html
+	9.	       Dashboard.html
+	10.	Profilo.html
+	11.	       pagamento.html
+	12.	Logout.html
+	13.	collezioni.html
+	14.	Yugioh.html
+	15.	pokemon.html
+	16.	Classifica.html
+	17.	Ordini.html
+	18.	scambi.html
+	19.	prodotti.html
+	20.	DB
+
+
+
+PHP CRUD
+
+	1.	aggiorna_prodotti.php
+	2.	elimina_prodotti.php
+	3.	inserisci_prodotti.php
+	4.	leggi_prodotti.php
+
+
+Futuro:
+storico box aperte
