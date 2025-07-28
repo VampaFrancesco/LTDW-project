@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+<<<<<<< HEAD:pages/index.html
    <head>
       <!-- basic -->
       <meta charset="utf-8">
@@ -51,11 +52,52 @@
                            <li><a href="#">New Releases</a></li>
                            <li><a href="#">Today's Deals</a></li>
                            <li><a href="#">Customer Service</a></li>
+=======
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Shop | E-commerce</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Preloader -->
+    <div id="preloader"><div class="loader"></div></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a href="index.html" class="header__logo"><img src="img/logo.png" alt="Anime Shop"></a>
+            <nav class="header__menu">
+                <ul class="d-flex list-unstyled mb-0">
+                    <li class="me-3"><a href="index.html">Home</a></li>
+                    <li class="me-3 dropdown">
+                        <a href="#" data-bs-toggle="dropdown">Shop <span class="fa fa-angle-down"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">All Products</a></li>
+                            <li><a class="dropdown-item" href="#">Categories</a></li>
+>>>>>>> parent of fe96176 (cambio template):index.html
                         </ul>
-                     </div>
-                  </div>
-               </div>
+                    </li>
+                    <li class="me-3"><a href="blog.html">Blog</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="header__icons">
+                <a href="#" class="me-3"><span class="icon_search"></span></a>
+                <a href="cart.html" class="position-relative">
+                    <span class="fa fa-shopping-cart"></span>
+                    <span id="cart-count" class="badge bg-danger position-absolute top-0 start-100 translate-middle">0</span>
+                </a>
             </div>
+<<<<<<< HEAD:pages/index.html
          </div>
          <!-- header top section start -->
          <!-- logo section start -->
@@ -643,3 +685,64 @@
       </script>
    </body>
 </html>
+=======
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero py-5 text-center bg-light">
+        <div class="container">
+            <h1 class="display-4">Welcome to Anime Shop</h1>
+            <p class="lead">Discover and purchase your favorite anime titles, merchandise and more!</p>
+            <a href="#featured" class="btn btn-primary">Shop Now</a>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section id="featured" class="product spad py-5">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-12 text-center"><h2>Featured</h2></div>
+            </div>
+            <div class="row">
+                <!-- Example product -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100">
+                        <img src="img/trending/trend-1.jpg" class="card-img-top" alt="Product Image">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">The Seven Deadly Sins: Wrath of the Gods</h5>
+                            <p class="card-text flex-grow-1">Complete series on Blu-ray.</p>
+                            <div class="mb-3"><strong>$49.99</strong></div>
+                            <button class="btn btn-success add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Repeat similar blocks for other products -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer bg-dark text-white py-4">
+        <div class="container text-center">
+            <p class="mb-0">&copy; <script>document.write(new Date().getFullYear());</script> Anime Shop. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JS Plugins -->
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Simple cart count logic
+        const cartCountEl = document.getElementById('cart-count');
+        document.querySelectorAll('.add-to-cart').forEach(btn => {
+            btn.addEventListener('click', () => {
+                let count = parseInt(cartCountEl.textContent);
+                cartCountEl.textContent = count + 1;
+            });
+        });
+    </script>
+</body>
+
+</html>
+>>>>>>> parent of fe96176 (cambio template):index.html
