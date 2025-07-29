@@ -1,4 +1,4 @@
---------------------------------------------------------------------- File Name: style.css ---------------------------------------------------------------------*/
+/*--------------------------------------------------------------------- File Name: style.css ---------------------------------------------------------------------*/
 /*--------------------------------------------------------------------- import Files ---------------------------------------------------------------------*/
 
 @import url(animate.min.css);
@@ -7,7 +7,6 @@
 @import url(css/font-awesome.min.css);
 @import url(meanmenu.css);
 @import url(owl.carousel.min.css);
-@import url(swiper.min.css);
 @import url(slick.css);
 @import url(jquery.fancybox.min.css);
 @import url(jquery-ui.css);
@@ -144,12 +143,69 @@ img {
     max-width: 100%;
     height: auto;
 }
+/* ------------------------------------------------------------------
+   HEADER-TOP: logo a sinistra, ricerca al centro, top-links a destra
+   ------------------------------------------------------------------ */
+
+.header-top .container {
+    display: flex;
+    align-items: center;
+}
+
+/* logo-link (l’<a> che contiene #logo_header) */
+.header-top .logo-link {
+    order: 1;
+    /* spazio tra logo e form */
+    margin-right: 1rem;
+}
+
+/* form di ricerca al centro */
+/* spaziatura e stile per il form di ricerca centrato */
+.header-top .flex-fill {
+    /* nessun absolute qui: lo flex riempie già il container */
+    box-sizing: border-box;
+}
+
+.header-top .form-inline {
+    background-color: #f1f5f9;
+    height: 50px;
+    line-height: 50px;
+    border-radius: 10px;
+    border: 0;
+    padding: 0 1rem;      /* allinea con il px-3 di bootstrap (1rem) */
+}
+
+.header-top .form-inline .form-control {
+    border: none;
+    height: 100%;
+}
+
+.header-top .form-inline .btn {
+    height: 100%;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+
+/* top-links a destra */
+.header-top .top-links {
+    order: 3;
+    display: flex;
+    align-items: center;
+    /* spazio dalla form */
+    margin-left: 1rem;
+}
+
+/* spaziatura interna ai singoli link */
+.header-top .top-links a {
+    margin: 0 0.5rem;
+}
 
  :focus {
     outline: 0;
 }
 
-.paddind_bottom_0 {
+.padding_bottom_0 {
     padding-bottom: 0 !important;
 }
 

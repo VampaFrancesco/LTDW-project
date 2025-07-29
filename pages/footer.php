@@ -1,58 +1,45 @@
-<?php session_start(); ?>
-<!-- banner bg main end -->
-<!-- footer section start -->
-<div class="footer_section layout_padding">
+<?php ?>
+<footer class="bg-dark text-light pt-5">
     <div class="container">
-        <div class="footer_logo">
-            <a href="index.php"><img src="images/footer-logo.png" alt="Footer Logo"></a>
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <h5>Iscriviti alla newsletter</h5>
+                <form class="form-inline">
+                    <input type="email" class="form-control mr-2 mb-2" placeholder="La tua email">
+                    <button type="submit" class="btn btn-primary mb-2">Iscriviti</button>
+                </form>
+                <p class="small mt-3">Box Omnia è il punto di riferimento ufficiale per tutti i veri Collezionisti di carte! Scopri un mondo di Carte Originali, Giochi, Accessori esclusivi e tanto altro.</p>
+            </div>
+            <div class="col-md-3 mb-4">
+                <h6>Informazioni</h6>
+                <ul class="list-unstyled">
+                    <li><a href="../about.php">Chi siamo</a></li>
+                    <li><a href="../contatti.php">Contatti</a></li>
+                    <li><a href="../partners.php">Partners</a></li>
+                    <li><a href="../eventi.php">Eventi</a></li>
+                    <li><a href="../lavora.php">Lavora con noi</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3 mb-4">
+                <h6>Assistenza</h6>
+                <ul class="list-unstyled">
+                    <li><a href="../spedizioni.php">Spedizioni</a></li>
+                    <li><a href="../pagamenti.php">Metodi di pagamento</a></li>
+                    <li><a href="../prevendite.php">Prevendite</a></li>
+                    <li><a href="../faq.php">Domande frequenti</a></li>
+                    <li><a href="../resi.php">Resi e rimborsi</a></li>
+                </ul>
+            </div>
         </div>
-        <div class="input_bt">
-            <input type="text" class="mail_bt" placeholder="Your Email" name="email">
-            <span class="subscribe_bt" id="basic-addon2"><a href="#">Subscribe</a></span>
-        </div>
-        <div class="footer_menu">
-            <ul>
-                <li><a href="#">Best Sellers</a></li>
-                <li><a href="#">Gift Ideas</a></li>
-                <li><a href="#">New Releases</a></li>
-                <li><a href="#">Today's Deals</a></li>
-                <li><a href="#">Customer Service</a></li>
-            </ul>
-        </div>
-        <div class="location_main">
-            Help Line Number: <a href="tel:+1180012001200">+1 1800 1200 1200</a>
+        <div class="text-center py-3 border-top">
+            <p class="mb-1">Orari servizio clienti: Lun - Ven 08:30 - 16:30 | <a href="mailto:info@boxomnia.it" class="text-light">info@boxomnia.it</a></p>
+            <p class="mb-0">© <?php echo date('Y'); ?> Box Omnia. Tutti i diritti riservati.</p>
         </div>
     </div>
-</div>
-<!-- footer section end -->
+</footer>
 
-<!-- copyright section start -->
-<div class="copyright_section">
-    <div class="container">
-        <p class="copyright_text">
-            © 2020 All Rights Reserved. Design by
-            <a href="https://html.design" target="_blank" rel="noopener">Free html Templates</a>
-        </p>
-    </div>
-</div>
-<!-- copyright section end -->
-
-<!-- Javascript files-->
-<script src="js/jquery.min.js"></script>
-<script src="js/popper.min.js"></script>
-<script src="js/bootstrap.bundle.min.js"></script>
-<script src="js/jquery-3.0.0.min.js"></script>
-<script src="js/plugin.js"></script>
-<script src="js/jquery.mCustomScrollbar.concat.min.js"></script>
-<script src="js/custom.js"></script>
-<script>
-    function openNav() {
-        document.getElementById("mySidenav").style.width = "250px";
-    }
-
-    function closeNav() {
-        document.getElementById("mySidenav").style.width = "0";
-    }
-</script>
-</body>
-</html>
+<!-- JS -->
+<script src="../js/jquery.min.js"></script>
+<script src="../js/popper.min.js"></script>
+<script src="../js/bootstrap.bundle.min.js"></script>
+<script src="../js/custom.js"></script>
