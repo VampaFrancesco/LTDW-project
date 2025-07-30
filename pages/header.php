@@ -10,16 +10,17 @@ require_once __DIR__ . '/../include/config.inc.php';
     <title>Box Omnia</title>
     <!-- CSS -->
     <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/responsive.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     <link rel="icon" href="../images/favicon.ico" type="image/gif"/>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/navbar.css">
+<!--    <link rel="stylesheet" href="../css/carousel.css">-->
 </head>
 <body>
-
 <?php if (empty($hideNav)): ?>
     <header>
         <div class="header-top bg-light py-2">
@@ -31,7 +32,8 @@ require_once __DIR__ . '/../include/config.inc.php';
                 </a>
                 <div class="flex-fill px-3">
                     <form class="form-inline w-100" method="get" action="search.php">
-                        <input class="form-control mr-2 flex-grow-1" type="search" name="q" placeholder="Cerca..." aria-label="Cerca">
+                        <input class="form-control mr-2 flex-grow-1" type="search" name="q" placeholder="Cerca..."
+                               aria-label="Cerca">
                         <button class="btn btn-outline-secondary" type="submit">
                             <i class="fa fa-search"></i>
                         </button>
@@ -48,31 +50,6 @@ require_once __DIR__ . '/../include/config.inc.php';
 
             </div>
         </div>
-        <nav class="navbar navbar-expand-lg navbar-light bg-white border-top border-bottom">
-            <div class="container">
-                <a class="navbar-brand" href="../index.php">
-                    <img src="../images/logo.png" alt="Box Omnia">
-                </a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="mainNav">
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item"><a class="nav-link" href="../index.php">Homepage</a></li>
-                        <li class="nav-item"><a class="nav-link" href="../novita.php">Novità</a></li>
-                        <li class="nav-item"><a class="nav-link" href="../prevendita.php">Prevendita</a></li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="merchDropdown" data-toggle="dropdown">Merch</a>
-                            <div class="dropdown-menu" aria-labelledby="merchDropdown">
-                                <a class="dropdown-item" href="../merch/spille.php">Spille e Gadget</a>
-                                <a class="dropdown-item" href="../merch/peluche.php">Peluche</a>
-                                <!-- aggiungi gli altri link -->
-                            </div>
-                        </li>
-                        <!-- replica dropdown per Games, Pokemon, Accessori, ecc. -->
-                    </ul>
-                </div>
-            </div>
-        </nav>
+        <?php include '../include/navbar.php' ?>
     </header>
 <?php endif; ?>
