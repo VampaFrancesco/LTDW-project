@@ -56,27 +56,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }*/
 ?>
 
-    <div class="login-container">
-        <h2>Accedi al tuo account</h2>
+<div class="login-container">
 
-        <?php if (!empty($error_message)): ?>
-            <p style="color: red;"><?php echo $error_message; ?></p>
-        <?php endif; ?>
+    <h2>Accedi al tuo account</h2>
 
-        <form action="#" method="POST">
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Accedi</button>
-        </form>
+    <?php if (!empty($error_message)): ?>
+        <p style="color: red;"><?php echo $error_message; ?></p>
+    <?php endif; ?>
 
-        <p>Non hai un account? <a href="register.php">Registrati qui</a></p>
-    </div>
+    <form action="#" method="POST">
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Accedi</button>
+    </form>
+    <?php if (isset($_GET['registered'])): ?>
+        <div class="floating-alert">
+            Registrazione avvenuta con successo!
+        </div>
+    <?php endif; ?>
+    <p>Non hai un account? <a href="register.php">Registrati qui</a></p>
+</div>
 
 <?php include __DIR__ . '/../footer.php';
 ?>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const alert = document.querySelector('.floating-alert');
+        if (!alert) return;
+        alert.addEventListener('animationend', () => {
+            alert.remove();
+        });
+    });
+</script>
+

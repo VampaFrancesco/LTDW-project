@@ -10,7 +10,7 @@ $db_config = require_once __DIR__ . '/../../include/config.inc.php';
         <p style="color: red;"><?php echo $error_message; ?></p>
     <?php endif; ?>
 
-    <form action="#" method="POST">
+    <form action="../../action/register_action.php" method="POST"  id="registerForm">
         <div class="form-group">
             <label for="nome">Nome:</label>
             <input type="text" id="nome" name="nome" required>

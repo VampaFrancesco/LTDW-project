@@ -1,41 +1,47 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 // register_action.php
 
-// 1) Carico configurazione
-$config = include __DIR__ . '/../include/config.inc.php';
+// 1) Carica configurazione
+$configPath = __DIR__ . '/../include/config.inc.php';
+if (!file_exists($configPath)) {
+    http_response_code(500);
+    exit(json_encode([
+        'success' => false,
+        'errors'  => ['File di configurazione non trovato.']
+    ]));
+}
+$config = include $configPath;
 
-// 2) Connessione MySQLi (host, user, passwd, dbname)
+// 2) Connessione MySQLi (HOST, USER, PASSWD, DBNAME)
 $conn = new mysqli(
     $config['host'],
     $config['user'],
     $config['passwd'],
     $config['dbname']
 );
-
-// Verifica connessione
 if ($conn->connect_error) {
     http_response_code(500);
-    echo json_encode([
+    exit(json_encode([
         'success' => false,
-        'errors'  => ['Connessione al database fallita.']
-    ]);
-    exit;
+        'errors'  => ['Connessione al database fallita: ' . $conn->connect_error]
+    ]));
 }
-
-// Forzo mysqli a lanciare eccezioni (opzionale ma utile)
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 // 3) Solo POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405); // Method Not Allowed
+    http_response_code(405);
     exit;
 }
 
-// 4) Recupero e validazione dei campi
-$nome     = trim($_POST['nome']     ?? '');
-$cognome  = trim($_POST['cognome']  ?? '');
-$email    = trim($_POST['email']    ?? '');
-$password = $_POST['password']      ?? '';
+// 4) Recupera e valida
+$nome    = trim($_POST['nome']    ?? '');
+$cognome = trim($_POST['cognome'] ?? '');
+$email   = trim($_POST['email']   ?? '');
+$pass    = $_POST['password']     ?? '';
 
 $errors = [];
 if ($nome === '')     $errors[] = 'Nome obbligatorio.';
@@ -43,53 +49,38 @@ if ($cognome === '')  $errors[] = 'Cognome obbligatorio.';
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $errors[] = 'Email non valida.';
 }
-if (strlen($password) < 6) {
-    $errors[] = 'Password troppo corta (minimo 6 caratteri).';
+if (strlen($pass) < 6) {
+    $errors[] = 'Password troppo corta (min 6 caratteri).';
 }
-
 if (!empty($errors)) {
     header('Content-Type: application/json');
     echo json_encode(['success' => false, 'errors' => $errors]);
     exit;
 }
 
-// 5) Hash della password
-$passwordHash = password_hash($password, PASSWORD_DEFAULT);
+// 5) Hash
+$passwordHash = password_hash($pass, PASSWORD_DEFAULT);
 
-// 6) Prepared statement e debug
+// 6) Insert con prepared statement
 try {
     $stmt = $conn->prepare(
         "INSERT INTO utente (nome, cognome, email, password)
-         VALUES (?, ?, ?, ?)"
+       VALUES (?, ?, ?, ?)"
     );
     $stmt->bind_param('ssss', $nome, $cognome, $email, $passwordHash);
+    $stmt->execute();
 
-    if ($stmt->execute()) {
-        // Controllo quante righe sono state influenzate
-        $n = $stmt->affected_rows;
-        header('Content-Type: application/json');
-        echo json_encode([
-            'success'       => true,
-            'affected_rows' => $n
-        ]);
-    } else {
-        // Se execute() ritorna false, mostro l’errore
-        header('Content-Type: application/json');
-        echo json_encode([
-            'success' => false,
-            'error'   => $stmt->error
-        ]);
-    }
+    // Redirect al login su success
+    header('Location: /LTDW-project/pages/auth/login.php?registered=1');
+    exit;
+
 
 } catch (mysqli_sql_exception $e) {
-    header('Content-Type: application/json');
-    echo json_encode([
-        'success' => false,
-        'exception' => $e->getMessage(),
-        'code'      => $e->getCode()
-    ]);
-}
+    // 1062 = duplicate entry
+    $msg = $e->getCode() === 1062
+        ? 'Email già registrata.'
+        : 'Errore interno. Riprova più tardi.';
 
-$stmt->close();
-$conn->close();
-exit;
+    header('Location: /register.php?error=' . urlencode($msg));
+    exit;
+}
