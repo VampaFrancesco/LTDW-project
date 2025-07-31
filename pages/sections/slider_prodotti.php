@@ -1,49 +1,35 @@
-<div class="simple-slider">
-    <div class="slides">
-        <div class="slide">
-            <img src="../../images/tshirt-img.png" alt="Slide 1">
-        </div>
-        <div class="slide">
-            <img src="../../images/tshirt-img.png" alt="Slide 2">
-        </div>
-        <div class="slide">
-            <img src="../../images/tshirt-img.png" alt="Slide 3">
-        </div>
+<?php
+?>
+<div class="slideshow-container">
+
+    <!-- Full-width images with number and caption text -->
+    <div class="mySlides fade">
+        <div class="numbertext">1 / 3</div>
+        <img src="images/boxomnia.png" style="width:100%" alt="alternativo1">
+        <div class="text">Caption Text</div>
     </div>
-    <button class="slider-button prev" aria-label="Previous slide">‹</button>
-    <button class="slider-button next" aria-label="Next slide">›</button>
+
+    <div class="mySlides fade">
+        <div class="numbertext">2 / 3</div>
+        <img src="images/boxomnia.png" style="width:100%" alt="alternativo2">
+        <div class="text">Caption Two</div>
+    </div>
+
+    <div class="mySlides fade">
+        <div class="numbertext">3 / 3</div>
+        <img src="images/boxomnia.png" style="width:100%" alt="alternativo3">
+        <div class="text">Caption Three</div>
+    </div>
+
+    <!-- Next and previous buttons -->
+    <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+    <a class="next" onclick="plusSlides(1)">&#10095;</a>
 </div>
+<br>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const slider = document.querySelector('.simple-slider');
-        const slides = slider.querySelectorAll('.slide');
-        const track  = slider.querySelector('.slides');
-        const prev   = slider.querySelector('.slider-button.prev');
-        const next   = slider.querySelector('.slider-button.next');
-        const total  = slides.length;
-        let index    = 0;
-
-        function update() {
-            track.style.transform = `translateX(-${index * 100}%)`;
-        }
-
-        prev.addEventListener('click', () => {
-            index = (index - 1 + total) % total;
-            update();
-        });
-
-        next.addEventListener('click', () => {
-            index = (index + 1) % total;
-            update();
-        });
-
-        // Autoplay (opzionale): scatta ogni 5s
-        // setInterval(() => {
-        //   next.click();
-        // }, 5000);
-
-        // inizializza
-        update();
-    });
-</script>
+<!-- The dots/circles -->
+<div style="text-align:center">
+    <span class="dot" onclick="currentSlide(1)"></span>
+    <span class="dot" onclick="currentSlide(2)"></span>
+    <span class="dot" onclick="currentSlide(3)"></span>
+</div> 

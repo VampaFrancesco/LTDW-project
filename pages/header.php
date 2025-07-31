@@ -37,7 +37,7 @@ require_once __DIR__ . '/../include/config.inc.php';
                         <input class="form-control mr-2 flex-grow-1" type="search" name="q" placeholder="Cerca..."
                                aria-label="Cerca">
                         <button class="btn btn-outline-secondary" type="submit">
-                            <i class="fa fa-search"></i>
+                            <i class="bi bi-search"></i>
                         </button>
                     </form>
                 </div>
