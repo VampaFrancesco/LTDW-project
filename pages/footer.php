@@ -46,3 +46,5 @@
 <script src="/LTDW-project/js/bootstrap.bundle.min.js" defer></script>
 <script src="/LTDW-project/js/slider-setting.js" defer></script>
 <script src="/LTDW-project/js/custom.js" defer></script>
+<script src="/LTDW-project/js/register.js" defer></script>
+

@@ -14,7 +14,7 @@ if ($conn->connect_error) {
 }
 
 // esegui la query
-$sql    = "SELECT id, nome, prezzo FROM prodotto ORDER BY id DESC LIMIT 10";
+$sql    = "SELECT id_box, nome, prezzo FROM mystery_box ORDER BY id_box DESC LIMIT 10";
 $result = $conn->query($sql);
 
 // raccogli in array

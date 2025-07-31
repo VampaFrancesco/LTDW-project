@@ -45,14 +45,6 @@ h6 {
     line-height: normal;
     color: #111111;
     margin: 0;
-    @font-face {
-        font-family: 'Bebas Neue';
-        src: url('/fonts/BebasNeue-Regular.ttf') format('ttf'),
-        url('/fonts/BebasNeue-Regular.ttf') format('ttf');
-        font-weight: normal;
-        font-style: normal;
-        font-display: swap; /* Per una migliore performance */
-    }
 }
 
 
@@ -1224,4 +1216,20 @@ Registration Page Styles
 
 .nav-item a:hover span {
     text-decoration: underline;
+}
+
+
+.bebas-neue-regular {
+    font-family: "Bebas Neue", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Bebas Neue';
+    src: url('/fonts/BebasNeue-Regular.ttf') format('ttf'),
+    url('/fonts/BebasNeue-Regular.ttf') format('ttf');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap; /* Per una migliore performance */
 }

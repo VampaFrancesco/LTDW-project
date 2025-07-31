@@ -3,27 +3,24 @@ session_start();
 require_once __DIR__ . '/../include/config.inc.php';
 ?>
 <!DOCTYPE html>
-<html lang="it" class="html">
+<html lang="it" class="html bebas-neue-regular">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Box Omnia</title>
 
     <!-- CSS -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="/LTDW-project/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-
     <link rel="icon"       href="../images/favicon.ico" type="image/gif"/>
     <link rel="stylesheet" href="/LTDW-project/css/style.css">
-
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+    </style>
 </head>
 <?php if (empty($hideNav)): ?>
     <header>
-        <div class="header-top bg-light py-2 background-custom">
+        <div class="header-top bg-light py-2 background-custom ">
             <div class="container d-flex align-items-center">
 
                 <!-- 1) Logo a sinistra -->
