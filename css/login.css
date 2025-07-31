@@ -1,68 +1,87 @@
-/* login */
-.login-container, .register-container {
+/*---------------------------------------------------------------------
+Login Page Styles
+---------------------------------------------------------------------*/
+
+.login-container {
+    width: 100%;
     max-width: 400px;
-    margin: 50px auto;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
+    margin: 80px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
     text-align: center;
+    font-family: 'Poppins', sans-serif;
 }
 
-.login-container h2, .register-container h2 {
+.login-container h2 {
+    font-size: 28px;
+    font-weight: bold;
+    color: #30302e;
+    margin-bottom: 30px;
+}
+
+.login-container .form-group {
     margin-bottom: 20px;
-    color: #333;
-}
-
-.form-group {
-    margin-bottom: 15px;
     text-align: left;
 }
 
-.form-group label {
+.login-container label {
     display: block;
+    font-size: 14px;
+    font-weight: 500;
     margin-bottom: 5px;
-    font-weight: bold;
-    color: #555;
+    color: #333;
 }
 
-.form-group input[type="email"],
-.form-group input[type="password"],
-.form-group input[type="text"] {
-    width: calc(100% - 20px); /* Adjust for padding */
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-}
-
-button[type="submit"] {
+.login-container input[type="email"],
+.login-container input[type="password"] {
     width: 100%;
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    background-color: #f9f9f9;
+    transition: border 0.3s ease;
+}
+
+.login-container input[type="email"]:focus,
+.login-container input[type="password"]:focus {
+    border-color: #f26522;
+    outline: none;
+}
+
+.login-container .btn {
+    width: 100%;
+    background-color: #30302e;
+    color: #ffffff;
+    padding: 12px;
     border: none;
-    border-radius: 4px;
-    font-size: 18px;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
-button[type="submit"]:hover {
-    background-color: #0056b3;
+.login-container .btn:hover {
+    background-color: #f26522;
+    color: #ffffff;
 }
 
-.login-container p, .register-container p {
+.login-container p {
     margin-top: 20px;
     font-size: 14px;
+    color: #666666;
 }
 
-.login-container p a, .register-container p a {
-    color: #007bff;
+.login-container p a {
+    color: #f26522;
     text-decoration: none;
+    font-weight: 500;
 }
 
-.login-container p a:hover, .register-container p a:hover {
+.login-container p a:hover {
     text-decoration: underline;
 }
