@@ -28,7 +28,7 @@ require_once __DIR__ . '/../include/config.inc.php';
 
                 <!-- 1) Logo a sinistra -->
                 <a href="index.php" class="logo-link mr-3">
-                    <img id="logo_header" src="../images/boxomnia.png" alt="logo">
+                    <img id="logo_header" src="/LTDW-project/images/boxomnia.png" alt="logo">
                 </a>
 
                 <!-- 2) Search bar -->
@@ -53,6 +53,6 @@ require_once __DIR__ . '/../include/config.inc.php';
 
             </div>
         </div>
-        <?php include '../include/navbar.php' ?>
+        <?php include __DIR__ . '/../include/navbar.php' ?>
     </header>
 <?php endif; ?>
