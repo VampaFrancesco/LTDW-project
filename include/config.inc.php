@@ -5,8 +5,6 @@ $config['dbms']['localhost']['passwd'] = "root";
 $config['dbms']['localhost']['host'] = "localhost";
 $config['dbms']['localhost']['dbname'] = "boxomnia";
 
-$HOME_ELEMENTS_PATH = 'pages/index.php';
-//$EXPLORE_ELEMENTS_PATH = "explore/";
 
 return [
     'user' => 'localhost',

@@ -1,14 +1,30 @@
 let slideIndex = 0;
-showSlides();
 
-function showSlides() {
-	let i;
-	let slides = document.getElementsByClassName("mySlides");
-	for (i = 0; i < slides.length; i++) {
-		slides[i].style.display = "none";
+// 1) mostro subito
+showOne(slideIndex);
+
+// 2) avvio il ciclo automatico con delay
+setTimeout(nextSlide, 10000);
+
+function nextSlide() {
+	// nascondo l’attuale
+	showOne(slideIndex, true);
+
+	// incremento e “avvolgo”
+	slideIndex = (slideIndex + 1) % document.getElementsByClassName("mySlides").length;
+
+	// mostro la nuova
+	showOne(slideIndex);
+
+	// richiamo dopo 10 s
+	setTimeout(nextSlide, 10000);
+}
+
+// helper: mostra solo slides[i], opzionalmente nasconde tutte prima
+function showOne(i, hideAll = false) {
+	const slides = document.getElementsByClassName("mySlides");
+	if (hideAll) {
+		for (let s of slides) s.style.display = 'none';
 	}
-	slideIndex++;
-	if (slideIndex > slides.length) {slideIndex = 1}
-	slides[slideIndex-1].style.display = "block";
-	setTimeout(showSlides, 2000); // Change image every 2 seconds
-} 
+	slides[i].style.display = 'block';
+}

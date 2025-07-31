@@ -1,16 +1,29 @@
 * {box-sizing:border-box}
 
-/* Slideshow container */
 .slideshow-container {
-    max-width: 1000px;
+    width: 1855px;
+    height: 618px;
     position: relative;
-    margin: auto;
+    overflow: hidden;
+    margin: 0 auto;      /* centra orizzontalmente */
 }
 
-/* Hide the images by default */
 .mySlides {
-    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;       /* di default nascoste */
 }
+
+.mySlides img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;   /* copre tutto senza deformare */
+}
+
+
 
 /* Next & previous buttons */
 .prev, .next {
@@ -73,15 +86,4 @@
 
 .active, .dot:hover {
     background-color: #717171;
-}
-
-/* Fading animation */
-.fade {
-    animation-name: fade;
-    animation-duration: 1.5s;
-}
-
-@keyframes fade {
-    from {opacity: .4}
-    to {opacity: 1}
 }
