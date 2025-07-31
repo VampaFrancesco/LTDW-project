@@ -10,17 +10,15 @@ require_once __DIR__ . '/../include/config.inc.php';
     <title>Box Omnia</title>
 
     <!-- CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="/LTDW-project/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     <link rel="icon"       href="../images/favicon.ico" type="image/gif"/>
     <link rel="stylesheet" href="/LTDW-project/css/style.css">
-    <link rel="stylesheet" href="/LTDW-project/css/navbar.css">
-    <link rel="stylesheet" href="/LTDW-project/css/slider.css">
-    <link rel="stylesheet" href="/LTDW-project/css/login.css">
-    <link rel="stylesheet" href="/LTDW-project/css/register.css">
-    <link rel="stylesheet" href="/LTDW-project/css/collezione.css">
 
 </head>
 <?php if (empty($hideNav)): ?>

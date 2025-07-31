@@ -82,7 +82,7 @@ $game_types = [
                 </div>
             </div>
 
-            <div class="card-category-section mb-5" id="pokemon-collection">
+            <div class="card-category-section" id="pokemon-collection">
                 <h2 class="category-title mb-4">Collezione Pokémon</h2>
                 <div class="row card-grid">
                     <?php

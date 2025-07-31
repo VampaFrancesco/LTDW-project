@@ -42,11 +42,19 @@ h6 {
     font-weight: normal;
     position: relative;
     padding: 0 0 10px 0;
-    font-weight: normal;
     line-height: normal;
     color: #111111;
-    margin: 0
+    margin: 0;
+    @font-face {
+        font-family: 'Bebas Neue';
+        src: url('/fonts/BebasNeue-Regular.ttf') format('ttf'),
+        url('/fonts/BebasNeue-Regular.ttf') format('ttf');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap; /* Per una migliore performance */
+    }
 }
+
 
 h1 {
     font-size: 24px
@@ -87,7 +95,7 @@ h4 a,
 h5 a,
 h6 a {
     color: #212121;
-    text-decoration: none!important;
+    text-decoration: none !important;
     opacity: 1
 }
 
@@ -117,20 +125,12 @@ a {
 }
 
 a,
-.btn {
-    text-decoration: none !important;
-    outline: none !important;
-    -webkit-transition: all .3s ease-in-out;
-    -moz-transition: all .3s ease-in-out;
-    -ms-transition: all .3s ease-in-out;
-    -o-transition: all .3s ease-in-out;
-    transition: all .3s ease-in-out;
-}
 
 img {
     max-width: 100%;
     height: auto;
 }
+
 /* ------------------------------------------------------------------
    HEADER-TOP: logo a sinistra, ricerca al centro, top-links a destra
 ------------------------------------------------------------------ */
@@ -159,7 +159,7 @@ img {
     line-height: 50px;
     border-radius: 10px;
     border: 0;
-    padding: 0 1rem;      /* allinea con il px-3 di bootstrap (1rem) */
+    padding: 0 1rem; /* allinea con il px-3 di bootstrap (1rem) */
 }
 
 .header-top .form-inline .form-control {
@@ -195,13 +195,6 @@ img {
     padding-bottom: 0 !important;
 }
 
-.btn-custom {
-    margin-top: 20px;
-    background-color: transparent !important;
-    border: 2px solid #ddd;
-    padding: 12px 40px;
-    font-size: 16px;
-}
 
 .lead {
     font-size: 18px;
@@ -220,9 +213,6 @@ img {
     border: none !important;
 }
 
-.badge {
-    font-weight: 500;
-}
 
 blockquote {
     margin: 20px 0 20px;
@@ -261,35 +251,6 @@ button {
     padding: 10px 0px;
 }
 
-.custom_menu {
-    width: 100%;
-    margin: 0 auto;
-    text-align: center;
-}
-
-.custom_menu ul {
-    margin: 0px;
-    padding: 0px;
-    display: inline-block;
-}
-
-.custom_menu li {
-    float: left;
-    font-size: 16px;
-    color: #f1f1f1;
-    padding: 6px 10px 0 10px;
-}
-
-.custom_menu li a {
-    color: #f1f1f1;
-}
-
-.custom_menu li a:hover {
-    color: #f26522;
-}
-
-
-/* header top section end */
 
 
 /* logo section start */
@@ -299,28 +260,7 @@ button {
     float: left;
 }
 
-.logo {
-    width: 100%;
-    float: left;
-    text-align: center;
-    padding: 30px 0px;
-}
-
-
 /* logo section end */
-
-
-/* header section start */
-
-.header_section {
-    width: 100%;
-    display: flex;
-}
-
-.containt_main {
-    display: flex;
-}
-
 
 /* opennav bar start */
 
@@ -346,22 +286,14 @@ button {
     transition: 0.3s;
 }
 
-.sidenav a:hover {
-    color: #f26522;
-}
 
-.sidenav .closebtn {
-    position: absolute;
-    top: 0;
-    right: 25px;
-    font-size: 36px;
-    margin-left: 50px;
-}
+
 
 @media screen and (max-height: 450px) {
     .sidenav {
         padding-top: 15px;
     }
+
     .sidenav a {
         font-size: 18px;
     }
@@ -378,37 +310,6 @@ button {
     display: flex;
 }
 
-.dropdown,
-.dropleft,
-.dropright,
-.dropup {
-    position: relative;
-    margin: 0 auto;
-    text-align: center;
-    display: inline-block;
-    margin-left: 30px;
-    order: 2;
-}
-
-.btn-secondary {
-    color: #fff;
-    background-color: #30302e;
-    border-color: #30302e;
-}
-
-.btn-secondary:hover {
-    color: #fff;
-    background-color: #30302e;
-    border-color: #30302e;
-}
-
-.show>.btn-secondary.dropdown-toggle:focus {
-    box-shadow: none;
-}
-
-
-/* opennav bar end */
-
 
 /* Styles for wrapping the search box start */
 
@@ -418,8 +319,6 @@ button {
     display: inline-block;
     order: 2;
 }
-
-
 
 
 /* Bootstrap 4 text input with search icon */
@@ -502,24 +401,6 @@ a:hover {
 
 /* header section end */
 
-
-/* banner section start */
-
-.banner_section {
-    width: 100%;
-    float: left;
-    padding-bottom: 60px;
-}
-
-.banner_taital {
-    width: 100%;
-    font-size: 60px;
-    color: #ffffff;
-    text-align: center;
-    text-transform: uppercase;
-    font-weight: bold;
-}
-
 .buynow_bt {
     width: 170px;
     margin: 0 auto;
@@ -544,67 +425,9 @@ a:hover {
     color: #ffffff;
 }
 
-#my_slider a.carousel-control-next {
-    right: 0px;
-    top: 40px;
-}
-
-#my_slider a.carousel-control-prev {
-    left: 0px;
-    top: 40px;
-}
-
-#my_slider .carousel-control-next,
-#my_slider .carousel-control-prev {
-    width: 45px;
-    height: 45px;
-    background: rgb(242, 222, 172, 0.80);
-    opacity: 1;
-    font-size: 20px;
-    color: #000;
-    border-radius: 100px;
-}
-
-#my_slider .carousel-control-next:focus,
-#my_slider .carousel-control-next:hover,
-#my_slider .carousel-control-prev:focus,
-#my_slider .carousel-control-prev:hover {
-    color: #fff;
-}
-
 
 /* banner section end */
 
-
-/* fashion section start */
-
-.fashion_section {
-    width: 100%;
-    float: left;
-    padding-bottom: 150px;
-}
-
-.fashion_taital {
-    width: 100%;
-    font-size: 40px;
-    color: #30302e;
-    text-align: center;
-    font-weight: bold;
-}
-
-.fashion_section_2 {
-    width: 100%;
-    margin-top: 30px;
-}
-
-.box_main {
-    width: 100%;
-    background-color: #ffffff;
-    height: auto;
-    padding: 20px;
-    box-shadow: 0px 0 30px 10px #f0f0f0;
-    margin-bottom: 20px;
-}
 
 .shirt_text {
     width: 100%;
@@ -630,30 +453,6 @@ a:hover {
     min-height: 370px;
 }
 
-.btn_main {
-    width: 100%;
-    display: flex;
-}
-
-.buy_bt {
-    float: left;
-    width: 100%;
-}
-
-.buy_bt a {
-    width: 100%;
-    font-size: 16px;
-    color: #f26522;
-    background-color: transparent;
-    text-align: right;
-    font-weight: bold;
-}
-
-.buy_bt a:hover {
-    background-color: transparent;
-    color: #262626;
-}
-
 .seemore_bt {
     width: 100%;
     float: right;
@@ -673,122 +472,11 @@ a:hover {
     color: #f26522;
 }
 
-#main_slider a.carousel-control-next {
-    right: 615px;
-    top: 105%;
-}
 
 #main_slider a.carousel-control-prev {
     left: 615px;
     top: 105%;
 }
-
-#main_slider .carousel-control-next,
-#main_slider .carousel-control-prev {
-    width: 55px;
-    height: 55px;
-    background-color: #30302e;
-    opacity: 1;
-    font-size: 30px;
-    color: #ffffff;
-}
-
-#main_slider .carousel-control-next:focus,
-#main_slider .carousel-control-next:hover,
-#main_slider .carousel-control-prev:focus,
-#main_slider .carousel-control-prev:hover {
-    color: #fff;
-    background-color: #f26522;
-}
-
-
-/* fashion section end */
-
-
-/* electronic section start */
-
-.electronic_img {
-    width: 100%;
-    text-align: center;
-    margin: 50px 0px;
-    min-height: 293px;
-}
-
-#electronic_main_slider a.carousel-control-next {
-    right: 615px;
-    top: 105%;
-}
-
-#electronic_main_slider a.carousel-control-prev {
-    left: 615px;
-    top: 105%;
-}
-
-#electronic_main_slider .carousel-control-next,
-#electronic_main_slider .carousel-control-prev {
-    width: 55px;
-    height: 55px;
-    background-color: #30302e;
-    opacity: 1;
-    font-size: 30px;
-    color: #ffffff;
-}
-
-#electronic_main_slider .carousel-control-next:focus,
-#electronic_main_slider .carousel-control-next:hover,
-#electronic_main_slider .carousel-control-prev:focus,
-#electronic_main_slider .carousel-control-prev:hover {
-    color: #fff;
-    background-color: #f26522;
-}
-
-
-/* electronic section end */
-
-
-/* jewellery section start */
-
-.jewellery_section {
-    width: 100%;
-    float: left;
-    padding-bottom: 50px;
-}
-
-.jewellery_img {
-    width: 100%;
-    text-align: center;
-    margin: 50px 0px;
-    min-height: 293px;
-}
-
-#jewellery_main_slider a.carousel-control-next {
-    right: 615px;
-    top: 75%;
-}
-
-#jewellery_main_slider a.carousel-control-prev {
-    left: 615px;
-    top: 75%;
-}
-
-#jewellery_main_slider .carousel-control-next,
-#jewellery_main_slider .carousel-control-prev {
-    width: 55px;
-    height: 55px;
-    background-color: #30302e;
-    opacity: 1;
-    font-size: 30px;
-    color: #ffffff;
-}
-
-#jewellery_main_slider .carousel-control-next:focus,
-#jewellery_main_slider .carousel-control-next:hover,
-#jewellery_main_slider .carousel-control-prev:focus,
-#jewellery_main_slider .carousel-control-prev:hover {
-    color: #fff;
-    background-color: #f26522;
-}
-
 
 /* loader bar css start */
 
@@ -830,25 +518,6 @@ a:hover {
     }
 }
 
-
-/* loader bar css end */
-
-
-/* jewellery section end */
-
-
-/* footer section start */
-
-
-/* footer section start */
-
-.footer_section {
-    width: 100%;
-    float: left;
-    background-color: #252525;
-    height: auto;
-}
-
 .footer_logo {
     width: 100%;
     text-align: center;
@@ -877,26 +546,6 @@ input.mail_bt::placeholder {
     color: #fff;
 }
 
-.subscribe_bt {
-    width: 30%;
-    float: right;
-    font-size: 16px;
-    color: #f26522;
-    background-color: transparent;
-    padding: 20px 0px 5px 0px;
-    border-radius: 30px;
-    border: 0px;
-    text-transform: uppercase;
-    text-align: right;
-}
-
-.subscribe_bt a {
-    color: #f26522;
-}
-
-.subscribe_bt a:hover {
-    color: #ffffff;
-}
 
 .footer_menu {
     width: 100%;
@@ -948,53 +597,27 @@ input.mail_bt::placeholder {
 }
 
 
-/* footer section end */
-
-
-/* copyright section start */
-
-.copyright_section {
-    width: 100%;
-    float: left;
-    background-color: #252525;
-    height: auto;
-}
-
-.copyright_text {
-    width: 100%;
-    float: left;
-    color: #ffffff;
-    text-align: center;
-    font-size: 16px;
-    margin: 20px 0px;
-}
-
-.copyright_text a {
-    color: #ffffff;
-}
-
-.copyright_text a:hover {
-    color: #f26522;
-}
 
 .margin_top90 {
     margin-top: 90px;
 }
 
-.background-custom{
+.background-custom {
     padding-top: 1.5rem !important;
     background-image: url('../images/sfondo2.jpg');
     background-size: cover;
     background-repeat: repeat;
     background-position: center;
 }
-.header .background-custom{
+
+.header .background-custom {
     padding-top: 1.5rem !important;
     background-image: url('../images/sfondo2.jpg');
     background-size: cover;
     background-repeat: repeat;
     background-position: center;
 }
+
 /* Overlay per migliorare la leggibilità (opzionale) */
 .background-custom::before {
     content: '';
@@ -1011,4 +634,594 @@ input.mail_bt::placeholder {
     padding: 2rem;
     border-radius: 8px;
 }
-/* copyright section end */
+
+
+
+/*  COLLEZIONE CSS*/
+/* Stili specifici per la pagina della collezione */
+
+.collection-page .fashion_taital {
+    margin-top: 30px;
+    font-size: 38px;
+    color: #30302e; /* Dal tuo stile.css per h1 */
+}
+
+/* Sezione Filtro per Rarità */
+.rarity-filter-section {
+    background-color: #f8f8f8; /* Un grigio chiaro per lo sfondo del filtro */
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05); /* Ombra leggera */
+    text-align: center;
+}
+
+.rarity-filter-section .filter-title {
+    font-size: 22px;
+    color: #30302e; /* Riprende il colore dei titoli */
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.rarity-filter-section .filter-buttons-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.rarity-filter-section .btn-filter {
+    background-color: #e0e0e0; /* Un grigio neutro per i bottoni inattivi */
+    color: #555; /* Testo grigio per i bottoni inattivi */
+    border: 1px solid #ccc;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+.rarity-filter-section .btn-filter:hover {
+    background-color: #d0d0d0; /* Grigio leggermente più scuro al hover */
+    color: #333; /* Testo più scuro al hover */
+}
+
+.rarity-filter-section .btn-filter.active {
+    background-color: #f26522; /* Colore d'accento dal tuo style.css */
+    color: #ffffff; /* Testo bianco sui bottoni attivi */
+    border-color: #f26522; /* Bordo dello stesso colore d'accento */
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(242, 101, 34, 0.3); /* Ombra con colore d'accento */
+}
+
+/* Sezione Categorie Carte (Yu-Gi-Oh, Pokémon) */
+.card-category-section .category-title {
+    font-size: 30px;
+    color: #30302e; /* Riprende il colore dei titoli */
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 2px solid #f26522; /* Linea d'accento sotto il titolo della categoria */
+    padding-bottom: 10px;
+    margin-top: 40px;
+}
+
+.card-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-top: 30px;
+}
+
+.card-item {
+    display: block;
+    animation: fadeIn 0.5s ease-out;
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Stile per il singolo contenitore della carta */
+.card-box {
+    background-color: #ffffff; /* Sfondo bianco per le card */
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Ombra delle card */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15); /* Ombra più pronunciata al hover */
+}
+
+.card-image-container {
+    width: 100%;
+    max-height: 200px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.card-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.card-info {
+    flex-grow: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #30302e; /* Colore scuro per il nome della carta */
+    margin-bottom: 8px;
+    line-height: 1.3;
+}
+
+.card-description {
+    font-size: 14px;
+    color: #666666; /* Colore testo generale dal tuo style.css */
+    margin: 0 0 10px 0;
+    flex-grow: 1;
+}
+
+.card-number {
+    font-size: 13px;
+    color: #888; /* Grigio chiaro per il numero */
+    margin-top: 5px;
+    font-weight: 500;
+}
+
+/* Stili per le carte non ottenute */
+.card-box.not-obtained {
+    background-color: #f2f2f2; /* Sfondo grigio più chiaro per le carte non ottenute */
+    border: 1px dashed #ccc; /* Bordo tratteggiato */
+    color: #aaa; /* Colore testo per non ottenute */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 280px;
+}
+
+.card-box.not-obtained .card-empty {
+    text-align: center;
+}
+
+.card-box.not-obtained .card-empty i {
+    font-size: 60px;
+    color: #bbb; /* Colore icona per non ottenute */
+    margin-bottom: 15px;
+}
+
+.card-box.not-obtained .card-empty p {
+    font-size: 18px;
+    font-weight: bold;
+    color: #999; /* Colore testo per non ottenute */
+    margin: 0;
+}
+
+/* Stili per le immagini all'interno delle card */
+.card-box .card-img-top {
+    width: 100%; /* L'immagine occupa tutta la larghezza disponibile */
+    height: auto; /* L'altezza si adatta per mantenere le proporzioni */
+    max-height: 200px; /* Limita l'altezza massima per uniformità */
+    object-fit: contain; /* L'intera immagine sarà contenuta nel box senza tagli */
+    margin-bottom: 10px; /* Spazio sotto l'immagine e sopra il testo */
+    border-radius: 5px; /* Angoli leggermente arrotondati per l'immagine */
+}
+
+/* Stile per le immagini delle carte non ottenute (grigie) */
+.card-box.not-obtained .card-img-top.greyed-out {
+    filter: grayscale(100%) brightness(70%); /* Rende l'immagine in bianco e nero e più scura */
+    opacity: 0.7; /* Rende l'immagine leggermente trasparente */
+}
+
+/* Stile per il contenuto della card quando la carta non è ottenuta */
+.card-box.not-obtained .card-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px; /* Assicura un'altezza minima per le card senza immagine o icona */
+    padding: 15px; /* Un po' di padding interno */
+    text-align: center;
+}
+
+.card-box.not-obtained .card-empty i {
+    font-size: 3em; /* Icona più grande */
+    color: #6c757d; /* Colore grigio per l'icona */
+    margin-bottom: 10px;
+}
+
+
+/* LOGIN CSS*/
+
+/*---------------------------------------------------------------------
+Login Page Styles
+---------------------------------------------------------------------*/
+
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 80px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+}
+
+.login-container h2 {
+    font-size: 28px;
+    font-weight: bold;
+    color: #30302e;
+    margin-bottom: 30px;
+}
+
+.login-container .form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.login-container label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.login-container input[type="email"],
+.login-container input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    background-color: #f9f9f9;
+    transition: border 0.3s ease;
+}
+
+.login-container input[type="email"]:focus,
+.login-container input[type="password"]:focus {
+    border-color: #ED308C;
+    outline: none;
+}
+
+.login-container .btn {
+    width: 100%;
+    background-color: #ED308C;
+    color: #ffffff;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-container .btn:hover {
+    background-color: #24B1D9;
+    color: #30302e;
+}
+
+.login-container p {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666666;
+}
+
+.login-container p a {
+    color: #24B1D9;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.login-container p a:hover {
+    text-decoration: underline;
+}
+
+/* REGISTER */
+
+/*---------------------------------------------------------------------
+Registration Page Styles
+---------------------------------------------------------------------*/
+
+.register-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 80px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+}
+
+.register-container h2 {
+    font-size: 28px;
+    font-weight: bold;
+    color: #30302e;
+    margin-bottom: 30px;
+}
+
+.register-container .form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.register-container label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.register-container input[type="text"],
+.register-container input[type="email"],
+.register-container input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    background-color: #f9f9f9;
+    transition: border 0.3s ease;
+}
+
+.register-container input[type="text"]:focus,
+.register-container input[type="email"]:focus,
+.register-container input[type="password"]:focus {
+    border-color: #ED308C;
+    outline: none;
+}
+
+/* If you add a submit button with class="btn", it will pick up these styles */
+.register-container .btn,
+.register-container input[type="submit"] {
+    width: 100%;
+    background-color: #ED308C;
+    color: #ffffff;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.register-container .btn:hover,
+.register-container input[type="submit"]:hover {
+    background-color: #24B1D9;
+    color: #30302e;
+}
+
+.register-container p {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666666;
+}
+
+.register-container p a {
+    color: #24B1D9;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.register-container p a:hover {
+    text-decoration: underline;
+}
+
+.register-container .btn-primary {
+    width: 100%;
+    background-color: #ED308C;
+    color: #ffffff;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.register-container .btn-primary:hover {
+    background-color: #24B1D9;
+    color: #30302e;
+
+}
+
+/* SLIDER CSS */
+
+* {box-sizing:border-box}
+
+.slideshow-container {
+    width: 100%;
+    height: 0;
+    padding-bottom: 33.33%; /* 618/1855 = 0.3333 (mantiene aspect ratio 1855x618) */
+    position: relative;
+    overflow: hidden;
+    margin: 0;
+}
+
+.mySlides {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+.mySlides.active {
+    display: block;
+    opacity: 1;
+}
+
+.mySlides img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Navigation buttons */
+.prev, .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    padding: 16px;
+    color: white;
+    font-weight: bold;
+    font-size: 24px;
+    transition: 0.3s ease;
+    background-color: rgba(0,0,0,0.5);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.prev {
+    left: 20px;
+}
+
+.next {
+    right: 20px;
+}
+
+.prev:hover, .next:hover {
+    background-color: rgba(0,0,0,0.8);
+}
+
+/* Caption text */
+.text {
+    color: #f2f2f2;
+    font-size: clamp(14px, 2vw, 20px); /* Testo responsive */
+    padding: 10px 15px;
+    position: absolute;
+    bottom: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0,0,0,0.7);
+    border-radius: 5px;
+    max-width: 90%;
+    text-align: center;
+}
+
+/* Number text */
+.numbertext {
+    color: #f2f2f2;
+    font-size: clamp(12px, 1.5vw, 16px); /* Testo responsive */
+    padding: 8px 12px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: rgba(0,0,0,0.5);
+    border-radius: 5px;
+}
+
+/* Dots navigation */
+.dots-container {
+    position: absolute;
+    bottom: 3%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+.dot {
+    cursor: pointer;
+    height: clamp(10px, 1.5vw, 15px); /* Dots responsive */
+    width: clamp(10px, 1.5vw, 15px);
+    margin: 0 5px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
+
+.dot.active, .dot:hover {
+    background-color: #717171;
+    transform: scale(1.2);
+}
+
+/* NAVBAR CSS */
+
+/* ------------------------------------------------------------------
+   BOXOMNIA: NUOVA NAVBAR ORIZZONTALE
+------------------------------------------------------------------ */
+
+.navbar-custom {
+    background: linear-gradient(90deg, #ED308C 0%, #24B1D9 100%);
+    padding: 0.75rem 1rem;
+}
+
+.nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.nav-item {
+    margin: 0 1rem;
+}
+
+.nav-item a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    font-family: inherit;
+    color: #ffffff;
+    font-size: 0.875rem;
+    transition: transform 0.2s;
+}
+
+.nav-item a i {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+/* Hover effect */
+.nav-item a:hover {
+    transform: translateY(-2px);
+}
+
+.nav-item a:hover span {
+    text-decoration: underline;
+}
