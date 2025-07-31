@@ -1,4 +1,5 @@
 <?php
+// include/config.inc.php
 
 $config['dbms']['localhost']['user'] = "root";
 $config['dbms']['localhost']['passwd'] = "root";
@@ -7,8 +8,10 @@ $config['dbms']['localhost']['dbname'] = "boxomnia";
 
 
 return [
-    'user' => 'localhost',
+    'user' => 'root',        
     'passwd' => 'root',
-    'host' => 'root',
+    'host' => 'localhost',
     'dbname' => 'boxomnia',
 ];
+
+?>
