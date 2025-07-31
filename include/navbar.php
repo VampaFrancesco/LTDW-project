@@ -19,5 +19,8 @@
         <li class="nav-item">
             <a href="/box-break"><i class="bi bi-box2"></i><span>Box Break</span></a>
         </li>
+        <li class="nav-item">
+            <a href="/LTDW-project/pages/collezione.php"><i class="bi bi-collection-fill"></i><span>Collezioni</span></a>
+        </li>
         </ul>
 </nav>
