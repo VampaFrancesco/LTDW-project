@@ -154,7 +154,6 @@ img {
 
 /* logo-link (l’<a> che contiene #logo_header) */
 .header-top .logo-link {
-    order: 1;
     /* spazio tra logo e form */
     margin-right: 1rem;
 }
@@ -189,7 +188,6 @@ img {
 
 /* top-links a destra */
 .header-top .top-links {
-    order: 3;
     display: flex;
     align-items: center;
     /* spazio dalla form */

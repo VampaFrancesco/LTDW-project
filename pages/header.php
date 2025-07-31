@@ -18,7 +18,7 @@ require_once __DIR__ . '/../include/config.inc.php';
     <link rel="icon" href="../images/favicon.ico" type="image/gif"/>
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/navbar.css">
-<!--    <link rel="stylesheet" href="../css/carousel.css">-->
+    <link rel="stylesheet" href="../css/slider.css">
 </head>
 <body>
 <?php if (empty($hideNav)): ?>
@@ -30,6 +30,8 @@ require_once __DIR__ . '/../include/config.inc.php';
                 <a href="index.php" class="logo-link mr-3">
                     <img id="logo_header" src="../images/boxomnia.png" alt="logo">
                 </a>
+
+                <!-- 2) Search bar -->
                 <div class="flex-fill px-3">
                     <form class="form-inline w-100" method="get" action="search.php">
                         <input class="form-control mr-2 flex-grow-1" type="search" name="q" placeholder="Cerca..."
@@ -39,6 +41,7 @@ require_once __DIR__ . '/../include/config.inc.php';
                         </button>
                     </form>
                 </div>
+
                 <!-- 3) Top-links a destra -->
                 <div class="top-links d-flex align-items-center ml-3">
                     <i class="bi bi-person-fill"></i>

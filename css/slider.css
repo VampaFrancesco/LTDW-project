@@ -1,0 +1,45 @@
+.simple-slider {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.simple-slider .slides {
+    display: flex;
+    transition: transform 0.5s ease;
+}
+
+.simple-slider .slide {
+    min-width: 100%;
+    box-sizing: border-box;
+}
+
+.simple-slider .slide img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* Pulsanti */
+.simple-slider .slider-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.4);
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 1.5rem;
+    z-index: 10;
+    border-radius: 4px;
+}
+.simple-slider .slider-button:hover {
+    background: rgba(0,0,0,0.6);
+}
+.simple-slider .slider-button.prev {
+    left: 1rem;
+}
+.simple-slider .slider-button.next {
+    right: 1rem;
+}
