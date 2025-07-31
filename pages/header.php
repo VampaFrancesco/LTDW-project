@@ -19,6 +19,8 @@ require_once __DIR__ . '/../include/config.inc.php';
     <link rel="stylesheet" href="/LTDW-project/css/style.css">
     <link rel="stylesheet" href="/LTDW-project/css/navbar.css">
     <link rel="stylesheet" href="/LTDW-project/css/slider.css">
+    <link rel="stylesheet" href="/LTDW-project/css/login.css">
+    <link rel="stylesheet" href="/LTDW-project/css/register.css">
 </head>
 <body>
 <?php if (empty($hideNav)): ?>
@@ -27,7 +29,7 @@ require_once __DIR__ . '/../include/config.inc.php';
             <div class="container d-flex align-items-center">
 
                 <!-- 1) Logo a sinistra -->
-                <a href="index.php" class="logo-link mr-3">
+                <a href="/LTDW-project/pages/index.php" class="logo-link mr-3">
                     <img id="logo_header" src="/LTDW-project/images/boxomnia.png" alt="logo">
                 </a>
 
@@ -45,7 +47,7 @@ require_once __DIR__ . '/../include/config.inc.php';
                 <!-- 3) Top-links a destra -->
                 <div class="top-links d-flex align-items-center ml-3">
                     <i class="bi bi-person-fill"></i>
-                    <a href="#" class="mx-2">ACCOUNT</a>
+                    <a href="/LTDW-project/pages/auth/login.php" class="mx-2">ACCOUNT</a>
                     <a href="#" class="mx-2"><i class="bi bi-gift-fill"></i></a>
                     <a href="#" class="mx-2"><i class="bi bi-heart-fill"></i></a>
                     <a href="cart.php" class="mx-2"><i class="bi bi-cart-fill"></i></a>

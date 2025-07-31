@@ -1,6 +1,6 @@
 <?php
 // pages/auth/login.php
-
+$hideNav = false;
 include __DIR__ . '/../header.php';
 
 // Cattura l'array di configurazione restituito da config.inc.php
