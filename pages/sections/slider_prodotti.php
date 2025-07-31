@@ -1,37 +1,33 @@
-<?php
-?>
-
 <div class="slideshow-container">
-
-    <!-- Full-width images with number and caption text -->
+    <!-- Slide 1 -->
     <div class="mySlides fade">
         <div class="numbertext">1 / 3</div>
-        <img src="/LTDW-project/images/yugioh.png" alt="Box Omnia"">
-        <div class="text">Caption Text</div>
+        <img src="/LTDW-project/images/yugioh.png" alt="Yu-Gi-Oh! Collection">
+        <div class="text">Esplora la collezione Yu-Gi-Oh!</div>
     </div>
 
+    <!-- Slide 2 -->
     <div class="mySlides fade">
         <div class="numbertext">2 / 3</div>
-        <img src="/LTDW-project/images/pokemon.png" alt="Box Omnia"">
-
-        <div class="text">Caption Two</div>
+        <img src="/LTDW-project/images/pokemon.png" alt="Pokemon Collection">
+        <div class="text">Scopri le carte Pokemon più rare</div>
     </div>
 
+    <!-- Slide 3 -->
     <div class="mySlides fade">
         <div class="numbertext">3 / 3</div>
-        <img src="/LTDW-project/images/boxomnia.png" alt="Box Omnia"">
-        <div class="text">Caption Three</div>
+        <img src="/LTDW-project/images/boxomnia.png" alt="Box Omnia">
+        <div class="text">Box Omnia - La collezione completa</div>
     </div>
 
-    <!-- Next and previous buttons -->
-    <a href="#" class="prev" onclick="plusSlides(-1)">&#10094;</a>
-    <a href="#" class="next" onclick="plusSlides(1)">&#10095;</a>
-</div>
-<br>
+    <!-- Navigation buttons -->
+    <a class="prev">&#10094;</a>
+    <a class="next">&#10095;</a>
 
-<!-- The dots/circles -->
-<div style="text-align:center">
-    <span class="dot" onclick="currentSlide(1)"></span>
-    <span class="dot" onclick="currentSlide(2)"></span>
-    <span class="dot" onclick="currentSlide(3)"></span>
+    <!-- Dots navigation -->
+    <div class="dots-container">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+    </div>
 </div>

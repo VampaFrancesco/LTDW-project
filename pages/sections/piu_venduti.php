@@ -1,10 +1,10 @@
 <?php
 $pdo = new PDO('mysql:host=localhost;dbname=boxomnia', 'root', 'root');
-$stmt = $pdo->prepare("SELECT * FROM prodotto ORDER BY id DESC LIMIT 6");
+$stmt = $pdo->prepare("SELECT * FROM mystery_box ORDER BY id_box DESC LIMIT 6");
 $stmt->execute();
 $best = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
-<section class="mb-5">
+<section class="section">
     <h2>Più Venduti</h2>
     <div class="row">
         <?php foreach ($best as $p): ?>
@@ -12,6 +12,7 @@ $best = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="card h-100">
                     <img src="../uploads/<?= htmlspecialchars($p['immagine']); ?>" class="card-img-top" alt="<?= htmlspecialchars($p['nome']); ?>">
                     <div class="card-body">
+                        <img src="/LTDW-project/images/prod_yugioh.png" alt="box yugioh">
                         <h5 class="card-title"><?= htmlspecialchars($p['nome']); ?></h5>
                         <p class="card-text">€ <?= number_format($p['prezzo'], 2, ',', '.'); ?></p>
                     </div>

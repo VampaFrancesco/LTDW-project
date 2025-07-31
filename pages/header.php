@@ -3,28 +3,27 @@ session_start();
 require_once __DIR__ . '/../include/config.inc.php';
 ?>
 <!DOCTYPE html>
-<html lang="it">
+<html lang="it" class="html">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Box Omnia</title>
-    <!-- CSS -->
-    <link rel="stylesheet" href="/LTDW-project/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-    <link rel="icon" href="../images/favicon.ico" type="image/gif"/>
+    <!-- CSS -->
+
+    <link rel="stylesheet" href="/LTDW-project/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <link rel="icon"       href="../images/favicon.ico" type="image/gif"/>
     <link rel="stylesheet" href="/LTDW-project/css/style.css">
     <link rel="stylesheet" href="/LTDW-project/css/navbar.css">
     <link rel="stylesheet" href="/LTDW-project/css/slider.css">
     <link rel="stylesheet" href="/LTDW-project/css/login.css">
     <link rel="stylesheet" href="/LTDW-project/css/register.css">
 </head>
-<body>
 <?php if (empty($hideNav)): ?>
     <header>
-        <div class="header-top bg-light py-2">
+        <div class="header-top bg-light py-2 background-custom">
             <div class="container d-flex align-items-center">
 
                 <!-- 1) Logo a sinistra -->

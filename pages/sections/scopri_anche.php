@@ -1,10 +1,10 @@
 <?php
 $pdo = new PDO('mysql:host=localhost;dbname=boxomnia', 'root', 'root');
-$stmt = $pdo->prepare("SELECT * FROM prodotto ORDER BY id LIMIT 6");
+$stmt = $pdo->prepare("SELECT * FROM mystery_box ORDER BY id_box LIMIT 6");
 $stmt->execute();
 $others = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
-<section class="mb-5">
+<section class="section">
     <h2>Scopri Anche</h2>
     <div class="row">
         <?php foreach ($others as $p): ?>
