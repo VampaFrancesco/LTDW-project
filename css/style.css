@@ -983,14 +983,14 @@ input.mail_bt::placeholder {
 
 .background-custom{
     padding-top: 1.5rem !important;
-    background-image: url('../images/sfondo2.jpg'); !important;
+    background-image: url('../images/sfondo2.jpg');
     background-size: cover;
     background-repeat: repeat;
     background-position: center;
 }
 .header .background-custom{
     padding-top: 1.5rem !important;
-    background-image: url('../images/sfondo2.jpg'); !important;
+    background-image: url('../images/sfondo2.jpg');
     background-size: cover;
     background-repeat: repeat;
     background-position: center;

@@ -20,6 +20,8 @@ require_once __DIR__ . '/../include/config.inc.php';
     <link rel="stylesheet" href="/LTDW-project/css/slider.css">
     <link rel="stylesheet" href="/LTDW-project/css/login.css">
     <link rel="stylesheet" href="/LTDW-project/css/register.css">
+    <link rel="stylesheet" href="/LTDW-project/css/collezione.css">
+
 </head>
 <?php if (empty($hideNav)): ?>
     <header>

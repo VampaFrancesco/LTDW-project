@@ -1,0 +1,150 @@
+<?php
+// pages/collection.php
+
+// Includi l'header (che include BASE_URL e la navbar)
+include __DIR__ . '/header.php';
+
+// Array delle rarità aggiornato
+$rarities = [
+    'Comune',
+    'Rara',
+    'Super Rara',
+    'Epica',
+    'Mitica',
+    'Leggendaria'
+];
+
+?>
+
+<main class="background-custom">
+    <div>
+        <div class="container">
+            <h1 class="fashion_taital mb-5">La mia Collezione</h1>
+
+            <div class="rarity-filter-section mb-5">
+                <h3 class="filter-title">Filtra per Rarità:</h3>
+                <div class="filter-buttons-container">
+                    <button class="btn btn-filter active" data-rarity="all">Tutte</button>
+                    <?php foreach ($rarities as $rarity): ?>
+                        <button class="btn btn-filter" data-rarity="<?php echo strtolower(str_replace(' ', '-', $rarity)); ?>"><?php echo $rarity; ?></button>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <div class="card-category-section mb-5" id="yu-gi-oh-collection">
+                <h2 class="category-title mb-4">Collezione Yu-Gi-Oh!</h2>
+                <div class="row card-grid">
+                    <?php
+                    // Esempi di 6 carte Yu-Gi-Oh con le nuove rarità
+                    $ygo_cards_data = [
+                        ['id' => 1, 'name' => 'Drago Bianco Occhi Blu', 'description' => 'Un drago leggendario la cui potenza distruttiva è incontenibile.', 'rarity' => 'Leggendaria', 'obtained' => true],
+                        ['id' => 2, 'name' => 'Mago Nero', 'description' => 'Il più grande di tutti i maghi in termini di attacco e difesa.', 'rarity' => 'Mitica', 'obtained' => true],
+                        ['id' => 3, 'name' => 'Kuriboh', 'description' => 'Una piccola creatura pelosa che può proteggerti da grandi danni.', 'rarity' => 'Comune', 'obtained' => true],
+                        ['id' => 4, 'name' => 'Guerriero Bassa Fusione', 'description' => 'Un guerriero che non si è ancora fuso, pronto per il campo.', 'rarity' => 'Rara', 'obtained' => false],
+                        ['id' => 5, 'name' => 'Cavaliere Gaia, il Feroce', 'description' => 'Un cavaliere leggendario che carica in battaglia.', 'rarity' => 'Epica', 'obtained' => true],
+                        ['id' => 6, 'name' => 'Marshmallon', 'description' => 'Una creatura soffice che non può essere distrutta in battaglia.', 'rarity' => 'Super Rara', 'obtained' => false],
+                    ];
+
+                    foreach ($ygo_cards_data as $card):
+                        $rarity_class = strtolower(str_replace(' ', '-', $card['rarity']));
+                        ?>
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-4 card-item <?php echo $rarity_class; ?>" data-game="yu-gi-oh" data-rarity="<?php echo $rarity_class; ?>">
+                            <div class="card-box <?php echo $card['obtained'] ? '' : 'not-obtained'; ?>">
+                                <?php if ($card['obtained']): ?>
+                                    <div class="card-image-container">
+                                        <img src="<?php echo BASE_URL; ?>/images/ygo_card_<?php echo $card['id']; ?>.png" alt="<?php echo $card['name']; ?>" class="img-fluid card-img">
+                                    </div>
+                                    <div class="card-info">
+                                        <h4 class="card-name"><?php echo $card['name']; ?></h4>
+                                        <p class="card-description"><?php echo $card['description']; ?> (Rarità: <?php echo $card['rarity']; ?>)</p>
+                                        <p class="card-number">Numero: YGO-00<?php echo $card['id']; ?></p>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="card-empty">
+                                        <i class="bi bi-question-circle-fill"></i>
+                                        <p>Carta non ottenuta</p>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                    </div>
+            </div>
+
+            <div class="card-category-section mb-5" id="pokemon-collection">
+                <h2 class="category-title mb-4">Collezione Pokémon</h2>
+                <div class="row card-grid">
+                    <?php
+                    // Esempi di 6 carte Pokémon con le nuove rarità
+                    $pk_cards_data = [
+                        ['id' => 1, 'name' => 'Charizard VMAX', 'description' => 'Un Pokémon potentissimo, capace di ardere gli avversari con fiammate incandescenti.', 'rarity' => 'Leggendaria', 'obtained' => true],
+                        ['id' => 2, 'name' => 'Pikachu V', 'description' => 'Il compagno leale di molti Allenatori, con un attacco fulmineo.', 'rarity' => 'Mitica', 'obtained' => true],
+                        ['id' => 3, 'name' => 'Rattata', 'description' => 'Un Pokémon comune che si trova ovunque. Molto adattabile.', 'rarity' => 'Comune', 'obtained' => true],
+                        ['id' => 4, 'name' => 'Snorlax', 'description' => 'Un Pokémon che mangia e dorme molto, bloccando spesso le strade.', 'rarity' => 'Rara', 'obtained' => false],
+                        ['id' => 5, 'name' => 'Mewtwo VSTAR', 'description' => 'Un Pokémon leggendario creato dalla manipolazione genetica.', 'rarity' => 'Epica', 'obtained' => true],
+                        ['id' => 6, 'name' => 'Jigglypuff', 'description' => 'Un Pokémon canterino che fa addormentare chiunque lo ascolti.', 'rarity' => 'Super Rara', 'obtained' => false],
+                    ];
+
+                    foreach ($pk_cards_data as $card):
+                        $rarity_class = strtolower(str_replace(' ', '-', $card['rarity']));
+                        ?>
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-4 card-item <?php echo $rarity_class; ?>" data-game="pokemon" data-rarity="<?php echo $rarity_class; ?>">
+                            <div class="card-box <?php echo $card['obtained'] ? '' : 'not-obtained'; ?>">
+                                <?php if ($card['obtained']): ?>
+                                    <div class="card-image-container">
+                                        <img src="<?php echo BASE_URL; ?>/images/pk_card_<?php echo $card['id']; ?>.png" alt="<?php echo $card['name']; ?>" class="img-fluid card-img">
+                                    </div>
+                                    <div class="card-info">
+                                        <h4 class="card-name"><?php echo $card['name']; ?></h4>
+                                        <p class="card-description"><?php echo $card['description']; ?> (Rarità: <?php echo $card['rarity']; ?>)</p>
+                                        <p class="card-number">Numero: PKM-00<?php echo $card['id']; ?></p>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="card-empty">
+                                        <i class="bi bi-question-circle-fill"></i>
+                                        <p>Carta non ottenuta</p>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                    </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+    <?php include __DIR__ . '/footer.php'; ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.btn-filter');
+    const cardItems = document.querySelectorAll('.card-item');
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Rimuovi la classe 'active' da tutti i bottoni
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            // Aggiungi la classe 'active' al bottone cliccato
+            this.classList.add('active');
+
+            const selectedRarity = this.dataset.rarity;
+
+            cardItems.forEach(card => {
+                const cardRarity = card.dataset.rarity;
+                
+                if (selectedRarity === 'all' || cardRarity === selectedRarity) {
+                    card.style.display = 'block'; // Mostra la carta
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                } else {
+                    card.style.display = 'none'; // Nascondi la carta
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(10px)';
+                }
+            });
+        });
+    });
+});
+</script>
