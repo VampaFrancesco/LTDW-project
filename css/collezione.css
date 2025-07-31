@@ -176,3 +176,36 @@
     color: #999; /* Colore testo per non ottenute */
     margin: 0;
 }
+
+/* Stili per le immagini all'interno delle card */
+.card-box .card-img-top {
+    width: 100%; /* L'immagine occupa tutta la larghezza disponibile */
+    height: auto; /* L'altezza si adatta per mantenere le proporzioni */
+    max-height: 200px; /* Limita l'altezza massima per uniformità */
+    object-fit: contain; /* L'intera immagine sarà contenuta nel box senza tagli */
+    margin-bottom: 10px; /* Spazio sotto l'immagine e sopra il testo */
+    border-radius: 5px; /* Angoli leggermente arrotondati per l'immagine */
+}
+
+/* Stile per le immagini delle carte non ottenute (grigie) */
+.card-box.not-obtained .card-img-top.greyed-out {
+    filter: grayscale(100%) brightness(70%); /* Rende l'immagine in bianco e nero e più scura */
+    opacity: 0.7; /* Rende l'immagine leggermente trasparente */
+}
+
+/* Stile per il contenuto della card quando la carta non è ottenuta */
+.card-box.not-obtained .card-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px; /* Assicura un'altezza minima per le card senza immagine o icona */
+    padding: 15px; /* Un po' di padding interno */
+    text-align: center;
+}
+
+.card-box.not-obtained .card-empty i {
+    font-size: 3em; /* Icona più grande */
+    color: #6c757d; /* Colore grigio per l'icona */
+    margin-bottom: 10px;
+}

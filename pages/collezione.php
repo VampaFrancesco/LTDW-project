@@ -41,14 +41,14 @@ $game_types = [
                 <h2 class="category-title mb-4">Collezione Yu-Gi-Oh!</h2>
                 <div class="row card-grid">
                     <?php
-                    // Esempi di 6 carte Yu-Gi-Oh con le nuove rarità e quantità
+                    // Esempi di 6 carte Yu-Gi-Oh con le nuove rarità, quantità e URL delle immagini
                     $ygo_cards_data = [
-                        ['id' => 1, 'name' => 'Drago Bianco Occhi Blu', 'description' => 'Un drago leggendario la cui potenza distruttiva è incontenibile.', 'rarity' => 'Leggendaria', 'obtained' => true, 'quantity' => 3],
-                        ['id' => 2, 'name' => 'Mago Nero', 'description' => 'Il più grande di tutti i maghi in termini di attacco e difesa.', 'rarity' => 'Mitica', 'obtained' => true, 'quantity' => 1],
-                        ['id' => 3, 'name' => 'Kuriboh', 'description' => 'Una piccola creatura pelosa che può proteggerti da grandi danni.', 'rarity' => 'Comune', 'obtained' => true, 'quantity' => 5],
-                        ['id' => 4, 'name' => 'Guerriero Bassa Fusione', 'description' => 'Un guerriero che non si è ancora fuso, pronto per il campo.', 'rarity' => 'Rara', 'obtained' => false, 'quantity' => 0],
-                        ['id' => 5, 'name' => 'Cavaliere Gaia, il Feroce', 'description' => 'Un cavaliere leggendario che carica in battaglia.', 'rarity' => 'Epica', 'obtained' => true, 'quantity' => 2],
-                        ['id' => 6, 'name' => 'Marshmallon', 'description' => 'Una creatura soffice che non può essere distrutta in battaglia.', 'rarity' => 'Super Rara', 'obtained' => false, 'quantity' => 0],
+                        ['id' => 1, 'name' => 'Drago Bianco Occhi Blu', 'description' => 'Un drago leggendario la cui potenza distruttiva è incontenibile.', 'rarity' => 'Leggendaria', 'obtained' => true, 'quantity' => 3, 'image_url' => 'assets/images/ygo_blue_eyes.jpg'],
+                        ['id' => 2, 'name' => 'Mago Nero', 'description' => 'Il più grande di tutti i maghi in termini di attacco e difesa.', 'rarity' => 'Mitica', 'obtained' => true, 'quantity' => 1, 'image_url' => 'assets/images/ygo_dark_magician.jpg'],
+                        ['id' => 3, 'name' => 'Kuriboh', 'description' => 'Una piccola creatura pelosa che può proteggerti da grandi danni.', 'rarity' => 'Comune', 'obtained' => true, 'quantity' => 5, 'image_url' => 'assets/images/ygo_kuriboh.jpg'],
+                        ['id' => 4, 'name' => 'Guerriero Bassa Fusione', 'description' => 'Un guerriero che non si è ancora fuso, pronto per il campo.', 'rarity' => 'Rara', 'obtained' => false, 'quantity' => 0, 'image_url' => 'assets/images/ygo_fusion_substitute.jpg'], // Esempio: carta non ottenuta, ma con URL immagine
+                        ['id' => 5, 'name' => 'Cavaliere Gaia, il Feroce', 'description' => 'Un cavaliere leggendario che carica in battaglia.', 'rarity' => 'Epica', 'obtained' => true, 'quantity' => 2, 'image_url' => 'assets/images/ygo_gaia.jpg'],
+                        ['id' => 6, 'name' => 'Marshmallon', 'description' => 'Una creatura soffice che non può essere distrutta in battaglia.', 'rarity' => 'Super Rara', 'obtained' => false, 'quantity' => 0, 'image_url' => 'assets/images/ygo_marshmallon.jpg'], // Esempio: carta non ottenuta, ma con URL immagine
                     ];
 
                     foreach ($ygo_cards_data as $card):
@@ -57,6 +57,9 @@ $game_types = [
                         <div class="col-lg-3 col-md-4 col-sm-6 mb-4 card-item <?php echo $rarity_class; ?>" data-game="yu-gi-oh" data-rarity="<?php echo $rarity_class; ?>">
                             <div class="card-box <?php echo $card['obtained'] ? '' : 'not-obtained'; ?>">
                                 <?php if ($card['obtained']): ?>
+                                    <?php if (isset($card['image_url']) && !empty($card['image_url'])): ?>
+                                        <img src="<?php echo $card['image_url']; ?>" alt="<?php echo $card['name']; ?>" class="card-img-top">
+                                    <?php endif; ?>
                                     <div class="card-info">
                                         <h4 class="card-name"><?php echo $card['name']; ?></h4>
                                         <p class="card-description"><?php echo $card['description']; ?> (Rarità: <?php echo $card['rarity']; ?>)</p>
@@ -65,7 +68,11 @@ $game_types = [
                                     </div>
                                 <?php else: ?>
                                     <div class="card-empty">
-                                        <i class="bi bi-question-circle-fill"></i>
+                                        <?php if (isset($card['image_url']) && !empty($card['image_url'])): ?>
+                                            <img src="<?php echo $card['image_url']; ?>" alt="<?php echo $card['name']; ?>" class="card-img-top greyed-out">
+                                        <?php else: ?>
+                                            <i class="bi bi-question-circle-fill"></i>
+                                        <?php endif; ?>
                                         <p>Carta non ottenuta</p>
                                     </div>
                                 <?php endif; ?>
@@ -79,14 +86,14 @@ $game_types = [
                 <h2 class="category-title mb-4">Collezione Pokémon</h2>
                 <div class="row card-grid">
                     <?php
-                    // Esempi di 6 carte Pokémon con le nuove rarità e quantità
+                    // Esempi di 6 carte Pokémon con le nuove rarità, quantità e URL delle immagini
                     $pk_cards_data = [
-                        ['id' => 1, 'name' => 'Charizard VMAX', 'description' => 'Un Pokémon potentissimo, capace di ardere gli avversari con fiammate incandescenti.', 'rarity' => 'Leggendaria', 'obtained' => true, 'quantity' => 1],
-                        ['id' => 2, 'name' => 'Pikachu V', 'description' => 'Il compagno leale di molti Allenatori, con un attacco fulmineo.', 'rarity' => 'Mitica', 'obtained' => true, 'quantity' => 2],
-                        ['id' => 3, 'name' => 'Rattata', 'description' => 'Un Pokémon comune che si trova ovunque. Molto adattabile.', 'rarity' => 'Comune', 'obtained' => true, 'quantity' => 4],
-                        ['id' => 4, 'name' => 'Snorlax', 'description' => 'Un Pokémon che mangia e dorme molto, bloccando spesso le strade.', 'rarity' => 'Rara', 'obtained' => false, 'quantity' => 0],
-                        ['id' => 5, 'name' => 'Mewtwo VSTAR', 'description' => 'Un Pokémon leggendario creato dalla manipolazione genetica.', 'rarity' => 'Epica', 'obtained' => true, 'quantity' => 1],
-                        ['id' => 6, 'name' => 'Jigglypuff', 'description' => 'Un Pokémon canterino che fa addormentare chiunque lo ascolti.', 'rarity' => 'Super Rara', 'obtained' => false, 'quantity' => 0],
+                        ['id' => 1, 'name' => 'Charizard VMAX', 'description' => 'Un Pokémon potentissimo, capace di ardere gli avversari con fiammate incandescenti.', 'rarity' => 'Leggendaria', 'obtained' => true, 'quantity' => 1, 'image_url' => 'assets/images/pk_charizard.jpg'],
+                        ['id' => 2, 'name' => 'Pikachu V', 'description' => 'Il compagno leale di molti Allenatori, con un attacco fulmineo.', 'rarity' => 'Mitica', 'obtained' => true, 'quantity' => 2, 'image_url' => 'assets/images/pk_pikachu.jpg'],
+                        ['id' => 3, 'name' => 'Rattata', 'description' => 'Un Pokémon comune che si trova ovunque. Molto adattabile.', 'rarity' => 'Comune', 'obtained' => true, 'quantity' => 4, 'image_url' => '../images/rattata.png'],
+                        ['id' => 4, 'name' => 'Snorlax', 'description' => 'Un Pokémon che mangia e dorme molto, bloccando spesso le strade.', 'rarity' => 'Rara', 'obtained' => false, 'quantity' => 0, 'image_url' => '../images/snorlax.png'],
+                        ['id' => 5, 'name' => 'Mewtwo VSTAR', 'description' => 'Un Pokémon leggendario creato dalla manipolazione genetica.', 'rarity' => 'Epica', 'obtained' => true, 'quantity' => 1, 'image_url' => 'assets/images/pk_mewtwo.jpg'],
+                        ['id' => 6, 'name' => 'Jigglypuff', 'description' => 'Un Pokémon canterino che fa addormentare chiunque lo ascolti.', 'rarity' => 'Super Rara', 'obtained' => false, 'quantity' => 0, 'image_url' => 'assets/images/pk_Jigglypuff.jpg'],
                     ];
 
                     foreach ($pk_cards_data as $card):
@@ -95,6 +102,9 @@ $game_types = [
                         <div class="col-lg-3 col-md-4 col-sm-6 mb-4 card-item <?php echo $rarity_class; ?>" data-game="pokemon" data-rarity="<?php echo $rarity_class; ?>">
                             <div class="card-box <?php echo $card['obtained'] ? '' : 'not-obtained'; ?>">
                                 <?php if ($card['obtained']): ?>
+                                    <?php if (isset($card['image_url']) && !empty($card['image_url'])): ?>
+                                        <img src="<?php echo $card['image_url']; ?>" alt="<?php echo $card['name']; ?>" class="card-img-top">
+                                    <?php endif; ?>
                                     <div class="card-info">
                                         <h4 class="card-name"><?php echo $card['name']; ?></h4>
                                         <p class="card-description"><?php echo $card['description']; ?> (Rarità: <?php echo $card['rarity']; ?>)</p>
@@ -103,7 +113,11 @@ $game_types = [
                                     </div>
                                 <?php else: ?>
                                     <div class="card-empty">
-                                        <i class="bi bi-question-circle-fill"></i>
+                                        <?php if (isset($card['image_url']) && !empty($card['image_url'])): ?>
+                                            <img src="<?php echo $card['image_url']; ?>" alt="<?php echo $card['name']; ?>" class="card-img-top greyed-out">
+                                        <?php else: ?>
+                                            <i class="bi bi-question-circle-fill"></i>
+                                        <?php endif; ?>
                                         <p>Carta non ottenuta</p>
                                     </div>
                                 <?php endif; ?>
