@@ -1,5 +1,6 @@
 <?php
-// navbar.php
+// include/navbar.php
+
 ?>
 <nav class="navbar-custom">
     <ul class="nav-list">
@@ -18,6 +19,5 @@
         <li class="nav-item">
             <a href="/box-break"><i class="bi bi-box2"></i><span>Box Break</span></a>
         </li>
-    </ul>
+        </ul>
 </nav>
-
