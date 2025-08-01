@@ -56,35 +56,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }*/
 ?>
 
-<div class="background-custom">
 
-<div class="login-container">
+<main class="background-custom">
 
-    <h2>Accedi al tuo account</h2>
 
-    <?php if (!empty($error_message)): ?>
-        <p style="color: red;"><?php echo $error_message; ?></p>
-    <?php endif; ?>
+    <div class="login-container">
 
-    <form action="#" method="POST">
-        <div class="form-group" >
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-        </div>
-        <div class="form-group">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Accedi</button>
-    </form>
-    <?php if (isset($_GET['registered'])): ?>
-        <div class="floating-alert background-custom">
-            Registrazione avvenuta con successo!
-        </div>
-    <?php endif; ?>
-    <p>Non hai un account? <a href="register.php">Registrati qui</a></p>
-</div>
-</div>
+        <h2>Accedi al tuo account</h2>
+
+        <?php if (!empty($error_message)): ?>
+            <p style="color: red;"><?php echo $error_message; ?></p>
+        <?php endif; ?>
+
+        <form action="#" method="POST">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Accedi</button>
+        </form>
+        <?php if (isset($_GET['registered'])): ?>
+            <div class="floating-alert background-custom">
+                Registrazione avvenuta con successo!
+            </div>
+        <?php endif; ?>
+        <p>Non hai un account? <a href="register.php">Registrati qui</a></p>
+    </div>
+</main>
 
 
 <?php include __DIR__ . '/../footer.php';

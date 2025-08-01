@@ -7,9 +7,13 @@
     transition: ease all 0.5s;
 }
 
-html {
+html, body, main {
     scroll-behavior: smooth;
     overflow-x: hidden;
+        height: auto;
+        margin: 0;
+        padding: 0;
+
 }
 
 a {
@@ -939,13 +943,9 @@ Registration Page Styles
     border-radius: 10px;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
     text-align: center;
-    font-family: 'Poppins', sans-serif;
 }
 
 .register-container h2 {
-    font-size: 28px;
-    font-weight: bold;
-    color: #30302e;
     margin-bottom: 30px;
 }
 
