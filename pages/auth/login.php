@@ -3,10 +3,15 @@
 $hideNav = false;
 include __DIR__ . '/../header.php';
 
-// Cattura l'array di configurazione restituito da config.inc.php
-$db_config = require_once __DIR__ . '/../../include/config.inc.php';
+// Invece di catturare un valore di ritorno, includi il file
+// per rendere la variabile $config disponibile nello scope corrente.
+require_once __DIR__ . '/../../include/config.inc.php';
 
-/* $error_message = '';
+// Assegna la parte specifica del database di $config a $db_config
+// Questo è cruciale per usare correttamente i valori di host, user, ecc.
+$db_config = $config['dbms']['localhost'];
+
+$error_message = '';
 
 // Controlla se il modulo è stato inviato
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -17,43 +22,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error_message = "Per favore, inserisci sia l'email che la password.";
     } else {
         // Connessione al database usando i valori dell'array $db_config
+        // Questa è la riga 20 nel tuo file (o simile, a seconda degli spazi/commenti)
         $conn = new mysqli($db_config['host'], $db_config['user'], $db_config['passwd'], $db_config['dbname']);
 
         // Controlla la connessione
         if ($conn->connect_error) {
-            die("Connessione al database fallita: " . $conn->connect_error);
-        }
-
-        // Prepara la query SQL per prevenire SQL injection
-        $stmt = $conn->prepare("SELECT id_utente, password FROM utente WHERE email = ?");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $stmt->store_result();
-
-        if ($stmt->num_rows === 1) {
-            $stmt->bind_result($id_utente, $hashed_password);
-            $stmt->fetch();
-
-            // Verifica la password
-            if (password_verify($password, $hashed_password)) {
-                // Password corretta, imposta le variabili di sessione e reindirizza
-                $_SESSION['user_id'] = $id_utente;
-                $_SESSION['user_email'] = $email;
-
-                // Reindirizza alla pagina principale o alla dashboard
-                header('Location: ../../index.php');
-                exit();
-            } else {
-                $error_message = "Email o password non validi.";
-            }
+            // Registra l'errore per il debug, ma non mostrare errori dettagliati all'utente
+            error_log("Connessione al database fallita: " . $conn->connect_error);
+            $error_message = "Si è verificato un errore durante la connessione al database. Riprova più tardi.";
         } else {
-            $error_message = "Email o password non validi.";
-        }
+            // Prepara la query SQL per prevenire SQL injection
+            $stmt = $conn->prepare("SELECT id_utente, password FROM utente WHERE email = ?");
+            if ($stmt) {
+                $stmt->bind_param("s", $email);
+                $stmt->execute();
+                $stmt->store_result();
 
-        $stmt->close();
-        $conn->close();
+                if ($stmt->num_rows === 1) {
+                    $stmt->bind_result($id_utente, $hashed_password);
+                    $stmt->fetch();
+
+                    // Verifica la password
+                    if (password_verify($password, $hashed_password)) {
+                        // Password corretta, imposta le variabili di sessione e reindirizza
+                        $_SESSION['user_id'] = $id_utente;
+                        $_SESSION['user_email'] = $email;
+
+                        // Rigenera l'ID di sessione per prevenire attacchi di fissazione della sessione
+                        session_regenerate_id(true);
+
+                        // Reindirizza alla pagina home_utente.php
+                        header('Location: ../../pages/home_utente.php');
+                        exit();
+                    } else {
+                        $error_message = "Email o password non validi.";
+                    }
+                } else {
+                    $error_message = "Email o password non validi.";
+                }
+                $stmt->close();
+            } else {
+                // Registra l'errore per il debug
+                error_log("Errore nella preparazione della query: " . $conn->error);
+                $error_message = "Si è verificato un errore interno. Riprova più tardi.";
+            }
+            $conn->close();
+        }
     }
-}*/
+}
 ?>
 
 
@@ -101,4 +117,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
     });
 </script>
-

@@ -13,14 +13,24 @@ if (!file_exists($configPath)) {
         'errors'  => ['File di configurazione non trovato.']
     ]));
 }
-$config = include $configPath;
+
+// *** MODIFICA QUI: Includi il file per rendere disponibile la variabile $config ***
+require_once $configPath; // Usa require_once per includere la variabile $config
+
+// *** E poi assegna la parte specifica del database di $config a $db_config ***
+// Questo è cruciale per usare correttamente i valori di host, user, ecc.
+// Se il tuo config.inc.php definisce $config['dbms']['localhost'] allora usa quello:
+$db_config = $config['dbms']['localhost'];
+
+// Se il tuo config.inc.php definisce $config direttamente con host, user, ecc., allora usa:
+// $db_config = $config; // Scegli questa riga o quella sopra, a seconda del config.inc.php
 
 // 2) Connessione MySQLi (HOST, USER, PASSWD, DBNAME)
 $conn = new mysqli(
-    $config['host'],
-    $config['user'],
-    $config['passwd'],
-    $config['dbname']
+    $db_config['host'], // Ora usa $db_config
+    $db_config['user'], // Ora usa $db_config
+    $db_config['passwd'], // Ora usa $db_config
+    $db_config['dbname']  // Ora usa $db_config
 );
 if ($conn->connect_error) {
     http_response_code(500);
@@ -65,7 +75,7 @@ $passwordHash = password_hash($pass, PASSWORD_DEFAULT);
 try {
     $stmt = $conn->prepare(
         "INSERT INTO utente (nome, cognome, email, password)
-       VALUES (?, ?, ?, ?)"
+        VALUES (?, ?, ?, ?)"
     );
     $stmt->bind_param('ssss', $nome, $cognome, $email, $passwordHash);
     $stmt->execute();
