@@ -12,15 +12,6 @@ html {
     overflow-x: hidden;
 }
 
-body {
-    color: #666666;
-    font-size: 14px;
-    line-height: 1.80857;
-    font-weight: normal;
-    overflow-x: hidden;
-    font-family: 'Poppins', sans-serif;
-}
-
 a {
     color: #1f1f1f;
     text-decoration: none !important;
@@ -865,7 +856,7 @@ Login Page Styles
     font-size: 28px;
     font-weight: bold;
     color: #30302e;
-    margin-bottom: 30px;
+
 }
 
 .login-container .form-group {

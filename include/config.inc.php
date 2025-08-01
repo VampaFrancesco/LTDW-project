@@ -1,8 +1,8 @@
 <?php
 // include/config.inc.php
 
-$config['dbms']['localhost']['user'] = "root";
-$config['dbms']['localhost']['passwd'] = "root";
+$config['dbms']['localhost']['user'] = "admin";
+$config['dbms']['localhost']['passwd'] = "admin";
 $config['dbms']['localhost']['host'] = "localhost";
 $config['dbms']['localhost']['dbname'] = "boxomnia";
 
@@ -12,8 +12,8 @@ if (!defined('BASE_URL')) {
 }
 
 return [
-    'user' => 'root',
-    'passwd' => 'root',
+    'user' => 'admin',
+    'passwd' => 'admin',
     'host' => 'localhost',
     'dbname' => 'boxomnia',
 ];

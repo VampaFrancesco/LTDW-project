@@ -50,6 +50,6 @@ require_once __DIR__ . '/../include/config.inc.php';
 
             </div>
         </div>
-        <?php include __DIR__ . '/../include/navbar.php' ?>
+        <?php include __DIR__ . '/sections/navbar.php' ?>
     </header>
 <?php endif; ?>

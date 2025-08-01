@@ -57,12 +57,6 @@ body {
 }
 
 
-/* Sfondo Custom per la Main (dal tuo PHP) */
-.background-custom {
-    background-color: #f8f8f8; /* Un colore di sfondo per il main, se diverso dal body */
-    padding: 50px 0; /* Spazio sopra e sotto il contenuto principale */
-}
-
 /* Titoli Generali */
 .fashion_taital {
     font-size: 48px;

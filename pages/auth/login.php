@@ -56,6 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }*/
 ?>
 
+<div class="background-custom">
+
 <div class="login-container">
 
     <h2>Accedi al tuo account</h2>
@@ -65,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
 
     <form action="#" method="POST">
-        <div class="form-group">
+        <div class="form-group" >
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required>
         </div>
@@ -76,12 +78,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <button type="submit" class="btn btn-primary">Accedi</button>
     </form>
     <?php if (isset($_GET['registered'])): ?>
-        <div class="floating-alert">
+        <div class="floating-alert background-custom">
             Registrazione avvenuta con successo!
         </div>
     <?php endif; ?>
     <p>Non hai un account? <a href="register.php">Registrati qui</a></p>
 </div>
+</div>
+
 
 <?php include __DIR__ . '/../footer.php';
 ?>
