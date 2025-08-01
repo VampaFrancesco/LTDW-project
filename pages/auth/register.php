@@ -1,16 +1,15 @@
 <?php
 $hideNav = false;
 include __DIR__ . '/../header.php';
-$db_config = require_once __DIR__ . '/../../include/config.inc.php';
 ?>
 
 <main class="background-custom">
         <div class="register-container">
             <h2> Registra il tuo account </h2>
 
-            <?php if (!empty($error_message)): ?>
-                <p style="color: red;"><?php echo $error_message; ?></p>
-            <?php endif; ?>
+<!--            --><?php //if (!empty($error_message)): ?>
+<!--                <p style="color: red;">--><?php //echo $error_message; ?><!--</p>-->
+<!--            --><?php //endif; ?>
 
             <form action="../../action/register_action.php" method="POST" id="registerForm">
                 <div class="form-group">

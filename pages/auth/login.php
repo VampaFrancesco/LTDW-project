@@ -58,8 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 <main class="background-custom">
-
-
     <div class="login-container">
 
         <h2>Accedi al tuo account</h2>
@@ -80,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit" class="btn btn-primary">Accedi</button>
         </form>
         <?php if (isset($_GET['registered'])): ?>
-            <div class="floating-alert background-custom">
+            <div class="floating-alert">
                 Registrazione avvenuta con successo!
             </div>
         <?php endif; ?>
