@@ -4,9 +4,9 @@ $config = include __DIR__ . '/../../include/config.inc.php';
 
 // connessione
 $conn = new mysqli(
+    $config['host'],
     $config['user'],
     $config['passwd'],
-    $config['host'],
     $config['dbname']
 );
 if ($conn->connect_error) {

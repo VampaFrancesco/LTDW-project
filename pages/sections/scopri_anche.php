@@ -1,5 +1,5 @@
 <?php
-$pdo = new PDO('mysql:host=localhost;dbname=boxomnia', 'root', 'root');
+$pdo = new PDO('mysql:host=localhost;dbname=boxomnia', 'admin', 'admin');
 $stmt = $pdo->prepare("SELECT * FROM mystery_box ORDER BY id_box LIMIT 6");
 $stmt->execute();
 $others = $stmt->fetchAll(PDO::FETCH_ASSOC);
