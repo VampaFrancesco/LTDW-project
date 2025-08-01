@@ -22,5 +22,8 @@
         <li class="nav-item">
             <a href="/LTDW-project/pages/collezione.php"><i class="bi bi-collection-fill"></i><span>Collezioni</span></a>
         </li>
+        <li class="nav-item">
+            <a href="/LTDW-project/pages/catalogo.php"><i class="bi bi-box-seam"></i><span>Catalogo</span></a>
+        </li>
         </ul>
 </nav>
