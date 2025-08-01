@@ -273,41 +273,6 @@ button {
     transition: 0.3s;
 }
 
-
-
-
-@media screen and (max-height: 450px) {
-    .sidenav {
-        padding-top: 15px;
-    }
-
-    .sidenav a {
-        font-size: 18px;
-    }
-}
-
-.toggle_icon {
-    cursor: pointer;
-    color: #ffffff;
-    order: 2;
-}
-
-.header_box {
-    order: 2;
-    display: flex;
-}
-
-
-/* Styles for wrapping the search box start */
-
-.main {
-    flex: 1;
-    margin: 0px 30px;
-    display: inline-block;
-    order: 2;
-}
-
-
 /* Bootstrap 4 text input with search icon */
 
 .has-search .form-control {
@@ -326,147 +291,6 @@ button {
     color: #aaa;
 }
 
-
-/* Styles for wrapping the search box end */
-
-.login_menu {
-    display: flex;
-    text-align: right;
-    float: right;
-}
-
-.login_menu ul {
-    margin: 0px;
-    padding: 0px;
-}
-
-.login_menu li {
-    float: left;
-    font-size: 16px;
-    color: #ffffff;
-    text-transform: uppercase;
-    padding-left: 10px;
-    padding-top: 4px;
-}
-
-.login_menu li a {
-    color: #ffffff;
-}
-
-.login_menu li a:hover {
-    color: #f26522;
-}
-
-.padding_10 {
-    padding-left: 10px;
-}
-
-
-/* flage css start */
-
-.lang_box {
-    display: flex;
-    float: right;
-    background: #fff;
-    border-radius: 5px;
-    margin-right: 20px;
-}
-
-.nav-link {
-    display: block;
-    padding: .4rem 1rem;
-}
-
-a:hover {
-    color: #f26522;
-    text-decoration: underline;
-}
-
-
-/* flage css end */
-
-
-/* header section end */
-
-.buynow_bt {
-    width: 170px;
-    margin: 0 auto;
-    padding-top: 30px;
-}
-
-.buynow_bt a {
-    width: 100%;
-    float: left;
-    font-size: 16px;
-    color: #ffffff;
-    background-color: #252525;
-    text-align: center;
-    padding: 10px 0px;
-    border-radius: 5px;
-    text-transform: uppercase;
-    font-weight: bold;
-}
-
-.buynow_bt a:hover {
-    background-color: #f26522;
-    color: #ffffff;
-}
-
-
-/* banner section end */
-
-
-.shirt_text {
-    width: 100%;
-    font-size: 20px;
-    color: #30302e;
-    text-align: center;
-    font-weight: bold;
-    padding-bottom: 5px;
-}
-
-.price_text {
-    width: 100%;
-    font-size: 16px;
-    color: #f26522;
-    text-align: center;
-    margin: 0px;
-}
-
-.tshirt_img {
-    width: 100%;
-    text-align: center;
-    margin: 50px 0px;
-    min-height: 370px;
-}
-
-.seemore_bt {
-    width: 100%;
-    float: right;
-    text-align: right;
-}
-
-.seemore_bt a {
-    width: 100%;
-    font-size: 16px;
-    color: #262626;
-    background-color: transparent;
-    text-align: right;
-}
-
-.seemore_bt a:hover {
-    background-color: transparent;
-    color: #f26522;
-}
-
-
-#main_slider a.carousel-control-prev {
-    left: 615px;
-    top: 105%;
-}
-
-/* loader bar css start */
-
 .loader_main {
     width: 100%;
     text-align: center;
@@ -474,12 +298,9 @@ a:hover {
 }
 
 .loader {
-    border: 16px solid #f3f3f3;
     border-radius: 50%;
-    border-top: 16px solid #414744;
-    border-right: 16px solid #f26522;
-    border-bottom: 16px solid #414744;
-    border-left: 16px solid #f26522;
+    border-right-color: #f26522;
+    border-left-color: #f26522;
     width: 120px;
     height: 120px;
     -webkit-animation: spin 2s linear infinite;
@@ -1339,7 +1160,7 @@ body {
     transform: translateX(-50%);
     width: 80px;
     height: 4px;
-    background-color: #f26522; /* Linea sotto il titolo principale */
+    background-color: #30302e; /* Linea sotto il titolo principale */
     border-radius: 2px;
 }
 
@@ -1348,7 +1169,7 @@ body {
     color: #30302e;
     font-weight: bold;
     text-align: center;
-    border-bottom: 2px solid #f26522; /* Linea sotto il titolo di categoria */
+    border-bottom: 2px solid #ffffff; /* Linea sotto il titolo di categoria */
     padding-bottom: 10px;
     margin-bottom: 40px;
 }
@@ -1392,7 +1213,7 @@ body {
 }
 
 .btn-filter.active {
-    background-color: #f26522; /* Colore d'accento per il bottone attivo */
+    background-color: #ED308C; /* Colore d'accento per il bottone attivo */
     color: #ffffff;
     border-color: #f26522;
     box-shadow: 0 4px 10px rgba(242, 101, 34, 0.3);
