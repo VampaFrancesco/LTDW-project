@@ -23,7 +23,7 @@
             <a href="/LTDW-project/pages/catalogo.php"><i class="bi bi-box-seam"></i><span>Catalogo</span></a>
         </li>
         <li class="nav-item">
-            <a href="/LTDW-project/pages/storico_ordini.php"><i class="bi bi-clock-history"></i><span>Ordini</span></a>
+            <a href="/LTDW-project/pages/ordini.php"><i class="bi bi-clock-history"></i><span>Ordini</span></a>
         </li>
         </ul>
 </nav>
