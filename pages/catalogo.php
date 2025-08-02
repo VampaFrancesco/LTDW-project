@@ -1,7 +1,4 @@
 <?php
-// pages/catalog.php
-
-// Includi l'header (che include BASE_URL e la navbar)
 include __DIR__ . '/header.php';
 
 // Dati di esempio per le Mystery Box
@@ -161,7 +158,6 @@ document.addEventListener('DOMContentLoaded', function() {
             } else if (order === 'price-desc') {
                 return priceB - priceA;
             }
-            // Per 'default', non fare nulla (l'ordine iniziale è casuale)
             return 0;
         });
 
@@ -188,13 +184,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     item.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
                     item.style.opacity = '1';
                     item.style.transform = 'translateY(0)';
-                }, 50); // Piccolo ritardo per assicurare che il browser riconosca il cambio di stato
-            }, 300); // Questo ritardo dovrebbe essere maggiore della transizione di uscita
+                }, 50);
+            }, 300);
         });
 
         if (order === 'default') {
-            // Per "Casuale", ricarica la pagina per ottenere un nuovo shuffle PHP (soluzione semplice per demo)
-            // In un ambiente reale, faresti una nuova richiesta AJAX per ottenere un ordine casuale dal server.
              window.location.reload();
         }
     });

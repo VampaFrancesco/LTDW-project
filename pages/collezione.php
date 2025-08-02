@@ -1,7 +1,4 @@
 <?php
-// pages/collection.php
-
-// Includi l'header (che include BASE_URL e la navbar)
 include __DIR__ . '/header.php';
 
 // Array delle rarità aggiornato
