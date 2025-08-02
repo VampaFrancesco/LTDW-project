@@ -1658,3 +1658,153 @@ body {
         padding: 20px;
     }
 }
+
+/* ORDINI */
+/* STORICO ORDINI CSS */
+
+.orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 30px; /* Spazio tra le card degli ordini */
+    max-width: 900px; /* Larghezza massima per la lista degli ordini */
+    margin: 0 auto; /* Centra la lista */
+}
+
+.order-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    display: flex; /* Utilizza flexbox per layout orizzontale */
+    padding: 20px;
+    align-items: center; /* Allinea verticalmente gli elementi */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.order-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.order-image-container {
+    flex-shrink: 0; /* Impedisce all'immagine di restringersi */
+    width: 150px; /* Larghezza fissa per l'immagine */
+    height: 150px; /* Altezza fissa per l'immagine */
+    overflow: hidden;
+    border-radius: 8px;
+    margin-right: 25px; /* Spazio tra immagine e dettagli */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #eee; /* Bordo leggero per l'immagine */
+}
+
+.order-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* L'intera immagine sarà contenuta */
+    display: block;
+}
+
+.order-details {
+    flex-grow: 1; /* Permette ai dettagli di occupare lo spazio rimanente */
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.order-details h3 {
+    font-size: 24px;
+    color: #30302e;
+    margin: 0;
+    padding: 0;
+}
+
+.order-status {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #ffffff; /* Colore testo predefinito per stato */
+}
+
+/* Stili specifici per lo stato dell'ordine */
+.order-status.completato {
+    background-color: #28a745; /* Verde per completato */
+}
+
+.order-status.in-elaborazione {
+    background-color: #ffc107; /* Giallo per in elaborazione */
+    color: #333; /* Testo scuro sul giallo */
+}
+
+.order-status.annullato {
+    background-color: #dc3545; /* Rosso per annullato */
+}
+
+.order-details p {
+    margin: 8px 0; /* Spazio tra i paragrafi */
+    font-size: 16px;
+    color: #555;
+    line-height: 1.5; /* Migliora leggibilità */
+}
+
+.order-details p strong {
+    color: #30302e; /* Colore più scuro per le etichette */
+}
+
+.order-total {
+    font-size: 18px;
+    font-weight: bold;
+    color: #f26522; /* Colore d'accento per il totale */
+    margin-top: 15px;
+}
+
+.btn-view-details {
+    background-color: #ED308C; /* Colore del bottone "Registrati" */
+    color: #ffffff;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block; /* Per applicare padding e margin correttamente */
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-view-details:hover {
+    background-color: #24B1D9; /* Colore hover del bottone "Accedi" */
+    color: #30302e; /* Testo scuro sull'hover */
+    text-decoration: none;
+}
+
+/* Media Queries per layout responsivo */
+@media (max-width: 768px) {
+    .order-card {
+        flex-direction: column; /* Impila gli elementi in colonna su schermi piccoli */
+        text-align: center;
+    }
+
+    .order-image-container {
+        margin-right: 0;
+        margin-bottom: 20px; /* Spazio sotto l'immagine quando in colonna */
+    }
+
+    .order-header {
+        flex-direction: column; /* Impila titolo e stato */
+        align-items: center;
+        text-align: center;
+    }
+
+    .order-header h3 {
+        margin-bottom: 10px;
+    }
+}
