@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Ago 01, 2025 alle 23:12
+-- Creato il: Ago 02, 2025 alle 11:45
 -- Versione del server: 10.4.32-MariaDB
 -- Versione PHP: 8.2.12
 
@@ -129,6 +129,7 @@ CREATE TABLE `immagine` (
 --
 
 CREATE TABLE `indirizzo_spedizione` (
+  `id_indirizzo` int(11) NOT NULL,
   `via` varchar(100) NOT NULL,
   `civico` bigint(20) NOT NULL,
   `cap` bigint(20) NOT NULL,
@@ -226,7 +227,8 @@ CREATE TABLE `ordine` (
   `data_ordine` datetime NOT NULL DEFAULT current_timestamp(),
   `tracking` varchar(100) DEFAULT NULL,
   `stato_ordine` tinyint(1) NOT NULL,
-  `fk_utente` int(11) NOT NULL
+  `fk_utente` int(11) NOT NULL,
+  `fk_indirizzo` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -379,7 +381,7 @@ ALTER TABLE `immagine`
 -- Indici per le tabelle `indirizzo_spedizione`
 --
 ALTER TABLE `indirizzo_spedizione`
-  ADD PRIMARY KEY (`via`,`civico`,`cap`),
+  ADD PRIMARY KEY (`id_indirizzo`),
   ADD KEY `fk_utente_indirizzo_spedizione` (`fk_utente`);
 
 --
@@ -428,7 +430,8 @@ ALTER TABLE `oggetto_utente`
 --
 ALTER TABLE `ordine`
   ADD PRIMARY KEY (`id_ordine`),
-  ADD KEY `fk_utente_ordine` (`fk_utente`);
+  ADD KEY `fk_utente_ordine` (`fk_utente`),
+  ADD KEY `fk_indirizzo_spedizione_ordine` (`fk_indirizzo`);
 
 --
 -- Indici per le tabelle `punti_utente`
@@ -517,6 +520,12 @@ ALTER TABLE `immagine`
   MODIFY `id_immagine` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT per la tabella `indirizzo_spedizione`
+--
+ALTER TABLE `indirizzo_spedizione`
+  MODIFY `id_indirizzo` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT per la tabella `mystery_box`
 --
 ALTER TABLE `mystery_box`
@@ -562,7 +571,7 @@ ALTER TABLE `titolo`
 -- AUTO_INCREMENT per la tabella `utente`
 --
 ALTER TABLE `utente`
-  MODIFY `id_utente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_utente` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Limiti per le tabelle scaricate
@@ -644,6 +653,7 @@ ALTER TABLE `oggetto_utente`
 -- Limiti per la tabella `ordine`
 --
 ALTER TABLE `ordine`
+  ADD CONSTRAINT `fk_indirizzo_spedizione_ordine` FOREIGN KEY (`fk_indirizzo`) REFERENCES `indirizzo_spedizione` (`id_indirizzo`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_utente_ordine` FOREIGN KEY (`fk_utente`) REFERENCES `utente` (`id_utente`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --

@@ -51,11 +51,6 @@ if (empty($email) || empty($password)) {
                 $stmt->fetch();
 
                 if (password_verify($password, $hashed_password)) {
-                    // Nota: Senza session_start(), queste righe non avranno effetto.
-                    // $_SESSION['user_id'] = $id_utente;
-                    // $_SESSION['user_email'] = $email;
-                    // session_regenerate_id(true);
-
                     header('Location: ../pages/home_utente.php');
                     exit();
                 } else {
