@@ -1,36 +1,42 @@
 <?php
 // C:\xampp\htdocs\LTDW-project\pages\collezione.php
 
-// Inizia la sessione PHP all'inizio del file
-
-
 // Inclusione dell'header, che è nella stessa directory (pages)
 include __DIR__ . '/header.php';
 
 // Controlla se l'utente è loggato
 if (!isset($_SESSION['user_id'])) {
     // Usa BASE_URL per il reindirizzamento assoluto
+    // Prima di usare BASE_URL, assicurati che il file config sia incluso
+    // Nota: BASE_URL è definito nel config.inc.php che includiamo qui.
+    // Se BASE_URL fosse usato prima dell'inclusione, dovrebbe essere definito altrove o il reindirizzamento gestito diversamente.
+    
+    // INCLUSIONE DI config.inc.php (senza catturare il valore di ritorno)
+    // Questo rende l'array $config disponibile in questo scope
+    require_once __DIR__ . '/../include/config.inc.php'; 
+
     header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/pages/auth/login.php');
     exit();
 }
 
 $user_id = $_SESSION['user_id']; // ID dell'utente loggato
 
-// Cattura l'array di configurazione restituito da config.inc.php
-// Il percorso da 'pages' a 'include' è '../include/config.inc.php'
-$db_config = require_once __DIR__ . '/../include/config.inc.php';
+// INCLUSIONE DI config.inc.php (senza catturare il valore di ritorno)
+// Questo rende l'array $config disponibile in questo scope
+require_once __DIR__ . '/../include/config.inc.php'; 
 
-// Connessione al database
+// Adesso usa l'array $config per le credenziali del database
 $conn = new mysqli(
-    $db_config['host'],
-    $db_config['user'],
-    $db_config['passwd'],
-    $db_config['dbname']
+    $config['dbms']['localhost']['host'],
+    $config['dbms']['localhost']['user'],
+    $config['dbms']['localhost']['passwd'],
+    $config['dbms']['localhost']['dbname']
 );
 
 if ($conn->connect_error) {
     die("Connessione al database fallita: " . $conn->connect_error);
 }
+
 
 // 1. Recupera le rarità e i loro colori
 $rarities_db = [];

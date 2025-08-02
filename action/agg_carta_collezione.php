@@ -1,6 +1,13 @@
 <?php
 // C:\xampp\htdocs\LTDW-project\actions\add_card_to_collection.php
 
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// INCLUSIONE DI config.inc.php (senza catturare il valore di ritorno)
+// Questo rende l'array $config disponibile in questo scope
+require_once __DIR__ . '/../include/config.inc.php'; 
 
 // Assicurati che l'utente sia loggato
 if (!isset($_SESSION['user_id'])) {
@@ -18,9 +25,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $user_id = $_SESSION['user_id'];
 $card_name = trim($_POST['card_name'] ?? '');
 $card_quantity = (int)($_POST['card_quantity'] ?? 0);
-// La checkbox 'card_obtained' non è strettamente necessaria per la logica di aggiunta/quantità,
-// ma se la vuoi usare per altri scopi, la variabile è impostata correttamente.
-// $card_obtained = isset($_POST['card_obtained']) ? 1 : 0; 
 
 // Validazione minima
 if (empty($card_name) || $card_quantity < 0) {
@@ -28,15 +32,12 @@ if (empty($card_name) || $card_quantity < 0) {
     exit();
 }
 
-// Carica configurazione DB. Il percorso da 'actions' a 'include' è '../include/config.inc.php'
-$db_config = require_once __DIR__ . '/../include/config.inc.php';
-
 // Connessione DB
 $conn = new mysqli(
-    $db_config['host'],
-    $db_config['user'],
-    $db_config['passwd'],
-    $db_config['dbname']
+    $config['dbms']['localhost']['host'],
+    $config['dbms']['localhost']['user'],
+    $config['dbms']['localhost']['passwd'],
+    $config['dbms']['localhost']['dbname']
 );
 
 if ($conn->connect_error) {
