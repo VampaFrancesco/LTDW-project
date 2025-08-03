@@ -1,37 +1,43 @@
 <?php
-
-
+// 1. Includi il Session Manager all'inizio e header
 include 'header.php';
+require_once __DIR__.'/../include/session_manager.php';
 
-// Verifica se l'utente è loggato
-// Se non c'è user_id nella sessione, reindirizza alla pagina di login
-if (!isset($_SESSION['user_id'])) {
-    header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/pages/auth/login.php');
+// 3. Verifica autenticazione usando il Session Manager
+if (!SessionManager::get('user_id')) {
+    $redirectUrl =  '/LTDW-project/pages/auth/login.php';
+    header('Location: ' . $redirectUrl);
     exit();
 }
 
-// Recupera il nome dell'utente dalla sessione.
-$nome_utente = $_SESSION['username'] ?? 'Utente';
+// 4. Recupera i dati utente in modo sicuro
+$nome_utente = SessionManager::get('user_name', 'Utente');
+$cognome_utente = SessionManager::get('user_surname', '');
+
+// Costruisci il nome completo (nome + cognome se esiste)
+$nome_completo = trim($nome_utente . ' ' . $cognome_utente) ?: 'Utente';
+
 
 ?>
 
-<main class="background-custom">
-    <div class="container">
-        <h1 class="fashion_taital mb-5">Bentornato, <?php echo htmlspecialchars($nome_utente); ?>!</h1>
-        <p class="section-intro-text text-center">Esplora le ultime novità, la tua collezione e le offerte esclusive pensate per te.</p>
+    <main class="background-custom">
+        <div class="container">
+            <!-- 5. Mostra il nome utente con escape XSS -->
+            <h1 class="fashion_taital mb-5">Bentornato, <?php echo htmlspecialchars($nome_completo) ?>!</h1>
+            <p class="section-intro-text text-center">Esplora le ultime novità, la tua collezione e le offerte esclusive pensate per te.</p>
 
-        <div class="section">
-            <?php include 'sections/slider_prodotti.php'; ?>
-        </div>
+            <div class="section">
+                <?php include 'sections/slider_prodotti.php'; ?>
+            </div>
 
-        <div class="section">
-            <?php include 'sections/piu_venduti.php'; ?>
-        </div>
+            <div class="section">
+                <?php include 'sections/piu_venduti.php'; ?>
+            </div>
 
-        <div class="section">
-            <?php include 'sections/scopri_anche.php'; ?>
+            <div class="section">
+                <?php include 'sections/scopri_anche.php'; ?>
+            </div>
         </div>
-    </div>
-</main>
+    </main>
 
 <?php include 'footer.php'; ?>

@@ -1,6 +1,7 @@
 <?php
 $hideNav = false;
 include __DIR__ . '/header.php';
+SessionManager::checkAuth();
 
 $orders = [
     [

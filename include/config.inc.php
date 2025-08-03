@@ -1,4 +1,5 @@
 <?php
+
 // Definizione della configurazione del database all'interno dell'array $config
 $config['dbms']['localhost']['user'] = "admin";
 $config['dbms']['localhost']['passwd'] = "admin";
@@ -9,4 +10,5 @@ $config['dbms']['localhost']['dbname'] = "boxomnia";
 if (!defined('BASE_URL')) {
     define('BASE_URL', '/LTDW-project');
 }
-?>
+
+return $config;

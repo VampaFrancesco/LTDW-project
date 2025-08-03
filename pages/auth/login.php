@@ -8,7 +8,7 @@ if (isset($_GET['error'])) {
 }
 ?>
 
-<div class="background-custom">
+<main class="background-custom">
 
     <div class="login-container">
 
@@ -30,13 +30,13 @@ if (isset($_GET['error'])) {
             <button type="submit" class="btn btn-primary">Accedi</button>
         </form>
         <?php if (isset($_GET['registered'])): ?>
-            <div class="floating-alert background-custom">
+            <div class="floating-alert">
                 Registrazione avvenuta con successo!
             </div>
         <?php endif; ?>
         <p>Non hai un account? <a href="register.php">Registrati qui</a></p>
     </div>
-</div>
+</main>
 
 <?php include __DIR__ . '/../footer.php'; ?>
 

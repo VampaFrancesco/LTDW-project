@@ -1,9 +1,13 @@
 <?php
+global $config;
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-session_start();
+
+// 1. INIZIO SESSIONE SICURA
+require_once __DIR__.'/../include/session_manager.php';
+SessionManager::startSecureSession();
 
 $configPath = __DIR__ . '/../include/config.inc.php';
 if (!file_exists($configPath)) {
@@ -40,18 +44,30 @@ if (empty($email) || empty($password)) {
     $error_message = "Inserire email e password";
 } else {
     try {
-        $stmt = $conn->prepare("SELECT id_utente, password FROM utente WHERE email = ?");
+        $stmt = $conn->prepare("SELECT id_utente, password, nome, cognome FROM utente WHERE email = ?");
         if ($stmt) {
             $stmt->bind_param("s", $email);
             $stmt->execute();
             $stmt->store_result();
 
             if ($stmt->num_rows === 1) {
-                $stmt->bind_result($id_utente, $hashed_password);
+                $stmt->bind_result($id_utente, $hashed_password, $nome, $cognome);
                 $stmt->fetch();
 
                 if (password_verify($password, $hashed_password)) {
-                    header('Location: ../pages/home_utente.php');
+                    // 2. REGISTRAZIONE DATI UTENTE IN SESSIONE
+                    SessionManager::set('user_id', $id_utente);
+                    SessionManager::set('user_email', $email);
+                    $isLoggato = SessionManager::set('user_logged_in', true);
+                    Sessionmanager::set('user_id', $id_utente);
+                    SessionManager::set('user_name', $nome);
+                    SessionManager::set('user_surname', $cognome);
+                    SessionManager::set('last_activity', time());
+
+
+                    // 3. REINDIRIZZAMENTO SICURO
+                    $redirect_url = $_POST['redirect'] ?? '/LTDW-project/pages/home_utente.php';
+                    header('Location: ' . filter_var($redirect_url, FILTER_SANITIZE_URL));
                     exit();
                 } else {
                     $error_message = "Email o password non validi";
@@ -71,9 +87,13 @@ if (empty($email) || empty($password)) {
 $conn->close();
 
 if (!empty($error_message)) {
+    // 4. PULIZIA SESSIONE IN CASO DI ERRORE
+    SessionManager::destroy();
     header('Location: ../pages/auth/login.php?error=' . urlencode($error_message));
     exit();
 }
 
+// 5. FALLBACK PER ERRORI IMPREVISTI
+SessionManager::destroy();
 header('Location: ../pages/auth/login.php?error=' . urlencode('Si è verificato un errore imprevisto'));
 exit();

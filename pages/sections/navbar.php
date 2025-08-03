@@ -5,7 +5,7 @@
 <nav class="navbar-custom">
     <ul class="nav-list">
         <li class="nav-item">
-            <a href="/LTDW-project/pages/index.php"><i class="bi bi-house-fill"></i><span>Homepage</span></a>
+            <a href="/LTDW-project/pages/home_utente.php"><i class="bi bi-house-fill"></i><span>Homepage</span></a>
         </li>
         <li class="nav-item">
             <a href="/novita"><i class="bi bi-stars"></i><span>Novità</span></a>

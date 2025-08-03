@@ -1,6 +1,14 @@
 <?php
 include 'header.php';
-include '../include/config.inc.php';
+
+// Corretto ordine:
+require_once __DIR__.'/../include/session_config.php';
+require_once __DIR__.'/../include/session_manager.php';
+require_once __DIR__.'/../include/config.inc.php';
+
+
+// Per proteggere una pagina:
+SessionManager::checkAuth(); // Reindirizza al login se non autenticato
 ?>
 
     <main class="background-custom"> <!-- Aggiunta classe specifica -->

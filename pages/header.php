@@ -1,6 +1,7 @@
 <?php
-session_start();
 require_once __DIR__ . '/../include/config.inc.php';
+require_once __DIR__ . '/../include/session_manager.php';
+SessionManager::startSecureSession();
 ?>
 <!DOCTYPE html>
 <html lang="it" class="html bebas-neue-regular">
@@ -12,11 +13,8 @@ require_once __DIR__ . '/../include/config.inc.php';
     <!-- CSS -->
     <link rel="stylesheet" href="/LTDW-project/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link rel="icon"       href="../images/favicon.ico" type="image/gif"/>
+    <link rel="icon" href="../images/favicon.ico" type="image/gif"/>
     <link rel="stylesheet" href="/LTDW-project/css/style.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
-    </style>
 </head>
 <?php if (empty($hideNav)): ?>
     <header>
@@ -42,7 +40,7 @@ require_once __DIR__ . '/../include/config.inc.php';
                 <!-- 3) Top-links a destra -->
                 <div class="top-links d-flex align-items-center ml-3">
                     <i class="bi bi-person-fill"></i>
-                    <a href="/LTDW-project/pages/auth/login.php" class="mx-2">ACCOUNT</a>
+                    <a href="<?php echo SessionManager::get('user_logged_in') ? '/LTDW-project/pages/home_utente.php' : '/LTDW-project/pages/auth/login.php'; ?>" class="mx-2">ACCOUNT</a>
                     <a href="#" class="mx-2"><i class="bi bi-gift-fill"></i></a>
                     <a href="#" class="mx-2"><i class="bi bi-heart-fill"></i></a>
                     <a href="cart.php" class="mx-2"><i class="bi bi-cart-fill"></i></a>
