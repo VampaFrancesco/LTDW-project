@@ -1,6 +1,6 @@
 <?php
-// C:\xampp\htdocs\LTDW-project\actions\agg_carta_collezione.php
-
+// C:\xampp\htdocs\LTDW-project\action\agg_carta_collezione.php
+session_start();
 // Includi il file di configurazione
 $configPath = __DIR__ . '/../include/config.inc.php';
 if (!file_exists($configPath)) {
@@ -39,7 +39,7 @@ if (!isset($config['dbms']['localhost']['host'], $config['dbms']['localhost']['u
 
 $db_host = $config['dbms']['localhost']['host'];
 $db_user = $config['dbms']['localhost']['user'];
-$db_passwd = $config['dbms']['localhost']['passwd'];
+$db_passwd = $config['dbms']['localhost']['passwd']; // Assicurati sia corretto
 $db_name = $config['dbms']['localhost']['dbname'];
 
 // Connessione DB
@@ -59,9 +59,17 @@ if ($conn->connect_error) {
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 try {
-    // 1. Trova l'id_oggetto della carta tramite il nome E il tipo_oggetto 'Carta Singola'
-    // Questo script aggiunge specificamente "Carte Singole".
-    $sql_find_card = "SELECT id_oggetto FROM oggetto WHERE nome_oggetto = ? AND tipo_oggetto = 'Carta Singola'";
+    // 1. Trova l'id_oggetto della carta tramite il nome E il tipo_oggetto 'Carta Singola' da categoria_oggetto
+    $sql_find_card = "
+        SELECT 
+            o.id_oggetto 
+        FROM 
+            oggetto o
+        JOIN 
+            categoria_oggetto co ON o.fk_categoria_oggetto = co.id_categoria
+        WHERE 
+            o.nome_oggetto = ? AND co.tipo_oggetto = 'Carta Singola'
+    ";
     $stmt_find_card = $conn->prepare($sql_find_card);
     if (!$stmt_find_card) {
         throw new Exception("Errore nella preparazione della query di ricerca carta: " . $conn->error);
@@ -98,8 +106,9 @@ try {
              $sql_update_card = "DELETE FROM oggetto_utente WHERE fk_utente = ? AND fk_oggetto = ?";
              $message = 'Carta rimossa dalla collezione.';
         } else {
-             $sql_update_card = "UPDATE oggetto_utente SET quantita_ogg = ? WHERE fk_utente = ? AND fk_oggetto = ?";
-             $message = 'Quantità della carta aggiornata con successo!';
+            // Aggiorniamo solo la quantità.
+            $sql_update_card = "UPDATE oggetto_utente SET quantita_ogg = ? WHERE fk_utente = ? AND fk_oggetto = ?";
+            $message = 'Quantità della carta aggiornata con successo!';
         }
         
         $stmt_update_card = $conn->prepare($sql_update_card);
@@ -116,10 +125,11 @@ try {
     } else {
         // La carta non esiste per l'utente, inserisci una nuova riga (solo se quantità > 0)
         if ($card_quantity > 0) {
+            // Inseriamo solo la quantità
             $sql_insert_card = "INSERT INTO oggetto_utente (fk_utente, fk_oggetto, quantita_ogg) VALUES (?, ?, ?)";
             $stmt_insert_card = $conn->prepare($sql_insert_card);
             if (!$stmt_insert_card) {
-                throw new Exception("Errore nella preparazione della query di insert collezione: " . $conn->error);
+                 throw new Exception("Errore nella preparazione della query di insert collezione: " . $conn->error);
             }
             $stmt_insert_card->bind_param("iii", $user_id, $oggetto_id, $card_quantity);
             $stmt_insert_card->execute();
