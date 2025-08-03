@@ -1,47 +1,54 @@
 <?php
 // C:\xampp\htdocs\LTDW-project\pages\collezione.php
 
-// Inclusione dell'header, che è nella stessa directory (pages)
+$configPath = __DIR__ . '/../include/config.inc.php';
+if (!file_exists($configPath)) {
+    // Gestione errore grave se il file di configurazione non esiste
+    header('Location: /error_page.php?code=config_missing'); // Reindirizza a una pagina di errore generica
+    exit();
+}
+require_once $configPath; // Questo rende l'array $config disponibile
+
+// Inclusione dell'header DOPO che la sessione è stata avviata e BASE_URL è definito
 include __DIR__ . '/header.php';
 
 // Controlla se l'utente è loggato
 if (!isset($_SESSION['user_id'])) {
-    // Usa BASE_URL per il reindirizzamento assoluto
-    // Prima di usare BASE_URL, assicurati che il file config sia incluso
-    // Nota: BASE_URL è definito nel config.inc.php che includiamo qui.
-    // Se BASE_URL fosse usato prima dell'inclusione, dovrebbe essere definito altrove o il reindirizzamento gestito diversamente.
-    
-    // INCLUSIONE DI config.inc.php (senza catturare il valore di ritorno)
-    // Questo rende l'array $config disponibile in questo scope
-    require_once __DIR__ . '/../include/config.inc.php'; 
-
     header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/pages/auth/login.php');
     exit();
 }
 
 $user_id = $_SESSION['user_id']; // ID dell'utente loggato
 
-// INCLUSIONE DI config.inc.php (senza catturare il valore di ritorno)
-// Questo rende l'array $config disponibile in questo scope
-require_once __DIR__ . '/../include/config.inc.php'; 
+// Accedi alle credenziali dal global $config array
+if (!isset($config['dbms']['localhost']['host'], $config['dbms']['localhost']['user'], $config['dbms']['localhost']['passwd'], $config['dbms']['localhost']['dbname'])) {
+     die("Errore: Credenziali database incomplete nel file di configurazione.");
+}
 
-// Adesso usa l'array $config per le credenziali del database
+$db_host = $config['dbms']['localhost']['host'];
+$db_user = $config['dbms']['localhost']['user'];
+$db_passwd = $config['dbms']['localhost']['passwd'];
+$db_name = $config['dbms']['localhost']['dbname'];
+
+// Connessione al database
 $conn = new mysqli(
-    $config['dbms']['localhost']['host'],
-    $config['dbms']['localhost']['user'],
-    $config['dbms']['localhost']['passwd'],
-    $config['dbms']['localhost']['dbname']
+    $db_host,
+    $db_user,
+    $db_passwd,
+    $db_name
 );
 
 if ($conn->connect_error) {
     die("Connessione al database fallita: " . $conn->connect_error);
 }
 
+// Abilita la reportistica degli errori MySQLi (utile per il debug)
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 // 1. Recupera le rarità e i loro colori
 $rarities_db = [];
 $rarity_colors = [];
-$sql_rarities = "SELECT id_rarita, nome_rarita, colore FROM rarita ORDER BY ordine ASC"; // Assumi 'ordine' per l'ordinamento
+$sql_rarities = "SELECT id_rarita, nome_rarita, colore FROM rarita ORDER BY ordine ASC";
 $result_rarities = $conn->query($sql_rarities);
 if ($result_rarities) {
     while ($row = $result_rarities->fetch_assoc()) {
@@ -52,17 +59,9 @@ if ($result_rarities) {
     error_log("Errore nel recupero delle rarità: " . $conn->error);
 }
 
-// 2. Recupera i tipi di categoria (es. 'Carta Singola')
-$categoria_carta_id = null;
-$sql_categoria = "SELECT id_categoria FROM categoria_oggetto WHERE nome_categoria = 'Carta Singola'";
-$result_categoria = $conn->query($sql_categoria);
-if ($result_categoria && $result_categoria->num_rows > 0) {
-    $categoria_carta_id = $result_categoria->fetch_assoc()['id_categoria'];
-} else {
-    die("Categoria 'Carta Singola' non trovata nel database. Assicurati che esista.");
-}
-
-// 3. Recupera tutte le carte "singole" disponibili (oggetti con fk_categoria_ogg = categoria_carta_id)
+// 2. Recupera tutte le carte "singole" disponibili
+// Ora filtriamo per il campo 'tipo_oggetto' nella tabella 'oggetto'
+// E recuperiamo il 'nome_categoria' dalla tabella 'categoria_oggetto'
 $available_cards = [];
 $sql_available_cards = "
     SELECT
@@ -71,40 +70,35 @@ $sql_available_cards = "
         o.desc_oggetto AS description,
         r.nome_rarita AS rarity,
         r.colore AS rarity_color,
-        i.nome_img AS image_filename -- Renamed to image_filename as it's just the file name
+        i.nome_img AS image_filename,
+        co.nome_categoria AS game_category
     FROM
         oggetto o
     JOIN
         rarita r ON o.fk_rarita = r.id_rarita
     LEFT JOIN
         immagine i ON o.id_oggetto = i.fk_oggetto
+    JOIN
+        categoria_oggetto co ON o.fk_categoria_oggetto = co.id_categoria
     WHERE
-        o.fk_categoria_ogg = ?
+        o.tipo_oggetto = 'Carta Singola'
     ORDER BY
         o.nome_oggetto ASC;
 ";
-$stmt_available = $conn->prepare($sql_available_cards);
-$stmt_available->bind_param("i", $categoria_carta_id);
-$stmt_available->execute();
-$result_available = $stmt_available->get_result();
+// Non è più necessario preparare la query con bind_param per 'Carta Singola' se è un valore fisso nella WHERE.
+$result_available = $conn->query($sql_available_cards);
 
-while ($row = $result_available->fetch_assoc()) {
-    // Determina il tipo di gioco. Potrebbe essere necessario un campo 'tipo_gioco' nella tabella 'oggetto'.
-    // Per ora, useremo una logica basata sul nome della carta o una mappatura.
-    $game_type = 'Altro'; // Default
-    // Esempio: se il nome della carta inizia con "Yu-Gi-Oh!" o contiene parole chiave specifiche
-    if (strpos($row['name'], 'Yu-Gi-Oh!') !== false || strpos($row['name'], 'Mago Nero') !== false || strpos($row['name'], 'Drago Bianco') !== false || strpos($row['name'], 'Kuriboh') !== false || strpos($row['name'], 'Gaia') !== false || strpos($row['name'], 'Marshmallon') !== false) {
-        $game_type = 'Yu-Gi-Oh!';
-    } elseif (strpos($row['name'], 'Pokémon') !== false || strpos($row['name'], 'Charizard') !== false || strpos($row['name'], 'Pikachu') !== false || strpos($row['name'], 'Rattata') !== false || strpos($row['name'], 'Snorlax') !== false || strpos($row['name'], 'Mewtwo') !== false || strpos($row['name'], 'Jigglypuff') !== false) {
-        $game_type = 'Pokémon';
+if ($result_available) {
+    while ($row = $result_available->fetch_assoc()) {
+        // 'game_type' ora viene direttamente da 'nome_categoria'
+        $row['game_type'] = $row['game_category']; 
+        $available_cards[$row['id_oggetto']] = $row;
     }
-    
-    $row['game_type'] = $game_type;
-    $available_cards[$row['id_oggetto']] = $row;
+} else {
+    die("Errore nel recupero delle carte disponibili: " . $conn->error);
 }
-$stmt_available->close();
 
-// 4. Recupera le carte possedute dall'utente
+// 3. Recupera le carte possedute dall'utente
 $user_collection = [];
 $sql_user_cards = "SELECT fk_oggetto, quantita_ogg FROM oggetto_utente WHERE fk_utente = ?";
 $stmt_user_cards = $conn->prepare($sql_user_cards);
@@ -124,26 +118,26 @@ $ygo_cards_data = [];
 $pk_cards_data = [];
 
 foreach ($available_cards as $card_id => $card) {
-    $card['obtained'] = isset($user_collection[$card_id]) && $user_collection[$card_id] > 0; // Se quantità > 0
+    $card['obtained'] = isset($user_collection[$card_id]) && $user_collection[$card_id] > 0;
     $card['quantity'] = $user_collection[$card_id] ?? 0;
     
     // Costruisci il percorso completo dell'immagine.
-    // Assumiamo che le immagini siano in C:\xampp\htdocs\LTDW-project\assets\images\
-    // E che image_filename contenga solo il nome del file (es. 'ygo_blue_eyes.jpg')
-    $card['image_url'] = (defined('BASE_URL') ? BASE_URL : '') . '/assets/images/' . $card['image_filename'];
+    $card['image_url'] = (defined('BASE_URL') ? BASE_URL : '') . 'images/' . $card['image_filename'];
 
+    // Usa 'game_type' (che è il nome della categoria) per popolare gli array
     if ($card['game_type'] === 'Yu-Gi-Oh!') {
         $ygo_cards_data[] = $card;
     } elseif ($card['game_type'] === 'Pokémon') {
         $pk_cards_data[] = $card;
     }
+    // Puoi aggiungere altri elseif per altre categorie se necessario
 }
 ?>
 
 <main class="background-custom">
     <div>
         <div class="container">
-            <h1 class="fashion_taital mb-5">La mia Collezione</h1>
+            <h1 class="fashion_taverage mb-5">La mia Collezione</h1>
 
             <div class="rarity-filter-section mb-5">
                 <h3 class="filter-title">Filtra per Rarità:</h3>
@@ -161,7 +155,6 @@ foreach ($available_cards as $card_id => $card) {
                     <?php
                     foreach ($ygo_cards_data as $card):
                         $rarity_class = strtolower(str_replace(' ', '-', $card['rarity']));
-                        // Colore dinamico del bordo
                         $border_color = $card['rarity_color'] ?? '#ccc'; // Usa il colore dal DB
                         ?>
                         <div class="col-lg-3 col-md-4 col-sm-6 mb-4 card-item <?php echo $rarity_class; ?>" data-game="yu-gi-oh" data-rarity="<?php echo $rarity_class; ?>">
@@ -197,7 +190,6 @@ foreach ($available_cards as $card_id => $card) {
                     <?php
                     foreach ($pk_cards_data as $card):
                         $rarity_class = strtolower(str_replace(' ', '-', $card['rarity']));
-                        // Colore dinamico del bordo
                         $border_color = $card['rarity_color'] ?? '#ccc'; // Usa il colore dal DB
                         ?>
                         <div class="col-lg-3 col-md-4 col-sm-6 mb-4 card-item <?php echo $rarity_class; ?>" data-game="pokemon" data-rarity="<?php echo $rarity_class; ?>">
