@@ -14,7 +14,7 @@
             <a href="/prevendita"><i class="bi bi-tags-fill"></i><span>Prevendita</span></a>
         </li>
         <li class="nav-item">
-            <a href="/merch"><i class="bi bi-shop"></i><span>Accessori</span></a>
+          <a href="/LTDW-project/pages/accessori.php"><i class="bi bi-shop"></i><span>Accessori</span></a>
         </li>
         <li class="nav-item">
             <a href="/LTDW-project/pages/collezione.php"><i class="bi bi-collection-fill"></i><span>Collezioni</span></a>
