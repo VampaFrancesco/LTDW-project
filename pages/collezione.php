@@ -1,5 +1,8 @@
 <?php
-// C:\xampp\htdocs\LTDW-project\pages\collezione.php
+
+include __DIR__ . '/header.php';
+require_once __DIR__ . '/../include/config.inc.php';
+
 
 // 1. Includi il file di configurazione
 $configPath = __DIR__ . '/../include/config.inc.php';
@@ -10,21 +13,14 @@ if (!file_exists($configPath)) {
 }
 require_once $configPath; // Questo rende l'array $config disponibile
 
-// 2. Assicurati che session_start(); sia chiamato PRIMA di qualsiasi output HTML.
-// Se header.php lo include, assicurati che header.php sia la PRIMA cosa che genera output.
-// Altrimenti, mettilo qui:
-session_start(); // <-- Assicurati che sia qui o in header.php come prima riga.
-
-// Inclusione dell'header DOPO che la sessione è stata avviata e BASE_URL è definito
-include __DIR__ . '/header.php';
 
 // Controlla se l'utente è loggato
-if (!isset($_SESSION['user_id'])) {
+if (SessionManager::get('user_logged_in')) {
     header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/pages/auth/login.php');
     exit();
 }
 
-$user_id = $_SESSION['user_id']; // ID dell'utente loggato
+$user_id = SessionManager::get('user_id'); // ID dell'utente loggato
 
 // Accedi alle credenziali dal global $config array
 if (!isset($config['dbms']['localhost']['host'], $config['dbms']['localhost']['user'], $config['dbms']['localhost']['passwd'], $config['dbms']['localhost']['dbname'])) {
@@ -138,49 +134,6 @@ foreach ($available_cards as $card_id => $card) {
     }
 }
 ?>
-
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>La mia Collezione</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/css/style.css">
-    <style>
-        /* Stili per le rarità */
-        .rarity-filter-section .btn-filter {
-            border: 2px solid transparent; /* Default */
-            transition: border-color 0.3s ease;
-        }
-        .rarity-filter-section .btn-filter.active {
-            font-weight: bold;
-        }
-        /* Stili specifici per i bordi dei filtri rarità (copiati dal tuo CSS precedente) */
-        .rarity-filter-section .btn-filter[data-rarity="comune"].active { border-color: #A0A0A0; }
-        .rarity-filter-section .btn-filter[data-rarity="rara"].active { border-color: #ADD8E6; }
-        .rarity-filter-section .btn-filter[data-rarity="ultra-rara"].active { border-color: #FFD700; }
-        .rarity-filter-section .btn-filter[data-rarity="segreta-rara"].active { border-color: #C0C0C0; }
-
-        /* Stili per le card non ottenute */
-        .card-box.not-obtained img.greyed-out {
-            filter: grayscale(100%) brightness(50%); /* Rende l'immagine sbiadita */
-            transition: filter 0.3s ease;
-        }
-        .card-box.not-obtained .card-empty p {
-            color: #777;
-        }
-        .card-box.not-obtained .card-empty .card-number,
-        .card-box.not-obtained .card-empty .card-value {
-             color: #999;
-        }
-        .card-box.not-obtained .card-box {
-            border-color: #555 !important; /* Bordo più scuro per le carte non ottenute */
-        }
-    </style>
-</head>
-<body>
-
 <main class="background-custom">
     <div>
         <div class="container">
@@ -371,5 +324,3 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-</body>
-</html>

@@ -4,7 +4,7 @@ include 'header.php';
 require_once __DIR__.'/../include/session_manager.php';
 
 // 3. Verifica autenticazione usando il Session Manager
-if (!SessionManager::get('user_id')) {
+if (!SessionManager::get('user_logged_in')) {
     $redirectUrl =  '/LTDW-project/pages/auth/login.php';
     header('Location: ' . $redirectUrl);
     exit();

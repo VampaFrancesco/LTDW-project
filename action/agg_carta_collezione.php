@@ -1,8 +1,7 @@
 <?php
-// C:\xampp\htdocs\LTDW-project\action\agg_carta_collezione.php
-session_start();
 // Includi il file di configurazione
 $configPath = __DIR__ . '/../include/config.inc.php';
+require_once __DIR__ . '/../include/session_manager.php';
 if (!file_exists($configPath)) {
     header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/pages/collezione.php?add_status=error&add_message=' . urlencode('Errore interno del server: file di configurazione non trovato.'));
     exit();
@@ -10,7 +9,7 @@ if (!file_exists($configPath)) {
 require_once $configPath; 
 
 // Assicurati che l'utente sia loggato
-if (!isset($_SESSION['user_id'])) {
+if (SessionManager::get('user_logged_in') === false) {
     header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/pages/auth/login.php');
     exit();
 }
@@ -21,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-$user_id = $_SESSION['user_id'];
+$user_id = SessionManager::get('user_id');
 $card_name = trim($_POST['card_name'] ?? '');
 $card_quantity = (int)($_POST['card_quantity'] ?? 0);
 

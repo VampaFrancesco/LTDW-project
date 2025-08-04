@@ -1881,3 +1881,35 @@ body {
     background-color: #f2f2f2;
     color: #30302e;
 }
+
+
+
+/* Stili per le rarità */
+.rarity-filter-section .btn-filter {
+    border: 2px solid transparent; /* Default */
+    transition: border-color 0.3s ease;
+}
+.rarity-filter-section .btn-filter.active {
+    font-weight: bold;
+}
+/* Stili specifici per i bordi dei filtri rarità (copiati dal tuo CSS precedente) */
+.rarity-filter-section .btn-filter[data-rarity="comune"].active { border-color: #A0A0A0; }
+.rarity-filter-section .btn-filter[data-rarity="rara"].active { border-color: #ADD8E6; }
+.rarity-filter-section .btn-filter[data-rarity="ultra-rara"].active { border-color: #FFD700; }
+.rarity-filter-section .btn-filter[data-rarity="segreta-rara"].active { border-color: #C0C0C0; }
+
+/* Stili per le card non ottenute */
+.card-box.not-obtained img.greyed-out {
+    filter: grayscale(100%) brightness(50%); /* Rende l'immagine sbiadita */
+    transition: filter 0.3s ease;
+}
+.card-box.not-obtained .card-empty p {
+    color: #777;
+}
+.card-box.not-obtained .card-empty .card-number,
+.card-box.not-obtained .card-empty .card-value {
+    color: #999;
+}
+.card-box.not-obtained .card-box {
+    border-color: #555 !important; /* Bordo più scuro per le carte non ottenute */
+}

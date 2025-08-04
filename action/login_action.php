@@ -58,7 +58,7 @@ if (empty($email) || empty($password)) {
                     // 2. REGISTRAZIONE DATI UTENTE IN SESSIONE
                     SessionManager::set('user_id', $id_utente);
                     SessionManager::set('user_email', $email);
-                    $isLoggato = SessionManager::set('user_logged_in', true);
+                    SessionManager::set('user_logged_in', true);
                     Sessionmanager::set('user_id', $id_utente);
                     SessionManager::set('user_name', $nome);
                     SessionManager::set('user_surname', $cognome);

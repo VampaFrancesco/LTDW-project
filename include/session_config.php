@@ -2,7 +2,7 @@
 
 // Impostazioni fondamentali per i cookie di sessione
 $cookieParams = [
-    'lifetime' => 3600, // 1 ora
+    'lifetime' => 5, // 1 minuto
     'path' => '/LTDW-project/' ?? '/',
     'domain' => $_SERVER['HTTP_HOST'],
     'httponly' => true,
