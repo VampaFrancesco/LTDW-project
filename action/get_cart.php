@@ -26,37 +26,40 @@ if (SessionManager::isLoggedIn()) {
     $id_utente = SessionManager::get('user_id');
 
     $query = "
-    SELECT 
-        c.id_carrello,
-        c.quantita,
-        c.totale,
-        CASE 
-            WHEN c.fk_mystery_box > 0 THEN mb.nome_box
-            ELSE ogg.nome_oggetto
-        END as nome,
-        CASE 
-            WHEN c.fk_mystery_box > 0 THEN mb.prezzo_box
-            ELSE ogg.prezzo_oggetto
-        END as prezzo,
-        CASE 
-            WHEN c.fk_mystery_box > 0 THEN 'mystery_box'
-            ELSE 'oggetto'
-        END as tipo,
-        CASE 
-            WHEN c.fk_mystery_box > 0 THEN c.fk_mystery_box
-            ELSE c.fk_oggetto
-        END as prodotto_id,
-        CASE 
-            WHEN c.fk_mystery_box > 0 THEN CONCAT('" . BASE_URL . "/images/', mb.nome_box, '.png')
-            ELSE COALESCE(CONCAT('" . BASE_URL . "/images/', img.nome_img), '" . BASE_URL . "/images/default_product.png')
-        END as image
-    FROM carrello c
-    LEFT JOIN mystery_box mb ON c.fk_mystery_box = mb.id_box
-    LEFT JOIN oggetto ogg ON c.fk_oggetto = ogg.id_oggetto
-    LEFT JOIN immagine img ON ogg.id_oggetto = img.fk_oggetto
-    WHERE c.fk_utente = ?
-    ORDER BY c.data_creazione DESC
-    ";
+SELECT 
+    c.id_carrello,
+    c.quantita,
+    c.totale,
+    CASE 
+        WHEN c.fk_mystery_box IS NOT NULL THEN mb.nome_box
+        WHEN c.fk_oggetto IS NOT NULL THEN ogg.nome_oggetto
+        ELSE 'Prodotto sconosciuto'
+    END as nome,
+    CASE 
+        WHEN c.fk_mystery_box IS NOT NULL THEN mb.prezzo_box
+        WHEN c.fk_oggetto IS NOT NULL THEN ogg.prezzo_oggetto
+        ELSE 0
+    END as prezzo,
+    CASE 
+        WHEN c.fk_mystery_box IS NOT NULL THEN 'mystery_box'
+        WHEN c.fk_oggetto IS NOT NULL THEN 'oggetto'
+        ELSE 'unknown'
+    END as tipo,
+    COALESCE(c.fk_mystery_box, c.fk_oggetto) as prodotto_id,
+    CASE 
+        WHEN c.fk_mystery_box IS NOT NULL THEN 
+            CONCAT('" . BASE_URL . "/images/', LOWER(REPLACE(REPLACE(mb.nome_box, ' ', '_'), '-', '_')), '.png')
+        WHEN c.fk_oggetto IS NOT NULL THEN 
+            COALESCE(CONCAT('" . BASE_URL . "/images/', img.nome_img), '" . BASE_URL . "/images/default_product.png')
+        ELSE '" . BASE_URL . "/images/default_product.png'
+    END as image
+FROM carrello c
+LEFT JOIN mystery_box mb ON c.fk_mystery_box = mb.id_box
+LEFT JOIN oggetto ogg ON c.fk_oggetto = ogg.id_oggetto
+LEFT JOIN immagine img ON ogg.id_oggetto = img.fk_oggetto
+WHERE c.fk_utente = ?
+ORDER BY c.data_creazione DESC
+";
 
     $stmt = $conn->prepare($query);
     $stmt->bind_param("i", $id_utente);

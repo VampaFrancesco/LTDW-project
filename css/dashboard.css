@@ -1,0 +1,109 @@
+/* dashboard.css */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap');
+
+:root {
+    --primary:      #4e73df;
+    --primary-dark: #224abe;
+    --light-bg:     #f8f9fc;
+    --dark-text:    #5a5c69;
+    --card-shadow:  rgba(58, 59, 69, .15);
+}
+
+* {
+    font-family: 'Open Sans', sans-serif;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--light-bg);
+}
+
+/* Navbar con gradient */
+.navbar {
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
+    box-shadow: 0 .15rem 1.75rem var(--card-shadow);
+}
+
+/* Sidebar scura e compatta */
+.sidebar {
+    background-color: var(--primary-dark);
+    color: #fff;
+}
+.sidebar .nav-link {
+    color: #fff !important;
+    padding: .75rem 1rem;
+}
+.sidebar .nav-link.active,
+.sidebar .nav-link:hover {
+    background-color: rgba(255,255,255,0.1) !important;
+    border-left: 4px solid #fff;
+}
+
+/* Card widget */
+.dashboard-card {
+    background: #fff;
+    border-radius: .75rem;
+    box-shadow: 0 .15rem 1.75rem var(--card-shadow);
+    transition: transform .2s, box-shadow .2s;
+}
+.dashboard-card:hover {
+    transform: translateY(-.5rem);
+    box-shadow: 0 .5rem 2rem var(--card-shadow);
+}
+.dashboard-card .icon-lg {
+    font-size: 2.5rem;
+    color: var(--primary);
+}
+.dashboard-card h3 {
+    font-weight: 700;
+    color: var(--dark-text);
+}
+.dashboard-card p {
+    font-size: .9rem;
+}
+
+/* Footer leggero */
+.footer {
+    background: #fff;
+    border-top: 1px solid #e3e6f0;
+    color: var(--dark-text);
+}
+
+/* Sezione CRUD */
+#crud-operations h2 {
+    color: var(--dark-text);
+}
+
+.crud-card {
+    transition: transform .2s, box-shadow .2s;
+}
+.crud-card:hover {
+    transform: translateY(-.5rem);
+    box-shadow: 0 .5rem 2rem var(--card-shadow);
+}
+.crud-card h5 {
+    font-weight: 600;
+    color: var(--dark-text);
+}
+.crud-card .btn {
+    font-size: .8rem;
+}
+.crud-card {
+    max-width: 480px;
+    margin: 0 auto;
+}
+/* --- Sidebar sempre visibile e con sfondo scuro --- */
+.sidebar {
+    background-color: var(--primary-dark) !important;
+    color: #fff !important;
+}
+
+/* Link della sidebar in bianco e evidenziati */
+.sidebar .nav-link {
+    color: rgba(255,255,255,0.8) !important;
+}
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    color: #fff !important;
+    background-color: rgba(255,255,255,0.1) !important;
+}

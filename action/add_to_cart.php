@@ -50,7 +50,7 @@ if (SessionManager::isLoggedIn()) {
 
     // Controlla se il prodotto è già nel carrello
     $stmt = $conn->prepare("SELECT id_carrello, quantita FROM carrello WHERE fk_utente = ? AND " .
-        ($tipo === 'mystery_box' ? 'fk_mystery_box = ? AND fk_oggetto = 0' : 'fk_oggetto = ? AND fk_mystery_box = 0'));
+        ($tipo === 'mystery_box' ? 'fk_mystery_box = ? AND fk_oggetto IS NULL' : 'fk_oggetto = ? AND fk_mystery_box IS NULL'));
     $stmt->bind_param("ii", $id_utente, $id_prodotto);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -76,19 +76,19 @@ if (SessionManager::isLoggedIn()) {
         $stmt->close();
         $totale = $quantita * $prezzo;
 
-        // La tabella carrello richiede sempre entrambi i campi, uno deve essere 0
+        // Usa NULL invece di 0 per i campi foreign key non utilizzati
         if ($tipo === 'mystery_box') {
-            $stmt = $conn->prepare("INSERT INTO carrello (fk_utente, fk_mystery_box, fk_oggetto, quantita, totale) VALUES (?, ?, 0, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO carrello (fk_utente, fk_mystery_box, fk_oggetto, quantita, totale) VALUES (?, ?, NULL, ?, ?)");
             $stmt->bind_param("iiid", $id_utente, $id_prodotto, $quantita, $totale);
         } else {
-            $stmt = $conn->prepare("INSERT INTO carrello (fk_utente, fk_mystery_box, fk_oggetto, quantita, totale) VALUES (?, 0, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO carrello (fk_utente, fk_mystery_box, fk_oggetto, quantita, totale) VALUES (?, NULL, ?, ?, ?)");
             $stmt->bind_param("iiid", $id_utente, $id_prodotto, $quantita, $totale);
         }
 
         if ($stmt->execute()) {
             SessionManager::setFlashMessage("Prodotto aggiunto al carrello!", 'success');
         } else {
-            SessionManager::setFlashMessage('Errore nell\'aggiungere il prodotto', 'danger');
+            SessionManager::setFlashMessage('Errore nell\'aggiungere il prodotto: ' . $stmt->error, 'danger');
         }
     }
 
@@ -139,4 +139,3 @@ function updateCartCount($conn, $id_utente) {
 
     SessionManager::set('cart_items_count', $row['total'] ?? 0);
 }
-?>

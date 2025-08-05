@@ -111,7 +111,7 @@ include  'header.php';
                                     </div>
                                 <?php endif; ?>
 
-                                <a href="<?php echo BASE_URL; ?>/pages/catalogo.php" class="btn btn-outline-primary w-100 mt-2">
+                                <a href="<?php echo BASE_URL; ?>/pages/pokémon.php" class="btn btn-outline-primary w-100 mt-2">
                                     <i class="bi bi-arrow-left"></i> Continua Shopping
                                 </a>
                             </div>
@@ -136,6 +136,18 @@ include  'header.php';
             if (quantity < 1) quantity = 1;
             if (quantity > 99) quantity = 99;
 
+            // Aggiorna l'input visivamente
+            const input = document.querySelector(`[data-item-id="${itemKey}"] .quantity-input`);
+            if (input) {
+                input.value = quantity;
+            }
+
+            console.log('Sending request with:', {
+                action: 'update',
+                item_key: itemKey,
+                quantity: quantity
+            });
+
             // Aggiorna via AJAX
             fetch('<?php echo BASE_URL; ?>/action/update_cart.php', {
                 method: 'POST',
@@ -144,22 +156,48 @@ include  'header.php';
                 },
                 body: `action=update&item_key=${encodeURIComponent(itemKey)}&quantity=${quantity}`
             })
-                .then(response => response.json())
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    console.log('Response headers:', response.headers);
+
+                    // Prima ottieni il testo della risposta
+                    return response.text().then(text => {
+                        console.log('Raw response text:', text);
+
+                        // Controlla se la risposta inizia con '<' (potrebbe essere HTML di errore)
+                        if (text.trim().startsWith('<')) {
+                            throw new Error('Received HTML instead of JSON. Check PHP errors.');
+                        }
+
+                        // Prova a fare il parse del JSON
+                        try {
+                            const data = JSON.parse(text);
+                            return data;
+                        } catch (e) {
+                            console.error('JSON parse error:', e);
+                            console.error('Failed to parse:', text);
+                            throw new Error('Invalid JSON response');
+                        }
+                    });
+                })
                 .then(data => {
+                    console.log('Parsed data:', data);
                     if (data.success) {
-                        location.reload(); // Ricarica per aggiornare i totali
+                        location.reload();
                     } else {
-                        alert('Errore nell\'aggiornare la quantità');
+                        alert('Errore: ' + (data.message || 'Impossibile aggiornare la quantità'));
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    alert('Errore nell\'aggiornare la quantità');
+                    console.error('Fetch error:', error);
+                    alert('Errore nell\'aggiornare la quantità. Apri la console del browser per vedere i dettagli.');
                 });
         }
 
         function removeItem(itemKey) {
             if (confirm('Sei sicuro di voler rimuovere questo articolo dal carrello?')) {
+                console.log('Removing item:', itemKey);
+
                 fetch('<?php echo BASE_URL; ?>/action/update_cart.php', {
                     method: 'POST',
                     headers: {
@@ -167,24 +205,41 @@ include  'header.php';
                     },
                     body: `action=remove&item_key=${encodeURIComponent(itemKey)}`
                 })
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('Remove response status:', response.status);
+
+                        return response.text().then(text => {
+                            console.log('Raw remove response:', text);
+
+                            if (text.trim().startsWith('<')) {
+                                throw new Error('Received HTML instead of JSON');
+                            }
+
+                            try {
+                                return JSON.parse(text);
+                            } catch (e) {
+                                console.error('JSON parse error:', e);
+                                throw new Error('Invalid JSON response');
+                            }
+                        });
+                    })
                     .then(data => {
+                        console.log('Remove response data:', data);
                         if (data.success) {
                             location.reload();
                         } else {
-                            alert('Errore nella rimozione dell\'articolo');
+                            alert('Errore: ' + (data.message || 'Impossibile rimuovere l\'articolo'));
                         }
                     })
                     .catch(error => {
-                        console.error('Error:', error);
-                        alert('Errore nella rimozione dell\'articolo');
+                        console.error('Remove error:', error);
+                        alert('Errore nella rimozione. Controlla la console per i dettagli.');
                     });
             }
         }
 
         function proceedToCheckout() {
-            // Implementa qui la logica per il checkout
-            alert('Funzionalità di checkout da implementare!');
+            window.location.href = '<?php echo BASE_URL; ?>/pages/checkout.php';
         }
     </script>
 
