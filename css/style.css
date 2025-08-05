@@ -1265,6 +1265,21 @@ body {
         align-items: center;
     }
 }
+
+/* Aggiungi questo stile per i menu a tendina */
+.dropdown-menu {
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    min-width: 200px;
+    /* Aggiungi questa linea per sovrapporre il menu al footer */
+    z-index: 1050; /* Un valore alto per essere sicuro */
+}
+
+/* Potrebbe essere necessario anche per il contenitore del dropdown */
+.filter-dropdown-container .dropdown {
+    /* Assicurati che anche il genitore abbia un posizionamento che consenta allo z-index di funzionare */
+    position: relative; 
+}
 /* Stili per la griglia di prodotti (sia Mystery Box che Funko Pop) */
 .mystery-box-item,
 .funko-pop-item {
