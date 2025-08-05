@@ -2016,6 +2016,84 @@ body {
             scroll-margin-top: 100px;
         }
 
+/* Stile per la Poké Ball */
+.pokeball {
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    display: inline-block;
+    transition: transform 0.2s ease-in-out;
+}
+
+.pokeball:hover {
+    transform: scale(1.1);
+}
+
+.pokeball-top {
+    height: 50%;
+    background-color: red;
+    border-bottom: 2px solid black;
+}
+
+.pokeball-middle {
+    height: 2px;
+    background-color: black;
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pokeball-button {
+    width: 12px;
+    height: 12px;
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 50%;
+    position: relative;
+}
+
+.pokeball-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    background-color: black;
+    border-radius: 50%;
+}
+
+.pokeball-bottom {
+    height: 50%;
+    background-color: white;
+}
+
+/* Stile per il link della navbar che contiene la Poké Ball */
+.nav-item .pokeball-link {
+    display: flex; /* Attiva il layout flessibile */
+    flex-direction: column; /* Imposta la disposizione degli elementi in colonna */
+    align-items: center; /* Centra gli elementi orizzontalmente */
+    text-align: center;
+    text-decoration: none;
+    color: white; /* Mantiene il colore del testo predefinito della navbar */
+    padding: 0; /* Rimuovi il padding predefinito per un layout più compatto */
+}
+
+.pokeball-link span {
+    margin-top: 5px; /* Spazio tra la Poké Ball e il testo */
+    font-size: 14px; /* Dimensione del testo */
+}
+
 
 /* MODAL DETTAGLI ORDINE */
 /* Stili per il modal dei dettagli ordine */
