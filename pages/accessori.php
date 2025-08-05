@@ -44,7 +44,7 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 // Query per recuperare tutti gli accessori
 $accessori_by_type = [];
-$accessory_types = ['Plance di gioco', 'Scatole porta mazzi', 'Proteggicarte', 'Porta carte'];
+$accessory_types = ['Proteggicarte', 'Porta carte', 'Scatole porta mazzi', 'Plance di gioco' ];
 
 foreach ($accessory_types as $type) {
     $sql_accessories = "
@@ -89,30 +89,6 @@ foreach ($accessory_types as $type) {
 
 $conn->close();
 ?>
-
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accessori</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/css/style.css">
-    <style>
-        .filter-container {
-            padding: 1rem 0;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid #e9ecef;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-        }
-        .accessory-section {
-            scroll-margin-top: 100px;
-        }
-    </style>
-</head>
-<body>
 
 <main class="background-custom">
     <div class="container">
@@ -250,5 +226,3 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-</body>
-</html>
