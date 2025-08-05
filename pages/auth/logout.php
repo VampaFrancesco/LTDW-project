@@ -1,9 +1,16 @@
 <?php
+// File: /action/logout.php
+
+require_once __DIR__.'/../../include/session_manager.php';
+require_once __DIR__.'/../../include/config.inc.php';
+
+// Distruggi la sessione
 SessionManager::destroy();
-?>
-<div>
-    <h1>Logout effettuato con successo</h1>
-    <p>Sei stato disconnesso. Puoi tornare alla pagina di login o alla home page.</p>
-    <a href="/LTDW-project/pages/auth/login.php">Login</a> |
-    <a href="/LTDW-project/pages/home_utente.php">Home</a>
-</div>
+
+// Crea nuova sessione per il messaggio
+session_start();
+SessionManager::setFlashMessage('Logout effettuato con successo', 'success');
+
+// Redirect al login
+header('Location: ' . BASE_URL . '/pages/auth/login.php');
+exit();

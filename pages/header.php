@@ -1,7 +1,24 @@
 <?php
 require_once __DIR__ . '/../include/config.inc.php';
 require_once __DIR__ . '/../include/session_manager.php';
+
+// IMPORTANTE: Fai tutti i controlli PRIMA di qualsiasi output HTML
 SessionManager::startSecureSession();
+
+// Controllo automatico per pagine protette (opzionale - se implementi auth_config.php)
+/*
+require_once __DIR__ . '/../include/auth_config.php';
+$current_page = $_SERVER['REQUEST_URI'];
+if (isProtectedPage($current_page)) {
+    SessionManager::requireLogin();
+}
+*/
+
+// Recupera il messaggio flash PRIMA dell'output HTML
+$flash_message = SessionManager::get('flash_message');
+if ($flash_message) {
+    SessionManager::set('flash_message', null); // Rimuovi subito per evitare duplicati
+}
 ?>
 <!DOCTYPE html>
 <html lang="it" class="html bebas-neue-regular">
@@ -11,24 +28,33 @@ SessionManager::startSecureSession();
     <title>Box Omnia</title>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="/LTDW-project/css/bootstrap.min.css">
+    <link rel="stylesheet" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link rel="icon" href="../images/favicon.ico" type="image/gif"/>
-    <link rel="stylesheet" href="/LTDW-project/css/style.css">
+    <link rel="icon" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/images/favicon.ico" type="image/gif"/>
+    <link rel="stylesheet" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/css/style.css">
 </head>
+<body>
+<!-- Gestione messaggi flash -->
+<?php if ($flash_message): ?>
+    <div class="alert alert-<?php echo htmlspecialchars($flash_message['type']); ?> alert-dismissible fade show" role="alert">
+        <?php echo htmlspecialchars($flash_message['content']); ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
+
 <?php if (empty($hideNav)): ?>
     <header>
-        <div class="header-top bg-light py-2 background-custom ">
+        <div class="header-top bg-light py-2 background-custom">
             <div class="container d-flex align-items-center">
 
                 <!-- 1) Logo a sinistra -->
-                <a href="/LTDW-project/pages/index.php" class="logo-link mr-3">
-                    <img id="logo_header" src="/LTDW-project/images/boxomnia.png" alt="logo">
+                <a href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/index.php" class="logo-link mr-3">
+                    <img id="logo_header" src="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/images/boxomnia.png" alt="logo">
                 </a>
 
                 <!-- 2) Search bar -->
                 <div class="flex-fill px-3">
-                    <form class="form-inline w-100" method="get" action="search.php">
+                    <form class="form-inline w-100" method="get" action="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/search.php">
                         <input class="form-control mr-2 flex-grow-1" type="search" name="q" placeholder="Cerca..."
                                aria-label="Cerca">
                         <button class="btn btn-outline-secondary" type="submit">
@@ -40,10 +66,65 @@ SessionManager::startSecureSession();
                 <!-- 3) Top-links a destra -->
                 <div class="top-links d-flex align-items-center ml-3">
                     <i class="bi bi-person-fill"></i>
-                    <a href="<?php echo SessionManager::get('user_logged_in') ? '/LTDW-project/pages/home_utente.php' : '/LTDW-project/pages/auth/login.php'; ?>" class="mx-2">ACCOUNT</a>
-                    <a href="#" class="mx-2"><i class="bi bi-gift-fill"></i></a>
-                    <a href="#" class="mx-2"><i class="bi bi-heart-fill"></i></a>
-                    <a href="cart.php" class="mx-2"><i class="bi bi-cart-fill"></i></a>
+
+                    <?php if (SessionManager::isLoggedIn()): ?>
+                        <!-- Utente loggato -->
+                        <div class="dropdown">
+                            <a href="#" class="mx-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                <?php
+                                $nome = SessionManager::get('user_nome', 'Utente');
+                                echo htmlspecialchars($nome);
+                                ?>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/home_utente.php">
+                                        <i class="bi bi-house"></i> Dashboard
+                                    </a></li>
+                                <li><a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/collezione.php">
+                                        <i class="bi bi-collection"></i> La mia Collezione
+                                    </a></li>
+                                <li><a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/profilo.php">
+                                        <i class="bi bi-person-gear"></i> Profilo
+                                    </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/action/logout.php">
+                                        <i class="bi bi-box-arrow-right"></i> Logout
+                                    </a></li>
+                            </ul>
+                        </div>
+                    <?php else: ?>
+                        <!-- Utente non loggato -->
+                        <a href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/auth/login.php" class="mx-2">ACCEDI</a>
+                        <a href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/auth/register.php" class="mx-2">REGISTRATI</a>
+                    <?php endif; ?>
+
+                    <!-- Altri link sempre visibili -->
+                    <a href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/wishlist.php" class="mx-2" title="Lista Desideri">
+                        <i class="bi bi-heart-fill"></i>
+                    </a>
+                    <a href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/cart.php" class="mx-2" title="Carrello">
+                        <i class="bi bi-cart-fill"></i>
+                        <?php
+                        // Mostra numero items nel carrello se presente
+                        $cart_items = SessionManager::get('cart_items_count', 0);
+                        if ($cart_items > 0):
+                            ?>
+                            <span class="badge bg-danger"><?php echo $cart_items; ?></span>
+                        <?php endif; ?>
+                    </a>
+
+                    <?php if (SessionManager::isLoggedIn()): ?>
+                        <a href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/notifications.php" class="mx-2" title="Notifiche">
+                            <i class="bi bi-bell-fill"></i>
+                            <?php
+                            // Mostra numero notifiche se presente
+                            $notifications = SessionManager::get('notifications_count', 0);
+                            if ($notifications > 0):
+                                ?>
+                                <span class="badge bg-warning"><?php echo $notifications; ?></span>
+                            <?php endif; ?>
+                        </a>
+                    <?php endif; ?>
                 </div>
 
             </div>
@@ -51,3 +132,17 @@ SessionManager::startSecureSession();
         <?php include __DIR__ . '/sections/navbar.php' ?>
     </header>
 <?php endif; ?>
+
+<!-- Script per il dropdown (Bootstrap 5) -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-hide alerts dopo 5 secondi
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            setTimeout(function() {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000);
+        });
+    });
+</script>

@@ -1,99 +1,95 @@
 <?php
-global $config;
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// Evita output prima degli header
+ob_start();
 
-
-// 1. INIZIO SESSIONE SICURA
 require_once __DIR__.'/../include/session_manager.php';
+require_once __DIR__.'/../include/config.inc.php';
+
+// Inizializza sessione
 SessionManager::startSecureSession();
 
-$configPath = __DIR__ . '/../include/config.inc.php';
-if (!file_exists($configPath)) {
-    header('Location: ../pages/auth/login.php?error=' . urlencode('Errore interno del server'));
-    exit;
+// Verifica metodo POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: ' . BASE_URL . '/pages/auth/login.php');
+    exit();
 }
 
-require_once $configPath;
-$db_config = $config['dbms']['localhost'];
+// Recupera dati form
+$email = trim($_POST['email'] ?? '');
+$password = $_POST['password'] ?? '';
 
+// Validazione base
+if (empty($email) || empty($password)) {
+    SessionManager::setFlashMessage('Inserire email e password', 'danger');
+    SessionManager::set('login_form_data', ['email' => $email]);
+    header('Location: ' . BASE_URL . '/pages/auth/login.php');
+    exit();
+}
+
+// Connessione database
+$db_config = $config['dbms']['localhost'];
 $conn = new mysqli(
     $db_config['host'],
     $db_config['user'],
     $db_config['passwd'],
     $db_config['dbname']
 );
+
 if ($conn->connect_error) {
-    header('Location: ../pages/auth/login.php?error=' . urlencode('Connessione al database fallita'));
-    exit;
-}
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ../pages/auth/login.php');
-    exit;
-}
-
-$email = trim($_POST['email'] ?? '');
-$password = $_POST['password'] ?? '';
-
-$error_message = '';
-
-if (empty($email) || empty($password)) {
-    $error_message = "Inserire email e password";
-} else {
-    try {
-        $stmt = $conn->prepare("SELECT id_utente, password, nome, cognome FROM utente WHERE email = ?");
-        if ($stmt) {
-            $stmt->bind_param("s", $email);
-            $stmt->execute();
-            $stmt->store_result();
-
-            if ($stmt->num_rows === 1) {
-                $stmt->bind_result($id_utente, $hashed_password, $nome, $cognome);
-                $stmt->fetch();
-
-                if (password_verify($password, $hashed_password)) {
-                    // 2. REGISTRAZIONE DATI UTENTE IN SESSIONE
-                    SessionManager::set('user_id', $id_utente);
-                    SessionManager::set('user_email', $email);
-                    SessionManager::set('user_logged_in', true);
-                    Sessionmanager::set('user_id', $id_utente);
-                    SessionManager::set('user_name', $nome);
-                    SessionManager::set('user_surname', $cognome);
-                    SessionManager::set('last_activity', time());
-
-
-                    // 3. REINDIRIZZAMENTO SICURO
-                    $redirect_url = $_POST['redirect'] ?? '/LTDW-project/pages/home_utente.php';
-                    header('Location: ' . filter_var($redirect_url, FILTER_SANITIZE_URL));
-                    exit();
-                } else {
-                    $error_message = "Email o password non validi";
-                }
-            } else {
-                $error_message = "Email o password non validi";
-            }
-            $stmt->close();
-        } else {
-            $error_message = "Si è verificato un errore";
-        }
-    } catch (mysqli_sql_exception $e) {
-        $error_message = "Si è verificato un errore interno";
-    }
-}
-
-$conn->close();
-
-if (!empty($error_message)) {
-    // 4. PULIZIA SESSIONE IN CASO DI ERRORE
-    SessionManager::destroy();
-    header('Location: ../pages/auth/login.php?error=' . urlencode($error_message));
+    SessionManager::setFlashMessage('Errore di connessione al database', 'danger');
+    header('Location: ' . BASE_URL . '/pages/auth/login.php');
     exit();
 }
 
-// 5. FALLBACK PER ERRORI IMPREVISTI
-SessionManager::destroy();
-header('Location: ../pages/auth/login.php?error=' . urlencode('Si è verificato un errore imprevisto'));
+// Query per verificare utente
+$stmt = $conn->prepare("SELECT id_utente, password, nome, cognome FROM utente WHERE email = ?");
+if (!$stmt) {
+    SessionManager::setFlashMessage('Errore interno del server', 'danger');
+    header('Location: ' . BASE_URL . '/pages/auth/login.php');
+    exit();
+}
+
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows === 1) {
+    $user = $result->fetch_assoc();
+
+    // Verifica password
+    if (password_verify($password, $user['password'])) {
+        // Login riuscito
+        SessionManager::login($user['id_utente'], [
+            'email' => $email,
+            'nome' => $user['nome'],
+            'cognome' => $user['cognome']
+        ]);
+
+        // Determina dove reindirizzare
+        $redirect_url = SessionManager::get('redirect_after_login');
+
+        if ($redirect_url && !strpos($redirect_url, 'logout')) {
+            // Usa il redirect salvato
+            SessionManager::remove('redirect_after_login');
+            $final_redirect = $redirect_url;
+        } else {
+            // Default: home utente
+            $final_redirect = BASE_URL . '/pages/home_utente.php';
+        }
+
+        $stmt->close();
+        $conn->close();
+
+        header('Location: ' . $final_redirect);
+        exit();
+    }
+}
+
+// Login fallito
+$stmt->close();
+$conn->close();
+
+SessionManager::setFlashMessage('Email o password non validi', 'danger');
+SessionManager::set('login_form_data', ['email' => $email]);
+header('Location: ' . BASE_URL . '/pages/auth/login.php');
 exit();

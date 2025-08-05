@@ -1,26 +1,16 @@
 <?php
-
-include __DIR__ . '/header.php';
+// 1. PRIMA di qualsiasi output: include SessionManager e controlli
+require_once __DIR__ . '/../include/session_manager.php';
 require_once __DIR__ . '/../include/config.inc.php';
 
+// 2. Richiedi autenticazione (fa il redirect automaticamente se non loggato)
+SessionManager::requireLogin();
 
-// 1. Includi il file di configurazione
-$configPath = __DIR__ . '/../include/config.inc.php';
-if (!file_exists($configPath)) {
-    // Gestione errore grave se il file di configurazione non esiste
-    header('Location: /error_page.php?code=config_missing'); // Reindirizza a una pagina di errore generica
-    exit();
-}
-require_once $configPath; // Questo rende l'array $config disponibile
+// 3. ORA è sicuro includere l'header
+include __DIR__ . '/header.php';
 
-
-// Controlla se l'utente è loggato
-if (SessionManager::get('user_logged_in')) {
-    header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/pages/auth/login.php');
-    exit();
-}
-
-$user_id = SessionManager::get('user_id'); // ID dell'utente loggato
+// 4. Recupera i dati utente
+$user_id = SessionManager::getUserId();
 
 // Accedi alle credenziali dal global $config array
 if (!isset($config['dbms']['localhost']['host'], $config['dbms']['localhost']['user'], $config['dbms']['localhost']['passwd'], $config['dbms']['localhost']['dbname'])) {
@@ -105,10 +95,10 @@ $result_available = $stmt_available_cards->get_result();
 
 if ($result_available) {
     while ($row = $result_available->fetch_assoc()) {
-        $row['game_type'] = $row['game_category']; 
+        $row['game_type'] = $row['game_category'];
         // Determina se la carta è ottenuta basandosi sulla quantità
         $row['obtained'] = ($row['quantity'] > 0);
-        
+
         $available_cards[$row['id_oggetto']] = $row;
     }
 } else {
@@ -123,9 +113,9 @@ $pk_cards_data = [];
 
 foreach ($available_cards as $card_id => $card) {
     // Costruisci il percorso completo dell'immagine.
-    $base_url_prefix = defined('BASE_URL') ? BASE_URL : ''; 
+    $base_url_prefix = defined('BASE_URL') ? BASE_URL : '';
     $image_filename_to_use = $card['image_filename'] ?? 'default_card.png';
-    $card['image_url'] = $base_url_prefix . '/images/' . $image_filename_to_use; 
+    $card['image_url'] = $base_url_prefix . '/images/' . $image_filename_to_use;
 
     if ($card['game_type'] === 'Yu-Gi-Oh!') {
         $ygo_cards_data[] = $card;
@@ -150,7 +140,7 @@ foreach ($available_cards as $card_id => $card) {
                 <div class="filter-buttons-container">
                     <button class="btn btn-filter active" data-rarity="all">Tutte</button>
                     <?php foreach ($rarities_db as $id => $rarity_name): ?>
-                        <button class="btn btn-filter" 
+                        <button class="btn btn-filter"
                                 data-rarity="<?php echo strtolower(str_replace(' ', '-', $rarity_name)); ?>"
                                 style="border-color: <?php echo htmlspecialchars($rarity_colors[$rarity_name] ?? '#ccc'); ?>;">
                             <?php echo htmlspecialchars($rarity_name); ?>
@@ -165,10 +155,10 @@ foreach ($available_cards as $card_id => $card) {
                     <?php
                     foreach ($ygo_cards_data as $card):
                         $rarity_class = strtolower(str_replace(' ', '-', $card['rarity']));
-                        $border_color = $card['rarity_color'] ?? '#ccc'; 
+                        $border_color = $card['rarity_color'] ?? '#ccc';
                         ?>
-                        <div class="col-lg-3 col-md-4 col-sm-6 mb-4 card-item <?php echo $rarity_class; ?>" 
-                             data-game="yu-gi-oh" 
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-4 card-item <?php echo $rarity_class; ?>"
+                             data-game="yu-gi-oh"
                              data-rarity="<?php echo $rarity_class; ?>"
                              data-card-id="<?php echo htmlspecialchars($card['id_oggetto']); ?>">
                             <div class="card-box <?php echo $card['obtained'] ? '' : 'not-obtained'; ?>" style="border: 3px solid <?php echo htmlspecialchars($border_color); ?>;">
@@ -215,10 +205,10 @@ foreach ($available_cards as $card_id => $card) {
                     <?php
                     foreach ($pk_cards_data as $card):
                         $rarity_class = strtolower(str_replace(' ', '-', $card['rarity']));
-                        $border_color = $card['rarity_color'] ?? '#ccc'; 
+                        $border_color = $card['rarity_color'] ?? '#ccc';
                         ?>
-                        <div class="col-lg-3 col-md-4 col-sm-6 mb-4 card-item <?php echo $rarity_class; ?>" 
-                             data-game="pokemon" 
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-4 card-item <?php echo $rarity_class; ?>"
+                             data-game="pokemon"
                              data-rarity="<?php echo $rarity_class; ?>"
                              data-card-id="<?php echo htmlspecialchars($card['id_oggetto']); ?>">
                             <div class="card-box <?php echo $card['obtained'] ? '' : 'not-obtained'; ?>" style="border: 3px solid <?php echo htmlspecialchars($border_color); ?>;">
@@ -262,7 +252,7 @@ foreach ($available_cards as $card_id => $card) {
             <div class="add-card-section mb-5">
                 <h2 class="category-title mb-4">Aggiungi una Nuova Carta</h2>
                 <div class="add-card-form-container">
-                    <form id="addCardForm" action="<?php echo (defined('BASE_URL') ? BASE_URL : '') . '/action/agg_carta_collezione.php'; ?>" method="post">
+                    <form id="addCardForm" action="<?php echo BASE_URL; ?>/action/agg_carta_collezione.php" method="post">
                         <div class="row">
                             <div class="col-md-12 mb-3">
                                 <label for="cardName" class="form-label">Nome Carta</label>
@@ -285,42 +275,42 @@ foreach ($available_cards as $card_id => $card) {
 <?php include __DIR__ . '/footer.php'; ?>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const filterButtons = document.querySelectorAll('.btn-filter');
-    const cardItems = document.querySelectorAll('.card-item');
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterButtons = document.querySelectorAll('.btn-filter');
+        const cardItems = document.querySelectorAll('.card-item');
 
-    filterButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            filterButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
 
-            const selectedRarity = this.dataset.rarity;
+                const selectedRarity = this.dataset.rarity;
 
-            cardItems.forEach(card => {
-                const cardRarity = card.dataset.rarity;
-                
-                if (selectedRarity === 'all' || cardRarity === selectedRarity) {
-                    card.style.display = 'block';
-                    setTimeout(() => {
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateY(0)';
-                    }, 50); 
-                } else {
-                    card.style.opacity = '0';
-                    card.style.transform = 'translateY(10px)';
-                    setTimeout(() => {
-                        card.style.display = 'none';
-                    }, 500); 
-                }
+                cardItems.forEach(card => {
+                    const cardRarity = card.dataset.rarity;
+
+                    if (selectedRarity === 'all' || cardRarity === selectedRarity) {
+                        card.style.display = 'block';
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0)';
+                        }, 50);
+                    } else {
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(10px)';
+                        setTimeout(() => {
+                            card.style.display = 'none';
+                        }, 500);
+                    }
+                });
             });
         });
-    });
 
-    const alert = document.querySelector('.alert');
-    if (alert) {
-        setTimeout(() => {
-            alert.remove();
-        }, 5000); 
-    }
-});
+        const alert = document.querySelector('.alert');
+        if (alert) {
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+    });
 </script>
