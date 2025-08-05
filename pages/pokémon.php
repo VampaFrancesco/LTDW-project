@@ -17,7 +17,8 @@ if ($conn->connect_error) {
     die("Errore di connessione: " . $conn->connect_error);
 }
 
-// Query per recuperare le Mystery Box dal database
+// Query per recuperare le Mystery Box.
+// Vengono recuperate le Mystery Box la cui categoria è 'Pokémon' e il tipo di oggetto è 'Mystery Box'.
 $query_mystery_box = "SELECT
     mb.id_box as id,
     mb.nome_box as name,
@@ -27,7 +28,10 @@ $query_mystery_box = "SELECT
     r.nome_rarita as rarity_name,
     r.colore as rarity_color
 FROM mystery_box mb
+INNER JOIN categoria_oggetto co ON mb.fk_categoria_oggetto = co.id_categoria
 LEFT JOIN rarita r ON mb.fk_rarita = r.id_rarita
+WHERE co.nome_categoria = 'Pokémon'
+  AND co.tipo_oggetto = 'Mystery Box'
 ORDER BY mb.id_box";
 
 $result_mystery_box = $conn->query($query_mystery_box);
@@ -50,7 +54,7 @@ if ($result_mystery_box->num_rows > 0) {
 }
 $no_boxes = empty($mystery_boxes);
 
-// Recupera le rarità per i filtri
+// Recupera le rarità per i filtri (rimane invariata)
 $query_rarita = "SELECT id_rarita, nome_rarita FROM rarita ORDER BY ordine";
 $result_rarita = $conn->query($query_rarita);
 $rarities = [];
@@ -60,7 +64,8 @@ if ($result_rarita->num_rows > 0) {
     }
 }
 
-// Query per recuperare i Funko Pop
+// Query per recuperare i Funko Pop.
+// Vengono recuperati gli oggetti la cui categoria è 'Pokémon' e il tipo di oggetto è 'Funko Pop'.
 $query_funko_pop = "SELECT
     o.id_oggetto as id,
     o.nome_oggetto as name,
@@ -73,7 +78,9 @@ $query_funko_pop = "SELECT
 FROM oggetto o
 INNER JOIN categoria_oggetto co ON o.fk_categoria_oggetto = co.id_categoria
 LEFT JOIN rarita r ON o.fk_rarita = r.id_rarita
-WHERE co.nome_categoria = 'Funko Pop'";
+WHERE co.nome_categoria = 'Pokémon'
+  AND co.tipo_oggetto = 'Funko Pop'
+ORDER BY o.id_oggetto";
 
 $result_funko_pop = $conn->query($query_funko_pop);
 $funko_pops = [];
