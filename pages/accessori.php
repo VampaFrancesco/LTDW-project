@@ -9,11 +9,11 @@ if (!file_exists($configPath)) {
 }
 require_once $configPath;
 
-// Includi il SessionManager per una gestione sicura della sessione
 require_once __DIR__ . '/../include/session_manager.php';
+require_once __DIR__ . '/../include/config.inc.php';
 
-// Avvia la sessione. Usiamo startSecureSession() perché la pagina non richiede l'autenticazione.
-SessionManager::startSecureSession();
+// 2. Richiedi autenticazione (fa il redirect automaticamente se non loggato)
+SessionManager::requireLogin();
 
 // Inclusione dell'header
 include __DIR__ . '/header.php';
@@ -90,7 +90,7 @@ foreach ($accessory_types as $type) {
 $conn->close();
 ?>
 
-<main class="background-custom">
+<main class="background-custom filter-container accessory-section">
     <div class="container">
         
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -156,7 +156,7 @@ $conn->close();
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>-->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const accessoryCards = document.querySelectorAll('.accessory-card');

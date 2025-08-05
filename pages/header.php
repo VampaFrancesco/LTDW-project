@@ -87,7 +87,7 @@ if ($flash_message) {
                                         <i class="bi bi-person-gear"></i> Profilo
                                     </a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/action/logout.php">
+                                <li><a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/auth/logout.php">
                                         <i class="bi bi-box-arrow-right"></i> Logout
                                     </a></li>
                             </ul>
@@ -134,6 +134,7 @@ if ($flash_message) {
 <?php endif; ?>
 
 <!-- Script per il dropdown (Bootstrap 5) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Auto-hide alerts dopo 5 secondi

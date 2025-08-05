@@ -1,5 +1,5 @@
 <?php
-$hideNav = false;
+$hideNav = true;
 include __DIR__ . '/../header.php';
 ?>
 
