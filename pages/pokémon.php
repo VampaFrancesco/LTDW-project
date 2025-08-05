@@ -18,87 +18,145 @@ if ($conn->connect_error) {
 }
 
 // Query per recuperare le Mystery Box dal database
-$query = "SELECT 
-    id_box as id,
-    nome_box as name,
-    desc_box as description, 
-    prezzo_box as price,
-    quantita_box,
-    CASE WHEN quantita_box > 0 THEN 1 ELSE 0 END as available
-FROM mystery_box 
-ORDER BY id_box";
+$query_mystery_box = "SELECT
+    mb.id_box as id,
+    mb.nome_box as name,
+    mb.desc_box as description,
+    mb.prezzo_box as price,
+    mb.quantita_box,
+    r.nome_rarita as rarity_name,
+    r.colore as rarity_color
+FROM mystery_box mb
+LEFT JOIN rarita r ON mb.fk_rarita = r.id_rarita
+ORDER BY mb.id_box";
 
-$result = $conn->query($query);
+$result_mystery_box = $conn->query($query_mystery_box);
 $mystery_boxes = [];
-
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        // Genera un nome immagine basato sul nome della box
+if ($result_mystery_box->num_rows > 0) {
+    while ($row = $result_mystery_box->fetch_assoc()) {
         $image_name = strtolower(str_replace([' ', '-'], '_', $row['name'])) . '.png';
-
         $mystery_boxes[] = [
             'id' => $row['id'],
             'name' => $row['name'],
             'description' => $row['description'],
             'price' => floatval($row['price']),
-            'available' => $row['available'] == 1,
             'stock' => $row['quantita_box'],
-            'image' => $image_name
+            'available' => $row['quantita_box'] > 0,
+            'image' => $image_name,
+            'rarity_name' => $row['rarity_name'],
+            'rarity_color' => $row['rarity_color']
         ];
     }
 }
+$no_boxes = empty($mystery_boxes);
+
+// Recupera le rarità per i filtri
+$query_rarita = "SELECT id_rarita, nome_rarita FROM rarita ORDER BY ordine";
+$result_rarita = $conn->query($query_rarita);
+$rarities = [];
+if ($result_rarita->num_rows > 0) {
+    while ($row = $result_rarita->fetch_assoc()) {
+        $rarities[] = $row;
+    }
+}
+
+// Query per recuperare i Funko Pop
+$query_funko_pop = "SELECT
+    o.id_oggetto as id,
+    o.nome_oggetto as name,
+    o.desc_oggetto as description,
+    o.prezzo_oggetto as price,
+    o.quant_oggetto as stock,
+    o.quant_oggetto > 0 as available,
+    r.nome_rarita as rarity_name,
+    r.colore as rarity_color
+FROM oggetto o
+INNER JOIN categoria_oggetto co ON o.fk_categoria_oggetto = co.id_categoria
+LEFT JOIN rarita r ON o.fk_rarita = r.id_rarita
+WHERE co.nome_categoria = 'Funko Pop'";
+
+$result_funko_pop = $conn->query($query_funko_pop);
+$funko_pops = [];
+if ($result_funko_pop->num_rows > 0) {
+    while ($row = $result_funko_pop->fetch_assoc()) {
+        $image_name = strtolower(str_replace([' ', '-'], '_', $row['name'])) . '.png';
+        $funko_pops[] = [
+            'id' => $row['id'],
+            'name' => $row['name'],
+            'description' => $row['description'],
+            'price' => floatval($row['price']),
+            'stock' => $row['stock'],
+            'available' => $row['available'] == 1,
+            'image' => $image_name,
+            'rarity_name' => $row['rarity_name'],
+            'rarity_color' => $row['rarity_color']
+        ];
+    }
+}
+$no_funko_pops = empty($funko_pops);
 
 $conn->close();
 
-// Se non ci sono Mystery Box nel database, mostra un messaggio
-if (empty($mystery_boxes)) {
-    $no_boxes = true;
-} else {
-    $no_boxes = false;
-    // Applica ordinamento casuale di default
-    shuffle($mystery_boxes);
-}
-
 ?>
-
-?>
-
 <main class="background-custom">
-    <div>
-        <div class="container">
-            <h1 class="fashion_taital mb-5">Le Nostre Mystery Box</h1>
+    <div class="container">
+        <h1 class="fashion_taital mb-5">Catalogo Pokémon</h1>
 
-            <div class="sorting-section mb-5 d-flex justify-content-end align-items-center">
-                <label for="sortOrder" class="form-label mb-0 me-3">Ordina per:</label>
-                <select class="form-select w-auto" id="sortOrder">
-                    <option value="default">Casuale (Default)</option>
-                    <option value="name-asc">Nome (A-Z)</option>
-                    <option value="name-desc">Nome (Z-A)</option>
-                    <option value="price-asc">Prezzo (Crescente)</option>
-                    <option value="price-desc">Prezzo (Decrescente)</option>
-                </select>
+        <div class="d-flex justify-content-between align-items-start mb-4">
+            <h2 class="category-title mb-0">Mystery Box</h2>
+            <div class="filter-dropdown-container">
+                <div class="dropdown mb-2">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="rarityDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Filtra per rarità
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="rarityDropdown">
+                        <li><a class="dropdown-item active" href="#" data-rarity="all">Tutte</a></li>
+                        <?php foreach ($rarities as $rarity): ?>
+                            <li><a class="dropdown-item" href="#" data-rarity="<?php echo htmlspecialchars($rarity['nome_rarita']); ?>">
+                                <?php echo htmlspecialchars($rarity['nome_rarita']); ?>
+                            </a></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="priceDropdownMystery" data-bs-toggle="dropdown" aria-expanded="false">
+                        Filtra per prezzo
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="priceDropdownMystery">
+                        <li><a class="dropdown-item active" href="#" data-price="all">Tutti</a></li>
+                        <li><a class="dropdown-item" href="#" data-price="under10">&lt; 10€</a></li>
+                        <li><a class="dropdown-item" href="#" data-price="10-25">10-25€</a></li>
+                        <li><a class="dropdown-item" href="#" data-price="25-50">25-50€</a></li>
+                        <li><a class="dropdown-item" href="#" data-price="over50">&gt; 50€</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" data-price="asc">Prezzo crescente</a></li>
+                        <li><a class="dropdown-item" href="#" data-price="desc">Prezzo decrescente</a></li>
+                    </ul>
+                </div>
             </div>
+        </div>
 
-            <div class="row" id="mysteryBoxGrid">
-                <?php if ($no_boxes): ?>
-                    <div class="col-12">
-                        <div class="alert alert-info text-center" role="alert">
-                            <i class="bi bi-info-circle me-2"></i>
-                            <h4>Nessuna Mystery Box disponibile</h4>
-                            <p>Al momento non ci sono Mystery Box nel catalogo. Torna più tardi per nuove sorprese!</p>
-                        </div>
+        <div class="row" id="mysteryBoxGrid">
+            <?php if ($no_boxes): ?>
+                <div class="col-12">
+                    <div class="alert alert-info text-center" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <h4>Nessuna Mystery Box disponibile</h4>
+                        <p>Al momento non ci sono Mystery Box nel catalogo. Torna più tardi per nuove sorprese!</p>
                     </div>
-                <?php else: ?>
-                    <?php foreach ($mystery_boxes as $box): ?>
-                        <div class="col-lg-4 col-md-6 col-sm-12 mb-4 mystery-box-item"
-                             data-name="<?php echo htmlspecialchars($box['name']); ?>"
-                             data-price="<?php echo htmlspecialchars($box['price']); ?>"
-                             data-stock="<?php echo htmlspecialchars($box['stock']); ?>">
-                            <div class="box-main <?php echo $box['available'] ? '' : 'unavailable'; ?>">
+                </div>
+            <?php else: ?>
+                <?php foreach ($mystery_boxes as $box): ?>
+                    <div class="col-lg-4 col-md-6 col-sm-12 mb-4 mystery-box-item"
+                        data-name="<?php echo htmlspecialchars($box['name']); ?>"
+                        data-price="<?php echo htmlspecialchars($box['price']); ?>"
+                        data-rarity="<?php echo htmlspecialchars($box['rarity_name']); ?>">
+                        <div class="box-main <?php echo $box['available'] ? '' : 'unavailable'; ?>">
+                            <a href="#" class="item-link" data-bs-toggle="modal" data-bs-target="#boxModal_<?php echo $box['id']; ?>">
                                 <div class="mystery-box-image-container">
-                                    <img src="<?php echo BASE_URL; ?>../images/<?php echo $image_name; ?>"
-                                         alt="<?php echo htmlspecialchars($box['name']); ?>"
-                                         class="img-fluid mystery-box-img">
+                                    <img src="<?php echo BASE_URL; ?>../images/<?php echo $box['image']; ?>"
+                                        alt="<?php echo htmlspecialchars($box['name']); ?>"
+                                        class="img-fluid mystery-box-img">
                                     <?php if (!$box['available']): ?>
                                         <div class="unavailable-overlay">
                                             <p>ESAURITO</p>
@@ -108,120 +166,271 @@ if (empty($mystery_boxes)) {
                                 <div class="mystery-box-info">
                                     <h4 class="mystery-box-name"><?php echo htmlspecialchars($box['name']); ?></h4>
                                     <p class="mystery-box-description"><?php echo htmlspecialchars($box['description']); ?></p>
-
+                                    <div class="d-flex justify-content-center align-items-center mb-3">
+                                        <span class="badge rounded-pill" style="background-color: <?php echo htmlspecialchars($box['rarity_color']); ?>;">
+                                            <?php echo htmlspecialchars($box['rarity_name']); ?>
+                                        </span>
+                                    </div>
                                     <?php if ($box['available'] && $box['stock'] <= 5): ?>
                                         <div class="stock-warning">
                                             <i class="bi bi-exclamation-triangle"></i>
                                             Solo <?php echo $box['stock']; ?> rimasti!
                                         </div>
                                     <?php endif; ?>
-
                                     <div class="mystery-box-footer d-flex justify-content-between align-items-center mt-3">
                                         <p class="mystery-box-price">€<?php echo number_format($box['price'], 2); ?></p>
-                                        <?php if ($box['available']): ?>
-                                            <form action="<?php echo BASE_URL; ?>/action/add_to_cart.php" method="POST" class="d-inline">
-                                                <input type="hidden" name="id_prodotto" value="<?php echo $box['id']; ?>">
-                                                <input type="hidden" name="nome_prodotto" value="<?php echo htmlspecialchars($box['name']); ?>">
-                                                <input type="hidden" name="prezzo" value="<?php echo $box['price']; ?>">
-                                                <input type="hidden" name="quantita" value="1">
-                                                <input type="hidden" name="tipo" value="mystery_box">
-                                                <input type="hidden" name="redirect_url" value="<?php echo $_SERVER['REQUEST_URI']; ?>">
-                                                <button type="submit" class="btn btn-add-to-cart">
-                                                    <i class="bi bi-cart-plus"></i> Aggiungi al carrello
-                                                </button>
-                                            </form>
-                                        <?php else: ?>
-                                            <button class="btn btn-notify-me" disabled>
-                                                <i class="bi bi-bell"></i> Avvisami quando disponibile
-                                            </button>
-                                        <?php endif; ?>
                                     </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="boxModal_<?php echo $box['id']; ?>" tabindex="-1" aria-labelledby="boxModalLabel_<?php echo $box['id']; ?>" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="boxModalLabel_<?php echo $box['id']; ?>"><?php echo htmlspecialchars($box['name']); ?></h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <img src="<?php echo BASE_URL; ?>../images/<?php echo $box['image']; ?>" alt="<?php echo htmlspecialchars($box['name']); ?>" class="img-fluid mb-3">
+                                    <p><?php echo htmlspecialchars($box['description']); ?></p>
+                                    <p><strong>Prezzo:</strong> €<?php echo number_format($box['price'], 2); ?></p>
+                                    <p class="stock-info"><strong>Disponibilità:</strong> <?php echo $box['stock']; ?> pezzi</p>
+                                    <form action="<?php echo BASE_URL; ?>/action/add_to_cart.php" method="POST">
+                                        <input type="hidden" name="id_prodotto" value="<?php echo $box['id']; ?>">
+                                        <input type="hidden" name="nome_prodotto" value="<?php echo htmlspecialchars($box['name']); ?>">
+                                        <input type="hidden" name="prezzo" value="<?php echo $box['price']; ?>">
+                                        <input type="hidden" name="tipo" value="mystery_box">
+                                        <div class="input-group mb-3">
+                                            <label for="quantityBox_<?php echo $box['id']; ?>" class="input-group-text">Quantità</label>
+                                            <input type="number" name="quantita" id="quantityBox_<?php echo $box['id']; ?>" class="form-control" value="1" min="1" max="<?php echo $box['stock']; ?>">
+                                        </div>
+                                        <button type="submit" class="btn btn-add-to-cart w-100" <?php echo $box['available'] ? '' : 'disabled'; ?>>Aggiungi al carrello</button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
 
+        <hr class="my-5">
+
+        <div class="d-flex justify-content-between align-items-start mb-4">
+            <h2 class="category-title mb-0">Funko Pop</h2>
+            <div class="filter-dropdown-container">
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="priceDropdownFunko" data-bs-toggle="dropdown" aria-expanded="false">
+                        Filtra per prezzo
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="priceDropdownFunko">
+                        <li><a class="dropdown-item active" href="#" data-price="all">Tutti</a></li>
+                        <li><a class="dropdown-item" href="#" data-price="under10">&lt; 10€</a></li>
+                        <li><a class="dropdown-item" href="#" data-price="10-25">10-25€</a></li>
+                        <li><a class="dropdown-item" href="#" data-price="25-50">25-50€</a></li>
+                        <li><a class="dropdown-item" href="#" data-price="over50">&gt; 50€</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" data-price="asc">Prezzo crescente</a></li>
+                        <li><a class="dropdown-item" href="#" data-price="desc">Prezzo decrescente</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" id="funkoPopGrid">
+            <?php if ($no_funko_pops): ?>
+                <div class="col-12">
+                    <div class="alert alert-info text-center" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <h4>Nessun Funko Pop disponibile</h4>
+                        <p>Al momento non ci sono Funko Pop nel catalogo. Torna più tardi!</p>
+                    </div>
+                </div>
+            <?php else: ?>
+                <?php foreach ($funko_pops as $funko): ?>
+                    <div class="col-lg-4 col-md-6 col-sm-12 mb-4 funko-pop-item"
+                        data-name="<?php echo htmlspecialchars($funko['name']); ?>"
+                        data-price="<?php echo htmlspecialchars($funko['price']); ?>"
+                        data-rarity="<?php echo htmlspecialchars($funko['rarity_name']); ?>">
+                        <div class="box-main <?php echo $funko['available'] ? '' : 'unavailable'; ?>">
+                            <a href="#" class="item-link" data-bs-toggle="modal" data-bs-target="#funkoModal_<?php echo $funko['id']; ?>">
+                                <div class="mystery-box-image-container">
+                                    <img src="<?php echo BASE_URL; ?>../images/<?php echo $funko['image']; ?>"
+                                        alt="<?php echo htmlspecialchars($funko['name']); ?>"
+                                        class="img-fluid mystery-box-img">
+                                    <?php if (!$funko['available']): ?>
+                                        <div class="unavailable-overlay">
+                                            <p>ESAURITO</p>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="mystery-box-info">
+                                    <h4 class="mystery-box-name"><?php echo htmlspecialchars($funko['name']); ?></h4>
+                                    <p class="mystery-box-description"><?php echo htmlspecialchars($funko['description']); ?></p>
+                                    <div class="d-flex justify-content-center align-items-center mb-3">
+                                        <span class="badge rounded-pill" style="background-color: <?php echo htmlspecialchars($funko['rarity_color']); ?>;">
+                                            <?php echo htmlspecialchars($funko['rarity_name']); ?>
+                                        </span>
+                                    </div>
+                                    <?php if ($funko['available'] && $funko['stock'] <= 5): ?>
+                                        <div class="stock-warning">
+                                            <i class="bi bi-exclamation-triangle"></i>
+                                            Solo <?php echo $funko['stock']; ?> rimasti!
+                                        </div>
+                                    <?php endif; ?>
+                                    <div class="mystery-box-footer d-flex justify-content-between align-items-center mt-3">
+                                        <p class="mystery-box-price">€<?php echo number_format($funko['price'], 2); ?></p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="funkoModal_<?php echo $funko['id']; ?>" tabindex="-1" aria-labelledby="funkoModalLabel_<?php echo $funko['id']; ?>" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="funkoModalLabel_<?php echo $funko['id']; ?>"><?php echo htmlspecialchars($funko['name']); ?></h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <img src="<?php echo BASE_URL; ?>../images/<?php echo $funko['image']; ?>" alt="<?php echo htmlspecialchars($funko['name']); ?>" class="img-fluid mb-3">
+                                    <p><?php echo htmlspecialchars($funko['description']); ?></p>
+                                    <p><strong>Prezzo:</strong> €<?php echo number_format($funko['price'], 2); ?></p>
+                                    <p class="stock-info"><strong>Disponibilità:</strong> <?php echo $funko['stock']; ?> pezzi</p>
+                                    <form action="<?php echo BASE_URL; ?>/action/add_to_cart.php" method="POST">
+                                        <input type="hidden" name="id_prodotto" value="<?php echo $funko['id']; ?>">
+                                        <input type="hidden" name="nome_prodotto" value="<?php echo htmlspecialchars($funko['name']); ?>">
+                                        <input type="hidden" name="prezzo" value="<?php echo $funko['price']; ?>">
+                                        <input type="hidden" name="tipo" value="funko_pop">
+                                        <div class="input-group mb-3">
+                                            <label for="quantityFunko_<?php echo $funko['id']; ?>" class="input-group-text">Quantità</label>
+                                            <input type="number" name="quantita" id="quantityFunko_<?php echo $funko['id']; ?>" class="form-control" value="1" min="1" max="<?php echo $funko['stock']; ?>">
+                                        </div>
+                                        <button type="submit" class="btn btn-add-to-cart w-100" <?php echo $funko['available'] ? '' : 'disabled'; ?>>Aggiungi al carrello</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </div>
 </main>
-
 <?php include __DIR__ . '/footer.php'; ?>
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const sortSelect = document.getElementById('sortOrder');
         const mysteryBoxGrid = document.getElementById('mysteryBoxGrid');
-        const boxItems = Array.from(mysteryBoxGrid.querySelectorAll('.mystery-box-item'));
+        const funkoPopGrid = document.getElementById('funkoPopGrid');
 
-        // Funzione per animazione di entrata
-        function animateBoxes() {
-            boxItems.forEach((item, index) => {
-                item.style.opacity = '0';
-                item.style.transform = 'translateY(20px)';
-                setTimeout(() => {
-                    item.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
-                    item.style.opacity = '1';
-                    item.style.transform = 'translateY(0)';
-                }, index * 100); // Ritardo progressivo per un effetto "a cascata"
+        // Event listener for Mystery Box filters
+        const rarityDropdownMenu = document.getElementById('rarityDropdown').nextElementSibling;
+        const priceDropdownMysteryMenu = document.getElementById('priceDropdownMystery').nextElementSibling;
+
+        if (rarityDropdownMenu) {
+            rarityDropdownMenu.addEventListener('click', function(e) {
+                if (e.target.classList.contains('dropdown-item')) {
+                    e.preventDefault();
+                    rarityDropdownMenu.querySelectorAll('.dropdown-item').forEach(item => item.classList.remove('active'));
+                    e.target.classList.add('active');
+                    document.getElementById('rarityDropdown').textContent = e.target.textContent;
+                    applyMysteryBoxFilters();
+                }
             });
         }
 
-        // Esegui l'animazione all'inizio
-        animateBoxes();
-
-        sortSelect.addEventListener('change', function() {
-            const order = this.value;
-
-            boxItems.sort((a, b) => {
-                const nameA = a.dataset.name.toLowerCase();
-                const nameB = b.dataset.name.toLowerCase();
-                const priceA = parseFloat(a.dataset.price);
-                const priceB = parseFloat(b.dataset.price);
-
-                if (order === 'name-asc') {
-                    return nameA.localeCompare(nameB);
-                } else if (order === 'name-desc') {
-                    return nameB.localeCompare(nameA);
-                } else if (order === 'price-asc') {
-                    return priceA - priceB;
-                } else if (order === 'price-desc') {
-                    return priceB - priceA;
+        if (priceDropdownMysteryMenu) {
+            priceDropdownMysteryMenu.addEventListener('click', function(e) {
+                if (e.target.classList.contains('dropdown-item')) {
+                    e.preventDefault();
+                    priceDropdownMysteryMenu.querySelectorAll('.dropdown-item').forEach(item => item.classList.remove('active'));
+                    e.target.classList.add('active');
+                    document.getElementById('priceDropdownMystery').textContent = e.target.textContent;
+                    applyMysteryBoxFilters();
                 }
-                return 0;
             });
+        }
 
-            // Rimuovi tutte le box esistenti dalla griglia
-            while (mysteryBoxGrid.firstChild) {
-                mysteryBoxGrid.removeChild(mysteryBoxGrid.firstChild);
+        // Event listener for Funko Pop filters
+        const priceDropdownFunkoMenu = document.getElementById('priceDropdownFunko').nextElementSibling;
+
+        if (priceDropdownFunkoMenu) {
+            priceDropdownFunkoMenu.addEventListener('click', function(e) {
+                if (e.target.classList.contains('dropdown-item')) {
+                    e.preventDefault();
+                    priceDropdownFunkoMenu.querySelectorAll('.dropdown-item').forEach(item => item.classList.remove('active'));
+                    e.target.classList.add('active');
+                    document.getElementById('priceDropdownFunko').textContent = e.target.textContent;
+                    applyFunkoPopFilters();
+                }
+            });
+        }
+
+        function applyMysteryBoxFilters() {
+            const selectedRarity = rarityDropdownMenu.querySelector('.dropdown-item.active')?.dataset.rarity || 'all';
+            const selectedPriceRange = priceDropdownMysteryMenu.querySelector('.dropdown-item.active')?.dataset.price || 'all';
+            filterAndSortItems(mysteryBoxGrid.querySelectorAll('.mystery-box-item'), mysteryBoxGrid, selectedRarity, selectedPriceRange);
+        }
+
+        function applyFunkoPopFilters() {
+            const selectedPriceRange = priceDropdownFunkoMenu.querySelector('.dropdown-item.active')?.dataset.price || 'all';
+            filterAndSortItems(funkoPopGrid.querySelectorAll('.funko-pop-item'), funkoPopGrid, 'all', selectedPriceRange);
+        }
+
+        function filterAndSortItems(items, grid, rarityValue, priceRangeValue) {
+            let sortedItems = Array.from(items);
+
+            // Filter by rarity
+            if (rarityValue !== 'all') {
+                sortedItems = sortedItems.filter(item => item.dataset.rarity === rarityValue);
             }
 
-            // Aggiungi le box ordinate con animazione di uscita e rientro
-            boxItems.forEach(item => {
-                // Animazione di uscita rapida prima di riposizionare
-                item.style.opacity = '0';
-                item.style.transform = 'translateY(-20px)';
-                item.style.transition = 'opacity 0.3s ease-in, transform 0.3s ease-in';
+            // Filter and sort by price
+            if (priceRangeValue === 'asc' || priceRangeValue === 'desc') {
+                sortedItems.sort((a, b) => {
+                    const priceA = parseFloat(a.dataset.price);
+                    const priceB = parseFloat(b.dataset.price);
+                    return priceRangeValue === 'asc' ? priceA - priceB : priceB - priceA;
+                });
+            } else if (priceRangeValue !== 'all') {
+                sortedItems = sortedItems.filter(item => {
+                    const itemPrice = parseFloat(item.dataset.price);
+                    if (priceRangeValue === 'under10') return itemPrice < 10;
+                    if (priceRangeValue === '10-25') return itemPrice >= 10 && itemPrice <= 25;
+                    if (priceRangeValue === '25-50') return itemPrice > 25 && itemPrice <= 50;
+                    if (priceRangeValue === 'over50') return itemPrice > 50;
+                    return true;
+                });
+            }
 
-                // Re-append dopo un breve ritardo per consentire l'animazione di uscita
-                setTimeout(() => {
-                    mysteryBoxGrid.appendChild(item);
-                    // Resetta lo stato per l'animazione di entrata
-                    item.style.opacity = '0';
-                    item.style.transform = 'translateY(20px)';
-                    // Attiva l'animazione di entrata
-                    setTimeout(() => {
-                        item.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
-                        item.style.opacity = '1';
-                        item.style.transform = 'translateY(0)';
-                    }, 50);
-                }, 300);
+            // Hide all items and re-append filtered/sorted ones
+            Array.from(grid.querySelectorAll('.mystery-box-item, .funko-pop-item')).forEach(item => {
+                item.style.display = 'none';
             });
 
-            if (order === 'default') {
-                window.location.reload();
+            while (grid.firstChild) {
+                grid.removeChild(grid.firstChild);
             }
-        });
+
+            if (sortedItems.length > 0) {
+                sortedItems.forEach(item => {
+                    item.style.display = 'block';
+                    grid.appendChild(item);
+                });
+            } else {
+                 // Show a "no items" message if no items match the filters
+                 const noItemsMessage = document.createElement('div');
+                 noItemsMessage.className = 'col-12';
+                 noItemsMessage.innerHTML = `
+                    <div class="alert alert-info text-center" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <h4>Nessun elemento trovato</h4>
+                        <p>Nessun articolo corrisponde ai filtri selezionati.</p>
+                    </div>
+                `;
+                grid.appendChild(noItemsMessage);
+            }
+        }
     });
 </script>

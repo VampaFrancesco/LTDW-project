@@ -1163,7 +1163,6 @@ body {
     width: auto !important; /* Bootstrap utility class */
 }
 
-
 /* Titoli Generali */
 .fashion_taital {
     font-size: 48px;
@@ -1198,291 +1197,77 @@ body {
     margin-bottom: 40px;
 }
 
-/* Sezione Filtro Rarità (Collezione) */
-.rarity-filter-section {
-    text-align: center;
-    margin-bottom: 50px;
+/* Stili per la sezione filtri con dropdown */
+.d-flex.justify-content-between {
+    align-items: flex-start;
 }
 
-.filter-title {
-    font-size: 20px;
-    color: #30302e;
-    font-weight: bold;
-    margin-bottom: 20px;
+.category-title {
+    /* Your existing h2 title styles, if any */
 }
 
-.filter-buttons-container {
+.filter-dropdown-container {
     display: flex;
-    flex-wrap: wrap; /* Permette ai bottoni di andare a capo */
-    justify-content: center;
-    gap: 10px; /* Spazio tra i bottoni */
+    flex-direction: column; /* Stacks the dropdowns vertically */
+    align-items: flex-end; /* Aligns dropdowns to the right within their container */
+    gap: 10px; /* Space between the dropdowns */
 }
 
-.btn-filter {
-    background-color: #f0f0f0;
-    color: #30302e;
-    border: 1px solid #ddd;
-    padding: 10px 20px;
-    border-radius: 25px; /* Bottoni pillola */
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    white-space: nowrap; /* Evita che il testo vada a capo */
-}
-
-.btn-filter:hover {
-    background-color: #e0e0e0;
-    border-color: #ccc;
-}
-
-.btn-filter.active {
-    background-color: #ED308C; /* Colore d'accento per il bottone attivo */
+.dropdown-toggle {
+    background-color: #55585b; /* Colore di sfondo del bottone come nell'immagine */
     color: #ffffff;
-    border-color: #f26522;
-    box-shadow: 0 4px 10px rgba(242, 101, 34, 0.3);
-}
-
-/* Stili per la griglia delle carte (Collezione) */
-.card-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center; /* Centra le carte se non riempiono una riga */
-}
-
-.card-item {
-    /* Le animazioni sono gestite via JS, qui lo stato iniziale */
-    opacity: 1;
-    transform: translateY(0);
-    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-}
-
-.card-box {
-    background-color: #ffffff;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-    overflow: hidden;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.card-box:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-}
-
-.card-info {
-    flex-grow: 1;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding-top: 10px;
-}
-
-.card-name {
-    font-size: 18px;
-    font-weight: bold;
-    color: #30302e;
-    margin-bottom: 8px;
-    line-height: 1.3;
-}
-
-.card-description {
-    font-size: 14px;
-    color: #666666;
-    margin: 0 0 10px 0;
-    flex-grow: 1;
-}
-
-.card-number {
-    font-size: 13px;
-    color: #888;
-    margin-top: 5px;
-    font-weight: 500;
-}
-
-/* Stile per il contatore di quantità */
-.card-quantity {
-    font-size: 15px;
-    color: #30302e;
-    font-weight: bold;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.card-quantity span {
-    font-size: 18px;
-    color: #f26522; /* Colore d'accento per la quantità */
-    font-weight: bold;
-}
-
-/* Stili per le carte non ottenute */
-.card-box.not-obtained {
-    background-color: #f2f2f2;
-    border: 1px dashed #ccc;
-    color: #aaa;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    min-height: 200px;
-    padding: 20px;
-    text-align: center;
-}
-
-.card-box.not-obtained .card-empty {
-    text-align: center;
-}
-
-.card-box.not-obtained .card-empty i {
-    font-size: 60px;
-    color: #bbb;
-    margin-bottom: 15px;
-}
-
-.card-box.not-obtained .card-empty p {
-    font-size: 18px;
-    font-weight: bold;
-    color: #999;
-    margin: 0;
-}
-
-
-/* Sezione Aggiungi Nuova Carta (Collezione) */
-.add-card-section {
-    margin-top: 60px;
-    padding-top: 40px;
-    border-top: 2px solid #eee;
-}
-
-.add-card-form-container {
-    background-color: #ffffff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.add-card-form-container .form-label {
-    font-weight: bold;
-    color: #30302e;
-    margin-bottom: 8px;
-    display: block;
-}
-
-.add-card-form-container .form-control,
-.add-card-form-container .form-select {
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 10px 15px;
+    border: none;
     font-size: 16px;
-    color: #333;
-    background-color: #fcfcfc;
-    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 5px;
+    min-width: 200px; /* Imposta una larghezza minima per allineare i dropdown */
+    text-align: left; /* Allinea il testo a sinistra */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.add-card-form-container .form-control:focus,
-.add-card-form-container .form-select:focus {
-    border-color: #f26522;
-    box-shadow: 0 0 0 0.25rem rgba(242, 101, 34, 0.25);
-    background-color: #fff;
+.dropdown-toggle::after {
+    margin-left: auto; /* Pushes the arrow to the right */
 }
 
-.add-card-form-container textarea.form-control {
-    resize: vertical;
-    min-height: 100px;
+.dropdown-menu {
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    min-width: 200px; /* Assicura che il menu sia largo quanto il bottone */
 }
 
-.add-card-form-container .form-text {
-    font-size: 13px;
-    color: #777;
-    margin-top: 5px;
+.dropdown-item {
+    color: #30302e;
+    font-size: 16px;
+    padding: 10px 20px;
+    transition: background-color 0.2s ease-in-out;
 }
 
-.add-card-form-container .btn-add-card {
+.dropdown-item:hover,
+.dropdown-item.active {
     background-color: #f26522;
     color: #ffffff;
-    padding: 12px 30px;
-    border-radius: 5px;
-    font-size: 18px;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease-in-out, transform 0.1s ease-in-out;
 }
 
-.add-card-form-container .btn-add-card:hover {
-    background-color: #e05c1b;
-    transform: translateY(-1px);
+@media (max-width: 768px) {
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .category-title {
+        margin-bottom: 1rem;
+    }
+
+    .filter-dropdown-container {
+        align-items: center;
+    }
 }
-
-.add-card-form-container .form-check {
-    padding-left: 1.5em;
-}
-
-.add-card-form-container .form-check-input {
-    margin-top: 0.3em;
-}
-
-.add-card-form-container .form-check-label {
-    margin-left: 0.5em;
-    font-weight: normal;
-    color: #30302e;
-}
-
-/* Modifica specifica per l'input di tipo number nel form di aggiunta */
-#cardQuantity {
-    -moz-appearance: textfield; /* Nasconde le frecce in Firefox */
-}
-#cardQuantity::-webkit-outer-spin-button,
-#cardQuantity::-webkit-inner-spin-button {
-    -webkit-appearance: none; /* Nasconde le frecce in Chrome/Safari */
-    margin: 0;
-}
-
-
-/* Stili per il Catalogo Mystery Box */
-
-.sorting-section {
-    padding: 15px 0;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 30px;
-    align-items: center;
-}
-
-.sorting-section .form-label {
-    font-weight: bold;
-    color: #30302e;
-    margin-bottom: 0;
-}
-
-.sorting-section .form-select {
-    width: auto;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 8px 15px;
-    font-size: 15px;
-    color: #333;
-    background-color: #fcfcfc;
-    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.sorting-section .form-select:focus {
-    border-color: #f26522;
-    box-shadow: 0 0 0 0.25rem rgba(242, 101, 34, 0.25);
-}
-
-.mystery-box-item {
+/* Stili per la griglia di prodotti (sia Mystery Box che Funko Pop) */
+.mystery-box-item,
+.funko-pop-item {
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.6s ease-out, transform 0.6s ease-out;
@@ -1492,8 +1277,8 @@ body {
     background-color: #ffffff;
     height: 100%;
     padding: 25px;
-    border: 1px solid #e0e0e0; /* Bordo per l'effetto cornice */
-    box-shadow: 0px 4px 20px rgba(0,0,0,0.08); /* Ombra definita */
+    border: 1px solid #e0e0e0;
+    box-shadow: 0px 4px 20px rgba(0,0,0,0.08);
     margin-bottom: 20px;
     border-radius: 10px;
     display: flex;
@@ -1507,7 +1292,7 @@ body {
 .box-main:hover {
     transform: translateY(-8px);
     box-shadow: 0px 8px 30px rgba(0,0,0,0.15);
-    border-color: #f26522; /* Bordo colorato all'hover */
+    border-color: #f26522;
 }
 
 .mystery-box-image-container {
@@ -1595,7 +1380,6 @@ body {
     cursor: not-allowed;
 }
 
-/* Stili per le box esaurite */
 .box-main.unavailable {
     opacity: 0.7;
     filter: grayscale(80%);
@@ -1628,32 +1412,43 @@ body {
     margin: 0;
 }
 
+/* Stile per i badge di rarità */
+.badge {
+    font-size: 14px;
+    padding: 6px 12px;
+    font-weight: bold;
+    color: white;
+}
+
+/* Stile per i link degli item */
+.item-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
+}
+
+/* Warning stock basso */
+.stock-warning {
+    color: #ff9800; /* Arancione */
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
 /* Media Queries per Responsiveness */
 @media (max-width: 992px) {
     .fashion_taital {
         font-size: 38px;
     }
-
     .category-title {
         font-size: 26px;
     }
-
     .filter-buttons-container {
-        flex-direction: column; /* Bottoni filtro impilati su schermi più piccoli */
-        align-items: center;
+        justify-content: center;
     }
-
-    .btn-filter {
-        width: 100%; /* Bottoni filtro a larghezza piena */
-        max-width: 250px;
-    }
-
-    .card-item, .mystery-box-item {
-        max-width: 350px; /* Limita la larghezza delle card/box sui tablet */
-    }
-
     .col-lg-3, .col-lg-4 {
-        flex: 0 0 50%; /* Due colonne su schermi medi */
+        flex: 0 0 50%;
         max-width: 50%;
     }
 }
@@ -1662,27 +1457,19 @@ body {
     .fashion_taital {
         font-size: 32px;
     }
-
     .category-title {
         font-size: 22px;
     }
-
     .col-lg-3, .col-lg-4, .col-md-4, .col-md-6 {
-        flex: 0 0 100%; /* Una colonna su schermi piccoli */
+        flex: 0 0 100%;
         max-width: 100%;
     }
-
-    .card-item, .mystery-box-item {
-        max-width: 400px; /* Consente una larghezza massima per non essere troppo larghi */
+    .mystery-box-item, .funko-pop-item {
+        max-width: 400px;
         margin-left: auto;
         margin-right: auto;
     }
-
-    .add-card-form-container {
-        padding: 20px;
-    }
 }
-
 /* ORDINI */
 /* STORICO ORDINI CSS */
 
