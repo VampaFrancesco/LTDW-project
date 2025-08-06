@@ -17,8 +17,36 @@ if ($conn->connect_error) {
     die("Errore di connessione: " . $conn->connect_error);
 }
 
+// Funzione per ottenere il percorso dell'immagine in base all'ID dell'oggetto o della box
+function getImagePathById($itemId, $itemType, $conn) {
+    if ($itemType === 'funko_pop') {
+        $fkColumn = 'fk_oggetto';
+    } elseif ($itemType === 'mystery_box') {
+        $fkColumn = 'fk_mystery_box';
+    } else {
+        return BASE_URL . '/images/default_product1.jpg'; // Tipo non supportato
+    }
+
+    $stmt = $conn->prepare("SELECT nome_img FROM immagine WHERE {$fkColumn} = ? LIMIT 1");
+    if ($stmt === false) {
+        // Gestione errore preparazione
+        error_log("Errore nella preparazione della query: " . $conn->error);
+        return BASE_URL . '/images/default_product1.jpg';
+    }
+
+    $stmt->bind_param('i', $itemId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        return BASE_URL . '/images/' . htmlspecialchars($row['nome_img']);
+    }
+
+    return BASE_URL . '/images/default_product1.jpg';
+}
+
 // Query per recuperare le Mystery Box.
-// Vengono recuperate le Mystery Box la cui categoria è 'Pokémon' e il tipo di oggetto è 'Mystery Box'.
 $query_mystery_box = "SELECT
     mb.id_box as id,
     mb.nome_box as name,
@@ -38,7 +66,6 @@ $result_mystery_box = $conn->query($query_mystery_box);
 $mystery_boxes = [];
 if ($result_mystery_box->num_rows > 0) {
     while ($row = $result_mystery_box->fetch_assoc()) {
-        $image_name = strtolower(str_replace([' ', '-'], '_', $row['name'])) . '.png';
         $mystery_boxes[] = [
             'id' => $row['id'],
             'name' => $row['name'],
@@ -46,7 +73,7 @@ if ($result_mystery_box->num_rows > 0) {
             'price' => floatval($row['price']),
             'stock' => $row['quantita_box'],
             'available' => $row['quantita_box'] > 0,
-            'image' => $image_name,
+            'image_url' => getImagePathById($row['id'], 'mystery_box', $conn),
             'rarity_name' => $row['rarity_name'],
             'rarity_color' => $row['rarity_color']
         ];
@@ -54,7 +81,7 @@ if ($result_mystery_box->num_rows > 0) {
 }
 $no_boxes = empty($mystery_boxes);
 
-// Recupera le rarità per i filtri (rimane invariata)
+// Recupera le rarità per i filtri
 $query_rarita = "SELECT id_rarita, nome_rarita FROM rarita ORDER BY ordine";
 $result_rarita = $conn->query($query_rarita);
 $rarities = [];
@@ -65,7 +92,6 @@ if ($result_rarita->num_rows > 0) {
 }
 
 // Query per recuperare i Funko Pop.
-// Vengono recuperati gli oggetti la cui categoria è 'Pokémon' e il tipo di oggetto è 'Funko Pop'.
 $query_funko_pop = "SELECT
     o.id_oggetto as id,
     o.nome_oggetto as name,
@@ -86,7 +112,6 @@ $result_funko_pop = $conn->query($query_funko_pop);
 $funko_pops = [];
 if ($result_funko_pop->num_rows > 0) {
     while ($row = $result_funko_pop->fetch_assoc()) {
-        $image_name = strtolower(str_replace([' ', '-'], '_', $row['name'])) . '.png';
         $funko_pops[] = [
             'id' => $row['id'],
             'name' => $row['name'],
@@ -94,7 +119,7 @@ if ($result_funko_pop->num_rows > 0) {
             'price' => floatval($row['price']),
             'stock' => $row['stock'],
             'available' => $row['available'] == 1,
-            'image' => $image_name,
+            'image_url' => getImagePathById($row['id'], 'funko_pop', $conn),
             'rarity_name' => $row['rarity_name'],
             'rarity_color' => $row['rarity_color']
         ];
@@ -161,7 +186,7 @@ $conn->close();
                         <div class="box-main <?php echo $box['available'] ? '' : 'unavailable'; ?>">
                             <a href="#" class="item-link" data-bs-toggle="modal" data-bs-target="#boxModal_<?php echo $box['id']; ?>">
                                 <div class="mystery-box-image-container">
-                                    <img src="<?php echo BASE_URL; ?>../images/<?php echo $box['image']; ?>"
+                                    <img src="<?php echo htmlspecialchars($box['image_url']); ?>"
                                         alt="<?php echo htmlspecialchars($box['name']); ?>"
                                         class="img-fluid mystery-box-img">
                                     <?php if (!$box['available']): ?>
@@ -199,7 +224,7 @@ $conn->close();
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <img src="<?php echo BASE_URL; ?>../images/<?php echo $box['image']; ?>" alt="<?php echo htmlspecialchars($box['name']); ?>" class="img-fluid mb-3">
+                                    <img src="<?php echo htmlspecialchars($box['image_url']); ?>" alt="<?php echo htmlspecialchars($box['name']); ?>" class="img-fluid mb-3">
                                     <p><?php echo htmlspecialchars($box['description']); ?></p>
                                     <p><strong>Prezzo:</strong> €<?php echo number_format($box['price'], 2); ?></p>
                                     <p class="stock-info"><strong>Disponibilità:</strong> <?php echo $box['stock']; ?> pezzi</p>
@@ -227,7 +252,7 @@ $conn->close();
         <div class="d-flex justify-content-between align-items-start mb-4">
             <h2 class="category-title mb-0">Funko Pop</h2>
             <div class="filter-dropdown-container">
-                <div class="dropdown">
+                <div class="dropdown" style="z-index: 1050;">
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="priceDropdownFunko" data-bs-toggle="dropdown" aria-expanded="false">
                         Filtra per prezzo
                     </button>
@@ -263,7 +288,7 @@ $conn->close();
                         <div class="box-main <?php echo $funko['available'] ? '' : 'unavailable'; ?>">
                             <a href="#" class="item-link" data-bs-toggle="modal" data-bs-target="#funkoModal_<?php echo $funko['id']; ?>">
                                 <div class="mystery-box-image-container">
-                                    <img src="<?php echo BASE_URL; ?>../images/<?php echo $funko['image']; ?>"
+                                    <img src="<?php echo htmlspecialchars($funko['image_url']); ?>"
                                         alt="<?php echo htmlspecialchars($funko['name']); ?>"
                                         class="img-fluid mystery-box-img">
                                     <?php if (!$funko['available']): ?>
@@ -301,7 +326,7 @@ $conn->close();
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <img src="<?php echo BASE_URL; ?>../images/<?php echo $funko['image']; ?>" alt="<?php echo htmlspecialchars($funko['name']); ?>" class="img-fluid mb-3">
+                                    <img src="<?php echo htmlspecialchars($funko['image_url']); ?>" alt="<?php echo htmlspecialchars($funko['name']); ?>" class="img-fluid mb-3">
                                     <p><?php echo htmlspecialchars($funko['description']); ?></p>
                                     <p><strong>Prezzo:</strong> €<?php echo number_format($funko['price'], 2); ?></p>
                                     <p class="stock-info"><strong>Disponibilità:</strong> <?php echo $funko['stock']; ?> pezzi</p>
@@ -331,7 +356,6 @@ $conn->close();
         const mysteryBoxGrid = document.getElementById('mysteryBoxGrid');
         const funkoPopGrid = document.getElementById('funkoPopGrid');
 
-        // Event listener for Mystery Box filters
         const rarityDropdownMenu = document.getElementById('rarityDropdown').nextElementSibling;
         const priceDropdownMysteryMenu = document.getElementById('priceDropdownMystery').nextElementSibling;
 
@@ -359,7 +383,6 @@ $conn->close();
             });
         }
 
-        // Event listener for Funko Pop filters
         const priceDropdownFunkoMenu = document.getElementById('priceDropdownFunko').nextElementSibling;
 
         if (priceDropdownFunkoMenu) {
@@ -388,12 +411,10 @@ $conn->close();
         function filterAndSortItems(items, grid, rarityValue, priceRangeValue) {
             let sortedItems = Array.from(items);
 
-            // Filter by rarity
             if (rarityValue !== 'all') {
                 sortedItems = sortedItems.filter(item => item.dataset.rarity === rarityValue);
             }
 
-            // Filter and sort by price
             if (priceRangeValue === 'asc' || priceRangeValue === 'desc') {
                 sortedItems.sort((a, b) => {
                     const priceA = parseFloat(a.dataset.price);
@@ -411,22 +432,22 @@ $conn->close();
                 });
             }
 
-            // Hide all items and re-append filtered/sorted ones
-            Array.from(grid.querySelectorAll('.mystery-box-item, .funko-pop-item')).forEach(item => {
-                item.style.display = 'none';
-            });
-
-            while (grid.firstChild) {
-                grid.removeChild(grid.firstChild);
+            // Remove previous no-items message if it exists
+            const existingNoItemsMessage = grid.querySelector('.alert');
+            if (existingNoItemsMessage) {
+                existingNoItemsMessage.parentNode.removeChild(existingNoItemsMessage);
             }
 
+            // Hide all items
+            items.forEach(item => {
+                item.style.display = 'none';
+            });
+            
             if (sortedItems.length > 0) {
                 sortedItems.forEach(item => {
                     item.style.display = 'block';
-                    grid.appendChild(item);
                 });
             } else {
-                 // Show a "no items" message if no items match the filters
                  const noItemsMessage = document.createElement('div');
                  noItemsMessage.className = 'col-12';
                  noItemsMessage.innerHTML = `
