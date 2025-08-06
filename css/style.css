@@ -1204,13 +1204,14 @@ body {
     color: #ffffff;
 }
 
-/* Stili per la griglia e le card dei prodotti */
+/* CORREZIONE PRINCIPALE - Stili per le card con forzatura della visibilità */
 .mystery-box-item,
 .funko-pop-item,
 .accessori-item {
-    /* Rimosso opacity: 0 e transform: translateY per mostrare le card */
-    /* Se vuoi l'animazione, aggiungi una classe .animate-in con questi stili
-       e attivala con JavaScript */
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+    transform: translateY(0) !important;
     transition: transform 0.3s ease-in-out, opacity 0.6s ease-out;
 }
 
@@ -1222,11 +1223,13 @@ body {
     box-shadow: 0px 4px 20px rgba(0,0,0,0.08);
     margin-bottom: 20px;
     border-radius: 10px;
-    display: flex;
+    display: flex !important;
     flex-direction: column;
     justify-content: space-between;
     overflow: hidden;
     position: relative;
+    opacity: 1 !important;
+    visibility: visible !important;
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
 }
 
@@ -1239,7 +1242,7 @@ body {
 .mystery-box-image-container {
     width: 100%;
     height: 200px;
-    display: flex;
+    display: flex !important;
     justify-content: center;
     align-items: center;
     margin-bottom: 20px;
@@ -1247,6 +1250,7 @@ body {
     background-color: #f9f9f9;
     border-radius: 8px;
     position: relative;
+    opacity: 1 !important;
 }
 
 .mystery-box-img {
@@ -1254,6 +1258,8 @@ body {
     max-height: 90%;
     object-fit: contain;
     transition: transform 0.3s ease-in-out;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 .box-main:hover .mystery-box-img {
@@ -1262,6 +1268,8 @@ body {
 
 .mystery-box-info {
     flex-grow: 1;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 .mystery-box-name {
@@ -1270,6 +1278,8 @@ body {
     text-align: center;
     font-weight: bold;
     margin-bottom: 10px;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 .mystery-box-description {
@@ -1279,6 +1289,8 @@ body {
     line-height: 1.6;
     margin-bottom: 15px;
     min-height: 70px;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 .mystery-box-footer {
@@ -1291,11 +1303,13 @@ body {
     color: #f26522;
     font-weight: bold;
     margin: 0;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 /* Stili per lo stato di non disponibilità */
 .box-main.unavailable {
-    opacity: 0.7;
+    opacity: 0.7 !important;
     filter: grayscale(80%);
     pointer-events: none;
     box-shadow: 0px 0 15px 5px #ddd;
@@ -1369,8 +1383,32 @@ body {
 .item-link {
     text-decoration: none;
     color: inherit;
-    display: block;
+    display: block !important;
     height: 100%;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Assicurati che le colonne Bootstrap siano corrette */
+.col-lg-4,
+.col-md-6,
+.col-sm-12 {
+    padding: 15px;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Per i filtri JavaScript - controlla display */
+.mystery-box-item[style*="display: none"],
+.funko-pop-item[style*="display: none"] {
+    display: none !important;
+}
+
+.mystery-box-item:not([style*="display: none"]),
+.funko-pop-item:not([style*="display: none"]) {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 /* Utility class di Bootstrap - le ho incluse qui per completezza */

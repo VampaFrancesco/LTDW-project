@@ -179,7 +179,8 @@ $conn->close();
                 </div>
             <?php else: ?>
                 <?php foreach ($mystery_boxes as $box): ?>
-                    <div class="col-lg-4 col-md-6 col-sm-12 mb-4 mystery-box-item"
+                    <div class="col-lg-4 col-md-6 col-sm-12 mb-4 mystery-box-item" 
+                        style="display: block !important; opacity: 1 !important; visibility: visible !important;"
                         data-name="<?php echo htmlspecialchars($box['name']); ?>"
                         data-price="<?php echo htmlspecialchars($box['price']); ?>"
                         data-rarity="<?php echo htmlspecialchars($box['rarity_name']); ?>">
@@ -281,7 +282,8 @@ $conn->close();
                 </div>
             <?php else: ?>
                 <?php foreach ($funko_pops as $funko): ?>
-                    <div class="col-lg-4 col-md-6 col-sm-12 mb-4 funko-pop-item"
+                    <div class="col-lg-4 col-md-6 col-sm-12 mb-4 funko-pop-item" 
+                        style="display: block !important; opacity: 1 !important; visibility: visible !important;"
                         data-name="<?php echo htmlspecialchars($funko['name']); ?>"
                         data-price="<?php echo htmlspecialchars($funko['price']); ?>"
                         data-rarity="<?php echo htmlspecialchars($funko['rarity_name']); ?>">
@@ -353,11 +355,27 @@ $conn->close();
 <?php include __DIR__ . '/footer.php'; ?>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, inizializzazione filtri...');
+        
         const mysteryBoxGrid = document.getElementById('mysteryBoxGrid');
         const funkoPopGrid = document.getElementById('funkoPopGrid');
 
-        const rarityDropdownMenu = document.getElementById('rarityDropdown').nextElementSibling;
-        const priceDropdownMysteryMenu = document.getElementById('priceDropdownMystery').nextElementSibling;
+        // Debug: controlla se gli elementi esistono
+        console.log('Mystery Box Grid:', mysteryBoxGrid);
+        console.log('Funko Pop Grid:', funkoPopGrid);
+
+        // Forza la visibilità di tutte le card all'avvio
+        const allItems = document.querySelectorAll('.mystery-box-item, .funko-pop-item');
+        allItems.forEach(item => {
+            item.style.display = 'block';
+            item.style.opacity = '1';
+            item.style.visibility = 'visible';
+            console.log('Item reso visibile:', item);
+        });
+
+        const rarityDropdownMenu = document.getElementById('rarityDropdown')?.nextElementSibling;
+        const priceDropdownMysteryMenu = document.getElementById('priceDropdownMystery')?.nextElementSibling;
+        const priceDropdownFunkoMenu = document.getElementById('priceDropdownFunko')?.nextElementSibling;
 
         if (rarityDropdownMenu) {
             rarityDropdownMenu.addEventListener('click', function(e) {
@@ -383,8 +401,6 @@ $conn->close();
             });
         }
 
-        const priceDropdownFunkoMenu = document.getElementById('priceDropdownFunko').nextElementSibling;
-
         if (priceDropdownFunkoMenu) {
             priceDropdownFunkoMenu.addEventListener('click', function(e) {
                 if (e.target.classList.contains('dropdown-item')) {
@@ -398,17 +414,19 @@ $conn->close();
         }
 
         function applyMysteryBoxFilters() {
-            const selectedRarity = rarityDropdownMenu.querySelector('.dropdown-item.active')?.dataset.rarity || 'all';
-            const selectedPriceRange = priceDropdownMysteryMenu.querySelector('.dropdown-item.active')?.dataset.price || 'all';
+            const selectedRarity = rarityDropdownMenu?.querySelector('.dropdown-item.active')?.dataset.rarity || 'all';
+            const selectedPriceRange = priceDropdownMysteryMenu?.querySelector('.dropdown-item.active')?.dataset.price || 'all';
             filterAndSortItems(mysteryBoxGrid.querySelectorAll('.mystery-box-item'), mysteryBoxGrid, selectedRarity, selectedPriceRange);
         }
 
         function applyFunkoPopFilters() {
-            const selectedPriceRange = priceDropdownFunkoMenu.querySelector('.dropdown-item.active')?.dataset.price || 'all';
+            const selectedPriceRange = priceDropdownFunkoMenu?.querySelector('.dropdown-item.active')?.dataset.price || 'all';
             filterAndSortItems(funkoPopGrid.querySelectorAll('.funko-pop-item'), funkoPopGrid, 'all', selectedPriceRange);
         }
 
         function filterAndSortItems(items, grid, rarityValue, priceRangeValue) {
+            console.log('Applicazione filtri:', { rarityValue, priceRangeValue, itemsCount: items.length });
+            
             let sortedItems = Array.from(items);
 
             if (rarityValue !== 'all') {
@@ -438,19 +456,24 @@ $conn->close();
                 existingNoItemsMessage.parentNode.removeChild(existingNoItemsMessage);
             }
 
-            // Hide all items
+            // Hide all items FIRST
             items.forEach(item => {
                 item.style.display = 'none';
+                item.style.opacity = '0';
             });
             
             if (sortedItems.length > 0) {
+                // Show filtered items with explicit styling
                 sortedItems.forEach(item => {
                     item.style.display = 'block';
+                    item.style.opacity = '1';
+                    item.style.visibility = 'visible';
                 });
+                console.log('Items mostrati:', sortedItems.length);
             } else {
-                 const noItemsMessage = document.createElement('div');
-                 noItemsMessage.className = 'col-12';
-                 noItemsMessage.innerHTML = `
+                const noItemsMessage = document.createElement('div');
+                noItemsMessage.className = 'col-12';
+                noItemsMessage.innerHTML = `
                     <div class="alert alert-info text-center" role="alert">
                         <i class="bi bi-info-circle me-2"></i>
                         <h4>Nessun elemento trovato</h4>
@@ -460,5 +483,18 @@ $conn->close();
                 grid.appendChild(noItemsMessage);
             }
         }
+
+        // Debug finale: verifica lo stato delle card
+        setTimeout(() => {
+            const visibleCards = document.querySelectorAll('.mystery-box-item:not([style*="display: none"]), .funko-pop-item:not([style*="display: none"])');
+            console.log('Card visibili dopo inizializzazione:', visibleCards.length);
+            visibleCards.forEach((card, index) => {
+                console.log(`Card ${index + 1}:`, {
+                    display: window.getComputedStyle(card).display,
+                    opacity: window.getComputedStyle(card).opacity,
+                    visibility: window.getComputedStyle(card).visibility
+                });
+            });
+        }, 1000);
     });
 </script>
