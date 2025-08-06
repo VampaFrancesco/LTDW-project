@@ -27,15 +27,24 @@ require_once __DIR__.'/../../include/config.inc.php';
             </a>
         </li>
         <li class="nav-item">
-            <a href="/LTDW-project/pages/pokémon.php" class="pokeball-link">
-        <div class="pokeball">
-            <div class="pokeball-top"></div>
-            <div class="pokeball-middle">
-                <div class="pokeball-button"></div>
-            </div>
-            <div class="pokeball-bottom"></div>
-        </div>
-        <span>Pokémon</span>
+            <a href="<?php echo BASE_URL; ?>/pages/pokémon.php" class="pokeball-link">
+                <div class="pokeball">
+                    <div class="pokeball-top"></div>
+                    <div class="pokeball-middle">
+                        <div class="pokeball-button"></div>
+                    </div>
+                    <div class="pokeball-bottom"></div>
+                </div>
+                <span>Pokémon</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="<?php echo BASE_URL; ?>/pages/yugioh.php" class="yugioh-link">
+                <div class="yugioh">
+                <span class="yugioh-card-icon">
+                    <span class="yugioh-card-element"></span>
+                </span>
+                <span>Yu-Gi-Oh!</span>
             </a>
         </li>
     </ul>

@@ -1010,7 +1010,6 @@ Registration Page Styles
 /* ------------------------------------------------------------------
    BOXOMNIA: NUOVA NAVBAR ORIZZONTALE
 ------------------------------------------------------------------ */
-
 .navbar-custom {
     background: linear-gradient(90deg, #ED308C 0%, #24B1D9 100%);
     padding: 0.75rem 1rem;
@@ -2258,4 +2257,63 @@ body {
 
 .bg-secondary {
     background-color: #6c757d !important;
+}
+
+/* ICONA YU-GI-OH NAVBAR */
+/* Stile del contenitore principale dell'icona (la "carta") */
+.yugioh-card-icon {
+    display: inline-block;
+    width: 25px; /* Larghezza dell'icona */
+    height: 35px; /* Altezza dell'icona */
+    background-color: #d1b672; /* Colore di base della carta (dorato/giallo) */
+    border: 2px solid #5a5a5a; /* Bordo scuro */
+    border-radius: 3px; /* Angoli leggermente arrotondati */
+    position: relative; /* Necessario per posizionare l'elemento interno */
+    overflow: hidden; /* Nasconde l'elemento interno se esce dai bordi */
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); /* Leggera ombra */
+    transform: rotate(-5deg); /* Rotazione leggera per dare un effetto dinamico */
+    transition: transform 0.2s ease-in-out; /* Animazione al passaggio del mouse */
+    margin-right: 8px; /* Spazio a destra per separare l'icona dal testo */
+    vertical-align: middle; /* Allinea l'icona verticalmente con il testo */
+}
+
+/* Animazione al passaggio del mouse sull'icona */
+.nav-link:hover .yugioh-card-icon {
+    transform: rotate(0deg) scale(1.1); /* Raddrizza e ingrandisce leggermente l'icona */
+}
+
+/* Stile dell'elemento interno (simboleggia l'immagine/testo della carta) */
+.yugioh-card-icon .yugioh-card-element {
+    display: block;
+    width: 60%; /* Larghezza dell'elemento interno */
+    height: 30%; /* Altezza dell'elemento interno */
+    background-color: #1a1a1a; /* Colore scuro per l'elemento */
+    position: absolute;
+    top: 20%; /* Posizionamento dall'alto */
+    left: 20%; /* Posizionamento da sinistra */
+    border-radius: 2px; /* Angoli arrotondati */
+    box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.5); /* Ombra interna per un effetto 3D */
+}
+
+/* Pseudo-elemento per il "livello stella" */
+.yugioh-card-icon::before {
+    content: '★'; /* Aggiunge il carattere stella */
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    color: gold; /* Colore dorato per la stella */
+    font-size: 10px;
+    line-height: 1;
+}
+
+/* Pseudo-elemento per la decorazione in basso */
+.yugioh-card-icon::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 2px;
+    background-color: #a33; /* Colore rosso per la linea */
 }
