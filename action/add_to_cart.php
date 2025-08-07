@@ -20,7 +20,7 @@ $nome_prodotto = trim($_POST['nome_prodotto'] ?? '');
 $prezzo = floatval($_POST['prezzo'] ?? 0);
 $quantita = intval($_POST['quantita'] ?? 1);
 $tipo = trim($_POST['tipo'] ?? 'mystery_box'); // mystery_box o oggetto
-$redirect_url = $_POST['redirect_url'] ?? BASE_URL . '/pages/pokémon.php';
+$redirect_url = $_POST['redirect_url'] ?? BASE_URL . '/pages/home_utente.php';
 
 // Validazione
 if ($id_prodotto <= 0 || $quantita <= 0 || empty($nome_prodotto) || $prezzo <= 0) {
