@@ -1070,10 +1070,21 @@ Registration Page Styles
 /* NAVBAR CSS */
 
 /* ------------------------------------------------------------------
-   BOXOMNIA: NUOVA NAVBAR ORIZZONTALE
+    BOXOMNIA: NUOVA NAVBAR ORIZZONTALE
 ------------------------------------------------------------------ */
+
+/* Variabili CSS per una gestione più semplice dei colori */
+:root {
+    --navbar-bg-color: #ED308C; /* Colore di default per la navbar */
+    --dropdown-bg-color: #ffffff; /* Un colore scuro per il dropdown, in contrasto */
+    --dropdown-text-color: #000000; /* Testo bianco per il dropdown */
+    --dropdown-hover-bg-color: #f26522; /* Arancione per l'hover */
+    --border-radius: 5px;
+    --text-color: #ffffff; /* Colore testo generale navbar */
+}
+
 .navbar-custom {
-    background: linear-gradient(90deg, #ED308C 0%, #24B1D9 100%);
+    background: linear-gradient(90deg, var(--navbar-bg-color) 0%, #24B1D9 100%);
     padding: 0.75rem 1rem;
 }
 
@@ -1088,6 +1099,7 @@ Registration Page Styles
 
 .nav-item {
     margin: 0 1rem;
+    position: relative;
 }
 
 .nav-item a {
@@ -1096,7 +1108,7 @@ Registration Page Styles
     align-items: center;
     text-decoration: none;
     font-family: inherit;
-    color: #ffffff;
+    color: var(--text-color);
     font-size: 0.875rem;
     transition: transform 0.2s;
 }
@@ -1115,6 +1127,83 @@ Registration Page Styles
     text-decoration: underline;
 }
 
+/* ------------------------------------------------------------------
+    MODIFICHE PER IL DROPDOWN
+------------------------------------------------------------------ */
+
+.nav-item.dropdown .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    /* Uso delle variabili CSS per i colori */
+    background-color: var(--dropdown-bg-color);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    list-style: none;
+    padding: 20px;
+    margin: 0;
+    margin-top: -20px;
+    min-width: 150px;
+    z-index: 1000;
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease; /* Aggiunge una transizione fluida */
+}
+
+/* Rende il menu visibile al passaggio del mouse sull'intero elemento LI genitore */
+.nav-item.dropdown:hover .dropdown-menu {
+    display: block;
+    /* Aggiungo un piccolo ritardo per evitare che scompaia immediatamente */
+    visibility: visible;
+    opacity: 1;
+}
+
+.dropdown-item {
+    display: block;
+    padding: 20px 25px;
+    text-decoration: none;
+    /* Uso della variabile CSS per il colore del testo */
+    color: #000000 !important;
+    white-space: nowrap;
+    text-align: left;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.dropdown-item:hover {
+    /* Uso della variabile CSS per il colore dell'hover */
+    background-color: var(--dropdown-hover-bg-color);
+    color: rgb(0, 0, 0);
+}
+
+/* Aggiungo una regola per il link principale del dropdown per farlo funzionare correttamente */
+.nav-item.dropdown > a {
+    padding: 20px 25px;
+    display: flex; /* Manteniamo il layout flessibile se serve */
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative; /* Mantengo la posizione relativa anche qui */
+    z-index: 1; /* Assicura che il link sia sopra gli altri elementi */
+}
+
+/* Stile per il link della navbar che contiene la Poké Ball */
+.nav-item .pokeball-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    padding: 0;
+}
+
+.pokeball-link span {
+    margin-top: 5px;
+    font-size: 14px;
+}
+
+/* Il resto del tuo CSS rimane invariato */
+/* ... (codice del catalogo, icone Yugioh e Pokémon) ... */
 
 .bebas-neue-regular {
     font-family: "Bebas Neue", sans-serif;
@@ -1128,10 +1217,9 @@ Registration Page Styles
     url('/fonts/BebasNeue-Regular.ttf') format('ttf');
     font-weight: normal;
     font-style: normal;
-    font-display: swap; /* Per una migliore performance */
+    font-display: swap;
 }
 
-/* keyframes per far salire e dissolvere l’alert */
 @keyframes floatUpFade {
     0% {
         opacity: 1;
@@ -1147,25 +1235,23 @@ Registration Page Styles
     }
 }
 
-/* stile dell’alert */
 .floating-alert {
     position: fixed;
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #d4edda;      /* verde chiaro */
-    color: #155724;                 /* verde scuro */
+    background-color: #d4edda;
+    color: #155724;
     padding: 12px 24px;
     border: 1px solid #c3e6cb;
     border-radius: 4px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     animation: floatUpFade 3s ease-out forwards;
-    pointer-events: none;           /* click “attraversano” l’alert */
+    pointer-events: none;
     font-size: 1rem;
     z-index: 1000;
 }
 
-/* Stili Generali per l'intero catalogo */
 body {
     font-family: 'Arial', sans-serif;
     line-height: 1.6;
@@ -1179,7 +1265,6 @@ body {
     padding: 20px 15px;
 }
 
-/* Titoli e Intestazioni */
 .fashion_taital {
     font-size: 48px;
     color: #30302e;
@@ -1213,7 +1298,6 @@ body {
     margin-bottom: 40px;
 }
 
-/* Stili per la sezione filtri */
 .d-flex.justify-content-between {
     align-items: flex-start;
 }
@@ -1223,7 +1307,7 @@ body {
     flex-direction: column;
     align-items: flex-end;
     gap: 10px;
-    z-index: 1050; /* Garantisce che i dropdown siano sopra il contenuto */
+    z-index: 1050;
 }
 
 .dropdown-toggle {
@@ -1265,7 +1349,6 @@ body {
     color: #ffffff;
 }
 
-/* CORREZIONE PRINCIPALE - Stili per le card con forzatura della visibilità */
 .mystery-box-item,
 .funko-pop-item,
 .accessori-item {
@@ -1368,7 +1451,6 @@ body {
     visibility: visible !important;
 }
 
-/* Stili per lo stato di non disponibilità */
 .box-main.unavailable {
     opacity: 0.7 !important;
     filter: grayscale(80%);
@@ -1401,7 +1483,6 @@ body {
     margin: 0;
 }
 
-/* Stili per i badge */
 .badge {
     font-size: 14px;
     padding: 6px 12px;
@@ -1409,7 +1490,6 @@ body {
     color: white;
 }
 
-/* Avviso stock basso */
 .stock-warning {
     color: #ff9800;
     font-weight: bold;
@@ -1417,7 +1497,6 @@ body {
     margin-bottom: 10px;
 }
 
-/* Bottoni */
 .btn-add-to-cart {
     background-color: #f26522;
     color: #ffffff;
@@ -1440,7 +1519,6 @@ body {
     cursor: not-allowed;
 }
 
-/* Stile per i link degli item */
 .item-link {
     text-decoration: none;
     color: inherit;
@@ -1450,7 +1528,6 @@ body {
     visibility: visible !important;
 }
 
-/* Assicurati che le colonne Bootstrap siano corrette */
 .col-lg-4,
 .col-md-6,
 .col-sm-12 {
@@ -1459,7 +1536,6 @@ body {
     visibility: visible !important;
 }
 
-/* Per i filtri JavaScript - controlla display */
 .mystery-box-item[style*="display: none"],
 .funko-pop-item[style*="display: none"] {
     display: none !important;
@@ -1472,7 +1548,6 @@ body {
     visibility: visible !important;
 }
 
-/* Utility class di Bootstrap - le ho incluse qui per completezza */
 .mb-5 { margin-bottom: 3rem !important; }
 .mb-4 { margin-bottom: 1.5rem !important; }
 .mb-3 { margin-bottom: 1rem !important; }
@@ -1485,7 +1560,6 @@ body {
 .align-items-center { align-items: center !important; }
 .w-auto { width: auto !important; }
 
-/* Media Queries per la reattività */
 @media (max-width: 992px) {
     .fashion_taital {
         font-size: 38px;
@@ -1531,6 +1605,140 @@ body {
         margin-right: auto;
     }
 }
+
+.yugioh-card-icon {
+    display: inline-block;
+    width: 25px;
+    height: 35px;
+    background-color: #d1b672;
+    border: 2px solid #5a5a5a;
+    border-radius: 3px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    transform: rotate(-5deg);
+    transition: transform 0.2s ease-in-out;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.nav-link:hover .yugioh-card-icon {
+    transform: rotate(0deg) scale(1.1);
+}
+
+.yugioh-card-icon .yugioh-card-element {
+    display: block;
+    width: 60%;
+    height: 30%;
+    background-color: #1a1a1a;
+    position: absolute;
+    top: 20%;
+    left: 20%;
+    border-radius: 2px;
+    box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+.yugioh-card-icon::before {
+    content: '★';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    color: gold;
+    font-size: 10px;
+    line-height: 1;
+}
+
+.yugioh-card-icon::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 2px;
+    background-color: #a33;
+}
+
+.yugioh-icon-container {
+    margin-bottom: 5px; /* Aggiunge 5 pixel di spazio sotto l'icona */
+}
+
+.pokeball {
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    display: inline-block;
+    transition: transform 0.2s ease-in-out;
+}
+
+.pokeball:hover {
+    transform: scale(1.1);
+}
+
+.pokeball-top {
+    height: 50%;
+    background-color: red;
+    border-bottom: 2px solid black;
+}
+
+.pokeball-middle {
+    height: 2px;
+    background-color: black;
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pokeball-button {
+    width: 12px;
+    height: 12px;
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 50%;
+    position: relative;
+}
+
+.pokeball-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    background-color: black;
+    border-radius: 50%;
+}
+
+.pokeball-bottom {
+    height: 50%;
+    background-color: white;
+}
+
+.nav-item .pokeball-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    padding: 0;
+}
+
+.pokeball-link span {
+    margin-top: 5px;
+    font-size: 14px;
+}
+
 /* ORDINI */
 /* STORICO ORDINI CSS */
 
@@ -1863,84 +2071,6 @@ body {
 .accessory-section {
             scroll-margin-top: 100px;
         }
-
-/* Stile per la Poké Ball */
-.pokeball {
-    width: 40px;
-    height: 40px;
-    background-color: white;
-    border: 2px solid black;
-    border-radius: 50%;
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
-    display: inline-block;
-    transition: transform 0.2s ease-in-out;
-}
-
-.pokeball:hover {
-    transform: scale(1.1);
-}
-
-.pokeball-top {
-    height: 50%;
-    background-color: red;
-    border-bottom: 2px solid black;
-}
-
-.pokeball-middle {
-    height: 2px;
-    background-color: black;
-    position: absolute;
-    width: 100%;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.pokeball-button {
-    width: 12px;
-    height: 12px;
-    background-color: white;
-    border: 2px solid black;
-    border-radius: 50%;
-    position: relative;
-}
-
-.pokeball-button::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 6px;
-    height: 6px;
-    background-color: black;
-    border-radius: 50%;
-}
-
-.pokeball-bottom {
-    height: 50%;
-    background-color: white;
-}
-
-/* Stile per il link della navbar che contiene la Poké Ball */
-.nav-item .pokeball-link {
-    display: flex; /* Attiva il layout flessibile */
-    flex-direction: column; /* Imposta la disposizione degli elementi in colonna */
-    align-items: center; /* Centra gli elementi orizzontalmente */
-    text-align: center;
-    text-decoration: none;
-    color: white; /* Mantiene il colore del testo predefinito della navbar */
-    padding: 0; /* Rimuovi il padding predefinito per un layout più compatto */
-}
-
-.pokeball-link span {
-    margin-top: 5px; /* Spazio tra la Poké Ball e il testo */
-    font-size: 14px; /* Dimensione del testo */
-}
 
 
 /* MODAL DETTAGLI ORDINE */
@@ -2319,63 +2449,4 @@ body {
 
 .bg-secondary {
     background-color: #6c757d !important;
-}
-
-/* ICONA YU-GI-OH NAVBAR */
-/* Stile del contenitore principale dell'icona (la "carta") */
-.yugioh-card-icon {
-    display: inline-block;
-    width: 25px; /* Larghezza dell'icona */
-    height: 35px; /* Altezza dell'icona */
-    background-color: #d1b672; /* Colore di base della carta (dorato/giallo) */
-    border: 2px solid #5a5a5a; /* Bordo scuro */
-    border-radius: 3px; /* Angoli leggermente arrotondati */
-    position: relative; /* Necessario per posizionare l'elemento interno */
-    overflow: hidden; /* Nasconde l'elemento interno se esce dai bordi */
-    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); /* Leggera ombra */
-    transform: rotate(-5deg); /* Rotazione leggera per dare un effetto dinamico */
-    transition: transform 0.2s ease-in-out; /* Animazione al passaggio del mouse */
-    margin-right: 8px; /* Spazio a destra per separare l'icona dal testo */
-    vertical-align: middle; /* Allinea l'icona verticalmente con il testo */
-}
-
-/* Animazione al passaggio del mouse sull'icona */
-.nav-link:hover .yugioh-card-icon {
-    transform: rotate(0deg) scale(1.1); /* Raddrizza e ingrandisce leggermente l'icona */
-}
-
-/* Stile dell'elemento interno (simboleggia l'immagine/testo della carta) */
-.yugioh-card-icon .yugioh-card-element {
-    display: block;
-    width: 60%; /* Larghezza dell'elemento interno */
-    height: 30%; /* Altezza dell'elemento interno */
-    background-color: #1a1a1a; /* Colore scuro per l'elemento */
-    position: absolute;
-    top: 20%; /* Posizionamento dall'alto */
-    left: 20%; /* Posizionamento da sinistra */
-    border-radius: 2px; /* Angoli arrotondati */
-    box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.5); /* Ombra interna per un effetto 3D */
-}
-
-/* Pseudo-elemento per il "livello stella" */
-.yugioh-card-icon::before {
-    content: '★'; /* Aggiunge il carattere stella */
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    color: gold; /* Colore dorato per la stella */
-    font-size: 10px;
-    line-height: 1;
-}
-
-/* Pseudo-elemento per la decorazione in basso */
-.yugioh-card-icon::after {
-    content: '';
-    position: absolute;
-    bottom: 2px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80%;
-    height: 2px;
-    background-color: #a33; /* Colore rosso per la linea */
 }

@@ -26,8 +26,9 @@ require_once __DIR__.'/../../include/config.inc.php';
                 <i class="bi bi-clock-history"></i><span>Ordini</span>
             </a>
         </li>
-        <li class="nav-item">
-            <a href="<?php echo BASE_URL; ?>/pages/pokémon.php" class="pokeball-link">
+        
+        <li class="nav-item dropdown">
+            <a href="#" class="pokeball-link" role="button" aria-expanded="false">
                 <div class="pokeball">
                     <div class="pokeball-top"></div>
                     <div class="pokeball-middle">
@@ -37,15 +38,25 @@ require_once __DIR__.'/../../include/config.inc.php';
                 </div>
                 <span>Pokémon</span>
             </a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/pages/pokemon_mystery_boxes.php">Mystery Box</a></li>
+                <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/pages/pokemon_funko_pops.php">Funko Pop</a></li>
+            </ul>
         </li>
-        <li class="nav-item">
-            <a href="<?php echo BASE_URL; ?>/pages/yugioh.php" class="yugioh-link">
-                <div class="yugioh">
-                <span class="yugioh-card-icon">
-                    <span class="yugioh-card-element"></span>
-                </span>
-                <span>Yu-Gi-Oh!</span>
+        <li class="nav-item dropdown">
+            <a href="#" class="yugioh-link" role="button" aria-expanded="false">
+                <div class="yugioh-icon-container">
+            <span class="yugioh-card-icon">
+            <span class="yugioh-card-element"></span>
+            </span>
+                </div>
+            <span>Yu-Gi-Oh!</span>
             </a>
+            <ul class="dropdown-menu">
+               <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/pages/yugioh_mystery_boxes.php">Mystery Box</a></li>
+               <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/pages/yugioh_funko_pops.php">Funko Pop</a></li>
+    </ul>
+</li>
         </li>
     </ul>
 </nav>
