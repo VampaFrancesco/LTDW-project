@@ -4,16 +4,6 @@ require_once __DIR__ . '/../include/session_manager.php';
 
 // IMPORTANTE: Fai tutti i controlli PRIMA di qualsiasi output HTML
 SessionManager::startSecureSession();
-
-// Controllo automatico per pagine protette (opzionale - se implementi auth_config.php)
-/*
-require_once __DIR__ . '/../include/auth_config.php';
-$current_page = $_SERVER['REQUEST_URI'];
-if (isProtectedPage($current_page)) {
-    SessionManager::requireLogin();
-}
-*/
-
 // Recupera il messaggio flash PRIMA dell'output HTML
 $flash_message = SessionManager::get('flash_message');
 if ($flash_message) {
@@ -73,23 +63,62 @@ if ($flash_message) {
                             <a href="#" class="mx-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                 <?php
                                 $nome = SessionManager::get('user_nome', 'Utente');
+                                $isAdmin = SessionManager::get('user_is_admin', false); // FIX: user_is_admin
                                 echo htmlspecialchars($nome);
+                                if ($isAdmin) {
+                                    echo ' <span class="badge bg-danger">Admin</span>';
+                                }
                                 ?>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/home_utente.php">
-                                        <i class="bi bi-house"></i> Dashboard
-                                    </a></li>
-                                <li><a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/collezione.php">
+                                <?php if ($isAdmin): ?>
+                                    <!-- Menu ADMIN: Dashboard invece di Profilo -->
+                                    <li>
+                                        <a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/dashboard/dashboard.php">
+                                            <i class="bi bi-speedometer2"></i> Dashboard Admin
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/home_utente.php">
+                                            <i class="bi bi-house"></i> Area Utente
+                                        </a>
+                                    </li>
+                                <?php else: ?>
+                                    <!-- Menu UTENTE NORMALE: Profilo invece di Dashboard -->
+                                    <li>
+                                        <a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/home_utente.php">
+                                            <i class="bi bi-house"></i> Dashboard
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/profilo.php">
+                                            <i class="bi bi-person-gear"></i> Profilo
+                                        </a>
+                                    </li>
+                                <?php endif; ?>
+
+                                <!-- Menu comune per tutti -->
+                                <li>
+                                    <a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/collezione.php">
                                         <i class="bi bi-collection"></i> La mia Collezione
-                                    </a></li>
-                                <li><a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/profilo.php">
-                                        <i class="bi bi-person-gear"></i> Profilo
-                                    </a></li>
+                                    </a>
+                                </li>
+
+                                <?php if (!$isAdmin): ?>
+                                    <!-- Ordini solo per utenti normali -->
+                                    <li>
+                                        <a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/ordini.php">
+                                            <i class="bi bi-bag-check"></i> I miei Ordini
+                                        </a>
+                                    </li>
+                                <?php endif; ?>
+
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/auth/logout.php">
+                                <li>
+                                    <a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/auth/logout.php">
                                         <i class="bi bi-box-arrow-right"></i> Logout
-                                    </a></li>
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     <?php else: ?>

@@ -1,97 +1,146 @@
 <?php
-global $config;
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-// register_action.php
+// Evita output prima degli header
+ob_start();
 
-// 1) Carica configurazione
-$configPath = __DIR__ . '/../include/config.inc.php';
-if (!file_exists($configPath)) {
-    http_response_code(500);
-    exit(json_encode([
-        'success' => false,
-        'errors'  => ['File di configurazione non trovato.']
-    ]));
-}
+require_once __DIR__.'/../include/session_manager.php';
+require_once __DIR__.'/../include/config.inc.php';
 
-// *** MODIFICA QUI: Includi il file per rendere disponibile la variabile $config ***
-require_once $configPath; // Usa require_once per includere la variabile $config
+// Inizializza sessione
+SessionManager::startSecureSession();
 
-// *** E poi assegna la parte specifica del database di $config a $db_config ***
-// Questo è cruciale per usare correttamente i valori di host, user, ecc.
-// Se il tuo config.inc.php definisce $config['dbms']['localhost'] allora usa quello:
-$db_config = $config['dbms']['localhost'];
-
-// Se il tuo config.inc.php definisce $config direttamente con host, user, ecc., allora usa:
-// $db_config = $config; // Scegli questa riga o quella sopra, a seconda del config.inc.php
-
-// 2) Connessione MySQLi (HOST, USER, PASSWD, DBNAME)
-$conn = new mysqli(
-    $db_config['host'], // Ora usa $db_config
-    $db_config['user'], // Ora usa $db_config
-    $db_config['passwd'], // Ora usa $db_config
-    $db_config['dbname']  // Ora usa $db_config
-);
-if ($conn->connect_error) {
-    http_response_code(500);
-    exit(json_encode([
-        'success' => false,
-        'errors'  => ['Connessione al database fallita: ' . $conn->connect_error]
-    ]));
-}
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-
-// 3) Solo POST
+// Verifica metodo POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    exit;
+    header('Location: ' . BASE_URL . '/pages/auth/register.php');
+    exit();
 }
 
-// 4) Recupera e valida
-$nome    = trim($_POST['nome']    ?? '');
+// Recupera dati form
+$nome = trim($_POST['nome'] ?? '');
 $cognome = trim($_POST['cognome'] ?? '');
-$email   = trim($_POST['email']   ?? '');
-$pass    = $_POST['password']     ?? '';
+$email = trim($_POST['email'] ?? '');
+$password = $_POST['password'] ?? '';
 
-$errors = [];
-if ($nome === '')     $errors[] = 'Nome obbligatorio.';
-if ($cognome === '')  $errors[] = 'Cognome obbligatorio.';
+// Validazione base
+if (empty($nome) || empty($cognome) || empty($email) || empty($password)) {
+    SessionManager::setFlashMessage('Tutti i campi sono obbligatori', 'danger');
+    SessionManager::set('register_form_data', [
+        'nome' => $nome,
+        'cognome' => $cognome,
+        'email' => $email
+    ]);
+    header('Location: ' . BASE_URL . '/pages/auth/register.php');
+    exit();
+}
+
+// Blocca registrazioni con email @boxomnia.it
+if (str_ends_with(strtolower($email), '@boxomnia.it')) {
+    SessionManager::setFlashMessage('Non è possibile registrarsi con email del dominio aziendale. Contattare l\'amministratore.', 'danger');
+    SessionManager::set('register_form_data', [
+        'nome' => $nome,
+        'cognome' => $cognome,
+        'email' => ''  // Rimuovi email non valida
+    ]);
+    header('Location: ' . BASE_URL . '/pages/auth/register.php');
+    exit();
+}
+
+// Validazione email
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $errors[] = 'Email non valida.';
+    SessionManager::setFlashMessage('Formato email non valido', 'danger');
+    SessionManager::set('register_form_data', [
+        'nome' => $nome,
+        'cognome' => $cognome,
+        'email' => $email
+    ]);
+    header('Location: ' . BASE_URL . '/pages/auth/register.php');
+    exit();
 }
-if (strlen($pass) < 6) {
-    $errors[] = 'Password troppo corta (min 6 caratteri).';
+
+// Validazione password
+if (strlen($password) < 6) {
+    SessionManager::setFlashMessage('La password deve essere lunga almeno 6 caratteri', 'danger');
+    SessionManager::set('register_form_data', [
+        'nome' => $nome,
+        'cognome' => $cognome,
+        'email' => $email
+    ]);
+    header('Location: ' . BASE_URL . '/pages/auth/register.php');
+    exit();
 }
-if (!empty($errors)) {
-    header('Content-Type: application/json');
-    echo json_encode(['success' => false, 'errors' => $errors]);
-    exit;
+
+// Connessione database
+$db_config = $config['dbms']['localhost'];
+$conn = new mysqli(
+    $db_config['host'],
+    $db_config['user'],
+    $db_config['passwd'],
+    $db_config['dbname']
+);
+
+if ($conn->connect_error) {
+    SessionManager::setFlashMessage('Errore di connessione al database', 'danger');
+    header('Location: ' . BASE_URL . '/pages/auth/register.php');
+    exit();
 }
 
-// 5) Hash
-$passwordHash = password_hash($pass, PASSWORD_DEFAULT);
+// Verifica se email già esistente
+$checkStmt = $conn->prepare("SELECT id_utente FROM utente WHERE email = ?");
+if (!$checkStmt) {
+    SessionManager::setFlashMessage('Errore interno del server', 'danger');
+    header('Location: ' . BASE_URL . '/pages/auth/register.php');
+    exit();
+}
 
-// 6) Insert con prepared statement
-try {
-    $stmt = $conn->prepare(
-        "INSERT INTO utente (nome, cognome, email, password)
-        VALUES (?, ?, ?, ?)"
-    );
-    $stmt->bind_param('ssss', $nome, $cognome, $email, $passwordHash);
-    $stmt->execute();
+$checkStmt->bind_param("s", $email);
+$checkStmt->execute();
+$result = $checkStmt->get_result();
 
-    // Redirect al login su success
-    header('Location: /LTDW-project/pages/auth/login.php?registered=1');
-    exit;
+if ($result->num_rows > 0) {
+    SessionManager::setFlashMessage('Email già registrata', 'danger');
+    SessionManager::set('register_form_data', [
+        'nome' => $nome,
+        'cognome' => $cognome,
+        'email' => ''
+    ]);
+    $checkStmt->close();
+    $conn->close();
+    header('Location: ' . BASE_URL . '/pages/auth/register.php');
+    exit();
+}
 
+$checkStmt->close();
 
-} catch (mysqli_sql_exception $e) {
-    // 1062 = duplicate entry
-    $msg = $e->getCode() === 1062
-        ? 'Email già registrata.'
-        : 'Errore interno. Riprova più tardi.';
+// Hash password
+$hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-    header('Location: /register.php?error=' . urlencode($msg));
-    exit;
+// Inserisci nuovo utente
+$stmt = $conn->prepare("INSERT INTO utente (nome, cognome, email, password) VALUES (?, ?, ?, ?)");
+if (!$stmt) {
+    SessionManager::setFlashMessage('Errore interno del server', 'danger');
+    $conn->close();
+    header('Location: ' . BASE_URL . '/pages/auth/register.php');
+    exit();
+}
+
+$stmt->bind_param("ssss", $nome, $cognome, $email, $hashedPassword);
+
+if ($stmt->execute()) {
+    // Registrazione riuscita
+    SessionManager::setFlashMessage('Registrazione completata con successo! Ora puoi accedere.', 'success');
+    $stmt->close();
+    $conn->close();
+    header('Location: ' . BASE_URL . '/pages/auth/login.php');
+    exit();
+} else {
+    // Errore nella registrazione
+    SessionManager::setFlashMessage('Errore durante la registrazione', 'danger');
+    SessionManager::set('register_form_data', [
+        'nome' => $nome,
+        'cognome' => $cognome,
+        'email' => $email
+    ]);
+    $stmt->close();
+    $conn->close();
+    header('Location: ' . BASE_URL . '/pages/auth/register.php');
+    exit();
 }
