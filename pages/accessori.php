@@ -113,10 +113,10 @@ $conn->close();
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" id="price-filter-menu">
                         <li><a class="dropdown-item filter-link active-filter" href="#" data-filter-type="price" data-filter-value="all">Tutti</a></li>
-                        <li><a class="dropdown-item filter-link" href="#" data-filter-type="price" data-filter-value="<10">&lt; 10€</a></li>
-                        <li><a class="dropdown-item filter-link" href="#" data-filter-type="price" data-filter-value="10-25">10-25€</a></li>
-                        <li><a class="dropdown-item filter-link" href="#" data-filter-type="price" data-filter-value="25-50">25-50€</a></li>
-                        <li><a class="dropdown-item filter-link" href="#" data-filter-type="price" data-filter-value=">50">&gt; 50€</a></li>
+                        <li><a class="dropdown-item filter-link" href="#" data-filter-type="price" data-filter-value="<5">&lt; 5€</a></li>
+                        <li><a class="dropdown-item filter-link" href="#" data-filter-type="price" data-filter-value="5-10">5-10€</a></li>
+                        <li><a class="dropdown-item filter-link" href="#" data-filter-type="price" data-filter-value=">10">&gt; 10€</a></li>
+
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item filter-link" href="#" data-filter-type="price" data-filter-value="asc">Prezzo crescente</a></li>
                         <li><a class="dropdown-item filter-link" href="#" data-filter-type="price" data-filter-value="desc">Prezzo decrescente</a></li>
@@ -158,7 +158,7 @@ $conn->close();
                             <?php endforeach; ?>
                         <?php else: ?>
                             <div class="col-12 empty-category-message">
-                                <p>Nessun accessorio di questo tipo disponibile.</p>
+                                <p>Nessun accessorio di questo tipo disponibile</p>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -223,10 +223,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     sectionItems = sectionItems.filter(item => {
                         const price = parseFloat(item.dataset.price);
                         switch (activePriceFilter) {
-                            case '<10': return price < 10;
-                            case '10-25': return price >= 10 && price <= 25;
-                            case '25-50': return price >= 25 && price <= 50;
-                            case '>50': return price > 50;
+                            case '<5': return price <5;
+                            case '5-10': return price >= 5 && price <=10;
+                            case '>10': return price > 10;
                         }
                     });
                 }
@@ -251,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     const emptyMessage = document.createElement('div');
                     emptyMessage.classList.add('col-12', 'empty-category-message');
-                    emptyMessage.innerHTML = '<p>Nessun accessorio trovato in questa categoria.</p>';
+                    emptyMessage.innerHTML = '<p>Nessun accessorio trovato in questa categoria</p>';
                     itemsContainer.appendChild(emptyMessage);
                 }
             }
@@ -261,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (activeCategoryFilter === 'tutti' && totalResults === 0) {
             const emptyMessage = document.createElement('div');
             emptyMessage.classList.add('col-12', 'empty-category-message', 'mt-4');
-            emptyMessage.innerHTML = '<p>Nessun accessorio trovato per i filtri selezionati.</p>';
+            emptyMessage.innerHTML = '<p>Nessun accessorio trovato per i filtri selezionati</p>';
             container.appendChild(emptyMessage);
         }
     }
@@ -322,7 +321,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <p class="fs-4 fw-bold">${price}€</p>
                         <p class="mb-3">Disponibilità: <span class="fw-bold">${availability}</span></p>
                         <hr>
-                        <form id="addToCartForm" action="<?php echo BASE_URL; ?>/action/add_to_cart_action.php" method="post">
+                        <form id="addToCartForm" action="<?php echo BASE_URL; ?>/action/add_to_cart.php" method="post">
                             <input type="hidden" name="id_prodotto" value="${id}">
                             <input type="hidden" name="nome_prodotto" value="${name}">
                             <input type="hidden" name="prezzo" value="${price}">
