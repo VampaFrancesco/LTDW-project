@@ -4,14 +4,14 @@
 // Includi il file di configurazione
 $configPath = __DIR__ . '/../include/config.inc.php';
 if (!file_exists($configPath)) {
-    header('Location: /error_page.php?code=config_missing');
+    header('Location: ' . BASE_URL . '/error_page.php?code=config_missing');
     exit();
 }
 require_once $configPath;
 
 require_once __DIR__ . '/../include/session_manager.php';
 
-// 2. Richiedi autenticazione (fa il redirect automaticamente se non loggato)
+// Richiedi autenticazione (fa il redirect automaticamente se non loggato)
 SessionManager::requireLogin();
 
 // Inclusione dell'header
@@ -43,7 +43,7 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 // Query per recuperare tutti gli accessori
 $accessori_by_type = [];
-$accessory_types = ['Proteggicarte', 'Porta carte', 'Scatole porta mazzi', 'Plance di gioco' ];
+$accessory_types = ['Proteggicarte', 'Porta mazzi', 'Scatole porta carte', 'Plance di gioco'];
 
 foreach ($accessory_types as $type) {
     $sql_accessories = "
@@ -52,6 +52,7 @@ foreach ($accessory_types as $type) {
             o.nome_oggetto AS name,
             o.desc_oggetto AS description,
             o.prezzo_oggetto AS price,
+            o.quant_oggetto AS availability,
             i.nome_img AS image_filename,
             co.nome_categoria AS category_name,
             co.tipo_oggetto AS object_type
@@ -66,7 +67,7 @@ foreach ($accessory_types as $type) {
         ORDER BY
             o.nome_oggetto ASC;
     ";
-    
+
     $stmt = $conn->prepare($sql_accessories);
     if (!$stmt) {
         die("Errore nella preparazione della query: " . $conn->error);
@@ -77,7 +78,7 @@ foreach ($accessory_types as $type) {
 
     if ($result) {
         while ($row = $result->fetch_assoc()) {
-            $row['image_url'] = (defined('BASE_URL') ? BASE_URL : '') . '/images/' . ($row['image_filename'] ?? 'default_accessory.png');
+            $row['image_url'] = (defined('BASE_URL') ? BASE_URL : '') . '/images/' . ($row['image_filename'] ?? 'default_product1.jpg');
             $accessori_by_type[$type][] = $row;
         }
     } else {
@@ -91,7 +92,7 @@ $conn->close();
 
 <main class="background-custom filter-container accessory-section">
     <div class="container">
-        
+
         <div class="d-flex justify-content-between align-items-start mb-4">
             <h1 class="fashion_taverage m-0">Accessori</h1>
             <div class="d-flex flex-column align-items-end">
@@ -123,7 +124,7 @@ $conn->close();
                 </div>
             </div>
         </div>
-        
+
         <div class="all-accessories-container" id="all-accessories-container">
             <?php foreach ($accessory_types as $type): ?>
                 <div id="<?php echo str_replace(' ', '_', $type); ?>" class="accessory-category-section mb-5" data-category="<?php echo str_replace(' ', '_', $type); ?>">
@@ -132,17 +133,25 @@ $conn->close();
                         <?php if (!empty($accessori_by_type[$type])): ?>
                             <?php foreach ($accessori_by_type[$type] as $accessory): ?>
                                 <div class="col accessory-item" data-price="<?php echo htmlspecialchars($accessory['price'] ?? 0); ?>" data-category="<?php echo str_replace(' ', '_', $type); ?>">
-                                    <div class="accessory-card card h-100" data-id="<?php echo htmlspecialchars($accessory['id_oggetto']); ?>" data-description="<?php echo htmlspecialchars($accessory['description']); ?>">
+                                    <div class="accessory-card card h-100"
+                                        data-id="<?php echo htmlspecialchars($accessory['id_oggetto']); ?>"
+                                        data-name="<?php echo htmlspecialchars($accessory['name']); ?>"
+                                        data-description="<?php echo htmlspecialchars($accessory['description']); ?>"
+                                        data-price="<?php echo htmlspecialchars($accessory['price']); ?>"
+                                        data-availability="<?php echo htmlspecialchars($accessory['availability']); ?>"
+                                        data-image-url="<?php echo htmlspecialchars($accessory['image_url']); ?>">
                                         <div class="card-img-container">
                                             <img src="<?php echo htmlspecialchars($accessory['image_url']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($accessory['name']); ?>">
                                         </div>
                                         <div class="card-body">
                                             <h5 class="card-title"><?php echo htmlspecialchars($accessory['name']); ?></h5>
                                             <p class="card-text text-muted"><?php echo htmlspecialchars($accessory['description']); ?></p>
-                                            <p class="card-text card-price"><?php echo isset($accessory['price']) ? htmlspecialchars($accessory['price']) . '€' : 'Prezzo non disponibile'; ?></p>
                                         </div>
                                         <div class="card-footer text-center">
-                                            <button class="btn btn-add-to-cart">Aggiungi al carrello</button>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <p class="card-text mb-0">Disponibilità: <span class="fw-bold"><?php echo htmlspecialchars($accessory['availability'] ?? '0'); ?></span></p>
+                                                <p class="card-text card-price mb-0 fs-5"><?php echo isset($accessory['price']) ? htmlspecialchars($accessory['price']) . '€' : 'Prezzo non disponibile'; ?></p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -169,7 +178,7 @@ $conn->close();
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-            </div>
+                </div>
         </div>
     </div>
 </div>
@@ -187,125 +196,73 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function applyFilters() {
         const container = document.getElementById('all-accessories-container');
-        
-        // Rimuovi eventuali messaggi di "Nessun risultato" precedenti
         document.querySelectorAll('.empty-category-message').forEach(el => el.remove());
 
-        // Logica per l'ordinamento
-        if (activePriceFilter === 'asc' || activePriceFilter === 'desc') {
-            // Se è attivo un filtro di ordinamento, si mostra un'unica lista
-            const filteredAndSortedItems = Array.from(allAccessoryItems)
-                .filter(item => {
-                    const category = item.dataset.category;
-                    const price = parseFloat(item.dataset.price);
+        // Rimuovi il contenitore di ordinamento temporaneo se esiste
+        container.querySelector('#sorted-results-container')?.remove();
 
-                    let isCategoryMatch = (activeCategoryFilter === 'tutti' || category === activeCategoryFilter);
-                    let isPriceMatch = (activePriceFilter === 'all' || 
-                                        (activePriceFilter === '<10' && price < 10) ||
-                                        (activePriceFilter === '10-25' && price >= 10 && price <= 25) ||
-                                        (activePriceFilter === '25-50' && price >= 25 && price <= 50) ||
-                                        (activePriceFilter === '>50' && price > 50));
-                    
-                    return isCategoryMatch && isPriceMatch;
-                })
-                .sort((a, b) => {
-                    const priceA = parseFloat(a.dataset.price);
-                    const priceB = parseFloat(b.dataset.price);
-                    return activePriceFilter === 'asc' ? priceA - priceB : priceB - priceA;
-                });
+        let totalResults = 0;
+
+        accessorySections.forEach(section => {
+            const categoryId = section.dataset.category;
+            const itemsContainer = section.querySelector('.category-items-container');
             
-            // Nascondi tutte le sezioni di categoria
-            accessorySections.forEach(section => section.style.display = 'none');
+            // Nascondi la sezione per default
+            section.style.display = 'none';
             
-            // Crea un contenitore temporaneo per gli elementi ordinati
-            let tempContainer = container.querySelector('#sorted-results-container');
-            if (!tempContainer) {
-                tempContainer = document.createElement('div');
-                tempContainer.id = 'sorted-results-container';
-                tempContainer.classList.add('row', 'g-4');
-                container.appendChild(tempContainer);
-            }
-            tempContainer.innerHTML = '';
-            
-            if (filteredAndSortedItems.length > 0) {
-                filteredAndSortedItems.forEach(item => {
-                    const itemClone = item.cloneNode(true);
-                    itemClone.style.display = 'block'; // Assicurati che sia visibile
-                    tempContainer.appendChild(itemClone);
-                });
-            } else {
-                // Aggiungi un messaggio se non ci sono risultati
-                tempContainer.innerHTML = '<div class="col-12"><p>Nessun accessorio trovato per i filtri selezionati.</p></div>';
-            }
-            
-        } else {
-            // Logica per i filtri di categoria e range di prezzo
-            container.querySelector('#sorted-results-container')?.remove(); // Rimuovi il contenitore di ordinamento
-            
-            let totalResults = 0;
-            accessorySections.forEach(section => {
-                const categoryId = section.dataset.category;
-                const itemsContainer = section.querySelector('.category-items-container');
-                let hasVisibleItems = false;
+            // Mostra la sezione solo se il filtro categoria è "tutti" o corrisponde
+            if (activeCategoryFilter === 'tutti' || categoryId === activeCategoryFilter) {
+                section.style.display = 'block';
+
+                // Filtra gli elementi che appartengono a questa sezione
+                let sectionItems = Array.from(allAccessoryItems)
+                    .filter(item => item.dataset.category === categoryId);
                 
-                // Nascondi tutti gli elementi prima di filtrare
-                Array.from(section.querySelectorAll('.accessory-item')).forEach(item => {
-                    item.style.display = 'none';
-                });
-
-                if (activeCategoryFilter === 'tutti' || categoryId === activeCategoryFilter) {
-                    section.style.display = 'block';
-                    
-                    // Filtra gli elementi all'interno della sezione
-                    Array.from(section.querySelectorAll('.accessory-item')).forEach(item => {
+                // Se c'è un filtro per prezzo a intervalli, filtra gli elementi
+                if (activePriceFilter !== 'all' && activePriceFilter !== 'asc' && activePriceFilter !== 'desc') {
+                    sectionItems = sectionItems.filter(item => {
                         const price = parseFloat(item.dataset.price);
-                        let isPriceMatch = false;
-
                         switch (activePriceFilter) {
-                            case 'all':
-                                isPriceMatch = true;
-                                break;
-                            case '<10':
-                                isPriceMatch = price < 10;
-                                break;
-                            case '10-25':
-                                isPriceMatch = price >= 10 && price <= 25;
-                                break;
-                            case '25-50':
-                                isPriceMatch = price >= 25 && price <= 50;
-                                break;
-                            case '>50':
-                                isPriceMatch = price > 50;
-                                break;
-                        }
-                        
-                        if (isPriceMatch) {
-                            item.style.display = 'block';
-                            hasVisibleItems = true;
-                            totalResults++;
+                            case '<10': return price < 10;
+                            case '10-25': return price >= 10 && price <= 25;
+                            case '25-50': return price >= 25 && price <= 50;
+                            case '>50': return price > 50;
                         }
                     });
-
-                    // Aggiungi un messaggio se la sezione è vuota
-                    if (!hasVisibleItems) {
-                        const emptyMessage = document.createElement('div');
-                        emptyMessage.classList.add('col-12', 'empty-category-message');
-                        emptyMessage.innerHTML = '<p>Nessun accessorio trovato in questa categoria.</p>';
-                        itemsContainer.appendChild(emptyMessage);
-                    }
-                    
-                } else {
-                    section.style.display = 'none';
                 }
-            });
-            
-            // Gestisci il caso in cui "Tutti" e nessun risultato
-            if (activeCategoryFilter === 'tutti' && totalResults === 0) {
-                 const emptyMessage = document.createElement('div');
-                 emptyMessage.classList.add('col-12', 'empty-category-message', 'mt-4');
-                 emptyMessage.innerHTML = '<p>Nessun accessorio trovato per i filtri selezionati.</p>';
-                 container.appendChild(emptyMessage);
+                
+                // Se c'è un filtro di ordinamento, ordina gli elementi di questa sezione
+                if (activePriceFilter === 'asc' || activePriceFilter === 'desc') {
+                    sectionItems.sort((a, b) => {
+                        const priceA = parseFloat(a.dataset.price);
+                        const priceB = parseFloat(b.dataset.price);
+                        return activePriceFilter === 'asc' ? priceA - priceB : priceB - priceA;
+                    });
+                }
+                
+                // Pulisci e riaggiungi gli elementi filtrati/ordinati al contenitore della categoria
+                itemsContainer.innerHTML = '';
+                if (sectionItems.length > 0) {
+                    sectionItems.forEach(item => {
+                        item.style.display = 'block';
+                        itemsContainer.appendChild(item);
+                    });
+                    totalResults += sectionItems.length;
+                } else {
+                    const emptyMessage = document.createElement('div');
+                    emptyMessage.classList.add('col-12', 'empty-category-message');
+                    emptyMessage.innerHTML = '<p>Nessun accessorio trovato in questa categoria.</p>';
+                    itemsContainer.appendChild(emptyMessage);
+                }
             }
+        });
+
+        // Gestisci il caso in cui "Tutti" e nessun risultato
+        if (activeCategoryFilter === 'tutti' && totalResults === 0) {
+            const emptyMessage = document.createElement('div');
+            emptyMessage.classList.add('col-12', 'empty-category-message', 'mt-4');
+            emptyMessage.innerHTML = '<p>Nessun accessorio trovato per i filtri selezionati.</p>';
+            container.appendChild(emptyMessage);
         }
     }
 
@@ -332,7 +289,7 @@ document.addEventListener('DOMContentLoaded', function() {
     categoryScrollLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             const targetId = this.getAttribute('href').substring(1);
-            if (activePriceFilter === 'asc' || activePriceFilter === 'desc' || targetId === 'tutti') {
+            if (targetId === 'tutti') {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
                 const targetElement = document.getElementById(targetId);
@@ -342,49 +299,45 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-
-    // Modal e Carrello (rimane invariato)
+    
+    // Modal e Carrello
     accessoryCards.forEach(card => {
-        card.addEventListener('click', function(event) {
-            if (event.target.closest('.btn-add-to-cart')) {
-                return;
-            }
+        card.addEventListener('click', function() {
             const id = this.dataset.id;
+            const name = this.dataset.name;
             const description = this.dataset.description;
-            const img = this.querySelector('.card-img-top');
-            const title = this.querySelector('.card-title').innerText;
-            const price = this.querySelector('.card-price').innerText;
-            
+            const price = this.dataset.price;
+            const availability = this.dataset.availability;
+            const imageUrl = this.dataset.imageUrl;
+
             const modalBody = document.querySelector('#accessoryModal .modal-body');
             modalBody.innerHTML = `
                 <div class="row">
                     <div class="col-md-6 text-center">
-                        <img src="${img.src}" class="img-fluid mb-3" alt="${title}">
+                        <img src="${imageUrl}" class="img-fluid mb-3" alt="${name}">
                     </div>
                     <div class="col-md-6">
-                        <h4>${title}</h4>
+                        <h4>${name}</h4>
                         <p class="text-muted">${description}</p>
-                        <p class="fs-4 fw-bold">${price}</p>
+                        <p class="fs-4 fw-bold">${price}€</p>
+                        <p class="mb-3">Disponibilità: <span class="fw-bold">${availability}</span></p>
                         <hr>
-                        <form action="#" method="post">
+                        <form id="addToCartForm" action="<?php echo BASE_URL; ?>/action/add_to_cart_action.php" method="post">
+                            <input type="hidden" name="id_prodotto" value="${id}">
+                            <input type="hidden" name="nome_prodotto" value="${name}">
+                            <input type="hidden" name="prezzo" value="${price}">
+                            <input type="hidden" name="tipo" value="accessorio">
+                            <input type="hidden" name="redirect_url" value="<?php echo BASE_URL; ?>/pages/accessori.php">
                             <div class="mb-3">
                                 <label for="modal-quantity" class="form-label">Quantità:</label>
-                                <input type="number" class="form-control" id="modal-quantity" name="quantita" value="1" min="1">
+                                <input type="number" class="form-control" id="modal-quantity" name="quantita" value="1" min="1" max="${availability}">
                             </div>
-                            <button type="submit" class="btn btn-add-to-cart w-100">Aggiungi al carrello</button>
+                            <button type="submit" class="btn btn-add-to-cart w-100" ${availability <= 0 ? 'disabled' : ''}>Aggiungi al carrello</button>
                         </form>
                     </div>
                 </div>
             `;
             accessoryModal.show();
-        });
-    });
-
-    const cartButtons = document.querySelectorAll('.btn-add-to-cart');
-    cartButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.stopPropagation();
-            alert('Aggiungi al carrello cliccato per l\'oggetto ID: ' + this.closest('.accessory-card, .modal-body').querySelector('input[name="id_oggetto"], .accessory-card').dataset.id);
         });
     });
 });
