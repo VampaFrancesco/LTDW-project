@@ -33,8 +33,8 @@ if (empty($nome) || empty($cognome) || empty($email) || empty($password)) {
 }
 
 // Blocca registrazioni con email @boxomnia.it
-if (str_ends_with(strtolower($email), '@boxomnia.it')) {
-    SessionManager::setFlashMessage('Non è possibile registrarsi con email del dominio aziendale. Contattare l\'amministratore.', 'danger');
+if (strpos(strtolower($email), '@boxomnia.it') !== false) {
+    SessionManager::setFlashMessage('La registrazione con email @boxomnia.it non è consentita. Gli account amministratore devono essere creati dal sistema.', 'danger');
     SessionManager::set('register_form_data', [
         'nome' => $nome,
         'cognome' => $cognome,

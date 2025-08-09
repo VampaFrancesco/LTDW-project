@@ -188,4 +188,102 @@ class SessionManager
             'type' => $type
         ]);
     }
+
+    /**
+     * Aggiorna il contatore del carrello
+     */
+    public static function updateCartCount() {
+        $cart = self::get('cart', []);
+        $total_items = 0;
+
+        foreach ($cart as $item) {
+            $total_items += $item['quantita'] ?? 0;
+        }
+
+        self::set('cart_items_count', $total_items);
+    }
+
+    /**
+     * Aggiungi prodotto al carrello
+     */
+    public static function addToCart($product_id, $product_data) {
+        $cart = self::get('cart', []);
+        $item_key = $product_data['tipo'] . '_' . $product_id;
+
+        if (isset($cart[$item_key])) {
+            $cart[$item_key]['quantita'] += $product_data['quantita'];
+        } else {
+            $cart[$item_key] = $product_data;
+        }
+
+        self::set('cart', $cart);
+        self::updateCartCount();
+    }
+
+    /**
+     * Rimuovi prodotto dal carrello
+     */
+    public static function removeFromCart($item_key) {
+        $cart = self::get('cart', []);
+
+        if (isset($cart[$item_key])) {
+            unset($cart[$item_key]);
+            self::set('cart', $cart);
+            self::updateCartCount();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Aggiorna quantità nel carrello
+     */
+    public static function updateCartQuantity($item_key, $quantity) {
+        $cart = self::get('cart', []);
+
+        if (isset($cart[$item_key])) {
+            if ($quantity <= 0) {
+                unset($cart[$item_key]);
+            } else {
+                $cart[$item_key]['quantita'] = $quantity;
+            }
+
+            self::set('cart', $cart);
+            self::updateCartCount();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Svuota il carrello
+     */
+    public static function clearCart() {
+        self::set('cart', []);
+        self::set('cart_items_count', 0);
+    }
+
+    /**
+     * Verifica se l'utente è admin
+     */
+    public static function isAdmin() {
+        self::startSecureSession();
+        return self::get('user_is_admin', false) === true;
+    }
+
+    /**
+     * Richiede privilegi admin
+     */
+    public static function requireAdmin() {
+        self::requireLogin();
+
+        if (!self::isAdmin()) {
+            self::setFlashMessage('Accesso negato. Area riservata agli amministratori.', 'danger');
+            $redirect_url = (defined('BASE_URL') ? BASE_URL : '') . '/pages/home_utente.php';
+            header('Location: ' . $redirect_url);
+            exit();
+        }
+    }
 }
