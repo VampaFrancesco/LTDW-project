@@ -1,4 +1,7 @@
 <?php
+// pages/auth/register.php
+ob_start();
+
 $hideNav = true;
 require_once __DIR__ . '/../../include/session_manager.php';
 require_once __DIR__ . '/../../include/config.inc.php';
@@ -13,209 +16,376 @@ if (SessionManager::isLoggedIn()) {
 $flash_message = SessionManager::getFlashMessage();
 $form_data = SessionManager::get('register_form_data', []);
 SessionManager::remove('register_form_data');
-
-include __DIR__ . '/../header.php';
 ?>
 
-    <main class="background-custom">
-        <div class="register-container">
-            <div class="text-center mb-4">
-                <img src="<?php echo BASE_URL; ?>/images/boxomnia.png" alt="Box Omnia" style="max-width: 200px;">
-            </div>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Registrati - Box Omnia</title>
 
-            <h2 class="text-center mb-4">Registra il tuo account</h2>
+    <!-- CSS -->
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="icon" href="<?php echo BASE_URL; ?>/images/favicon.ico" type="image/gif"/>
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/style.css">
 
-            <!-- Mostra messaggi flash -->
-            <?php if ($flash_message): ?>
-                <div class="alert alert-<?php echo htmlspecialchars($flash_message['type']); ?> alert-dismissible fade show" role="alert">
-                    <i class="bi bi-<?php echo $flash_message['type'] === 'danger' ? 'exclamation-triangle' : 'info-circle'; ?>"></i>
-                    <?php echo htmlspecialchars($flash_message['content']); ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            <?php endif; ?>
+    <style>
+        .register-container {
+            max-width: 500px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
 
-            <form action="<?php echo BASE_URL; ?>/action/register_action.php" method="POST" id="registerForm">
-                <div class="form-group mb-3">
-                    <label for="nome" class="form-label">Nome:</label>
-                    <input type="text"
-                           class="form-control"
-                           id="nome"
-                           name="nome"
-                           value="<?php echo htmlspecialchars($form_data['nome'] ?? ''); ?>"
-                           required
-                           autofocus>
-                </div>
+        .background-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
 
-                <div class="form-group mb-3">
-                    <label for="cognome" class="form-label">Cognome:</label>
-                    <input type="text"
-                           class="form-control"
-                           id="cognome"
-                           name="cognome"
-                           value="<?php echo htmlspecialchars($form_data['cognome'] ?? ''); ?>"
-                           required>
-                </div>
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
 
-                <div class="form-group mb-3">
-                    <label for="email" class="form-label">Email:</label>
-                    <input type="email"
-                           class="form-control"
-                           id="email"
-                           name="email"
-                           value="<?php echo htmlspecialchars($form_data['email'] ?? ''); ?>"
-                           required>
-                    <div class="form-text">
-                        <small class="text-muted">
-                            <i class="bi bi-info-circle"></i>
-                            Note: Le registrazioni con email @boxomnia.it sono riservate agli amministratori.
-                        </small>
-                    </div>
-                    <!-- Alert dinamico per email @boxomnia.it -->
-                    <div id="boxomniaAlert" class="alert alert-warning mt-2" style="display: none;">
-                        <i class="bi bi-exclamation-triangle"></i>
-                        <strong>Attenzione:</strong> Le email con dominio @boxomnia.it sono riservate agli account amministratore e non possono essere utilizzate per la registrazione normale.
-                    </div>
-                </div>
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            border: none;
+            padding: 0.75rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
 
-                <div class="form-group mb-4">
-                    <label for="password" class="form-label">Password:</label>
-                    <input type="password"
-                           class="form-control"
-                           id="password"
-                           name="password"
-                           required>
-                    <div class="form-text">
-                        <small class="text-muted">Minimo 6 caratteri</small>
-                    </div>
-                    <!-- Indicatore forza password -->
-                    <div class="password-strength mt-2" id="passwordStrength" style="display: none;">
-                        <div class="progress" style="height: 5px;">
-                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
-                        </div>
-                        <small class="strength-text text-muted"></small>
-                    </div>
-                </div>
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0056b3, #004085);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
 
-                <button type="submit" class="btn btn-primary w-100 mb-3" id="submitBtn">
-                    <i class="bi bi-person-plus"></i> Registrati
-                </button>
-            </form>
+        .alert {
+            border-radius: 8px;
+            border: none;
+            font-weight: 500;
+        }
 
-            <div class="text-center">
-                <p class="mb-0">Hai già un account? <a href="<?php echo BASE_URL; ?>/pages/auth/login.php">Accedi qui</a></p>
-            </div>
+        .alert-danger {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #212529;
+        }
+
+        .login-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .login-link:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .password-requirements {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }
+
+        .password-requirements.valid {
+            color: #28a745;
+        }
+
+        .password-requirements.invalid {
+            color: #dc3545;
+        }
+
+        .email-warning {
+            font-size: 0.85rem;
+            color: #856404;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+
+        .form-control.is-valid {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+        }
+    </style>
+</head>
+<body>
+<main class="background-custom">
+    <div class="register-container">
+        <div class="text-center mb-4">
+            <img src="<?php echo BASE_URL; ?>/images/boxomnia.png" alt="Box Omnia" style="max-width: 200px;">
         </div>
-    </main>
 
+        <h2 class="text-center mb-4">Registra il tuo account</h2>
 
-    <script>
-        // Validazione email in tempo reale
-        document.getElementById('email').addEventListener('input', function() {
+        <!-- ✅ ALERT PER ERRORI DI REGISTRAZIONE -->
+        <?php if ($flash_message): ?>
+            <div class="alert alert-<?php echo htmlspecialchars($flash_message['type']); ?> alert-dismissible fade show" role="alert">
+                <i class="bi bi-<?php echo $flash_message['type'] === 'danger' ? 'exclamation-triangle' : ($flash_message['type'] === 'success' ? 'check-circle' : 'info-circle'); ?> me-2"></i>
+                <?php echo htmlspecialchars($flash_message['content']); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+
+        <form action="<?php echo BASE_URL; ?>/action/register_action.php" method="POST" id="registerForm" novalidate>
+            <div class="form-group mb-3">
+                <label for="nome" class="form-label">
+                    <i class="bi bi-person me-2"></i>Nome:
+                </label>
+                <input type="text"
+                       class="form-control"
+                       id="nome"
+                       name="nome"
+                       value="<?php echo htmlspecialchars($form_data['nome'] ?? ''); ?>"
+                       placeholder="Inserisci il tuo nome"
+                       required
+                       autofocus>
+                <div class="invalid-feedback">Il nome è obbligatorio</div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="cognome" class="form-label">
+                    <i class="bi bi-person me-2"></i>Cognome:
+                </label>
+                <input type="text"
+                       class="form-control"
+                       id="cognome"
+                       name="cognome"
+                       value="<?php echo htmlspecialchars($form_data['cognome'] ?? ''); ?>"
+                       placeholder="Inserisci il tuo cognome"
+                       required>
+                <div class="invalid-feedback">Il cognome è obbligatorio</div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="email" class="form-label">
+                    <i class="bi bi-envelope me-2"></i>Email:
+                </label>
+                <input type="email"
+                       class="form-control"
+                       id="email"
+                       name="email"
+                       value="<?php echo htmlspecialchars($form_data['email'] ?? ''); ?>"
+                       placeholder="Inserisci la tua email"
+                       required>
+                <div class="invalid-feedback">Inserisci un indirizzo email valido</div>
+                <!-- ✅ WARNING PER EMAIL @boxomnia.it -->
+                <div class="email-warning" id="emailWarning">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    Le email con dominio @boxomnia.it sono riservate agli amministratori
+                </div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="password" class="form-label">
+                    <i class="bi bi-lock me-2"></i>Password:
+                </label>
+                <input type="password"
+                       class="form-control"
+                       id="password"
+                       name="password"
+                       placeholder="Crea una password sicura"
+                       required>
+                <div class="invalid-feedback">La password non soddisfa i requisiti</div>
+                <!-- ✅ INDICAZIONI SICUREZZA PASSWORD -->
+                <div class="password-requirements" id="passwordRequirements">
+                    <i class="bi bi-info-circle me-1"></i>
+                    La password deve contenere almeno 6 caratteri
+                </div>
+            </div>
+
+            <div class="form-group mb-4">
+                <label for="confirm_password" class="form-label">
+                    <i class="bi bi-lock-fill me-2"></i>Conferma Password:
+                </label>
+                <input type="password"
+                       class="form-control"
+                       id="confirm_password"
+                       name="confirm_password"
+                       placeholder="Conferma la password"
+                       required>
+                <div class="invalid-feedback">Le password non corrispondono</div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 mb-3">
+                <i class="bi bi-person-plus me-2"></i>Registrati
+            </button>
+        </form>
+
+        <div class="text-center">
+            <p class="mb-0">Hai già un account?
+                <a href="<?php echo BASE_URL; ?>/pages/auth/login.php" class="login-link">
+                    Accedi qui
+                </a>
+            </p>
+        </div>
+    </div>
+</main>
+
+<!-- JavaScript -->
+<script src="<?php echo BASE_URL; ?>/js/bootstrap.bundle.min.js"></script>
+
+<!-- ✅ VALIDAZIONI COMPLETE PER REGISTRAZIONE -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('registerForm');
+        const nomeField = document.getElementById('nome');
+        const cognomeField = document.getElementById('cognome');
+        const emailField = document.getElementById('email');
+        const passwordField = document.getElementById('password');
+        const confirmPasswordField = document.getElementById('confirm_password');
+        const emailWarning = document.getElementById('emailWarning');
+        const passwordRequirements = document.getElementById('passwordRequirements');
+
+        // ✅ VALIDAZIONE EMAIL @boxomnia.it
+        emailField.addEventListener('input', function() {
             const email = this.value.toLowerCase();
-            const boxomniaAlert = document.getElementById('boxomniaAlert');
-            const submitBtn = document.getElementById('submitBtn');
 
-            if (email.includes('@boxomnia.it')) {
-                boxomniaAlert.style.display = 'block';
-                this.classList.add('invalid');
-                this.classList.remove('valid');
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Email non consentita';
+            if (email.endsWith('@boxomnia.it')) {
+                emailWarning.style.display = 'block';
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+            } else if (this.validity.valid && email.length > 0) {
+                emailWarning.style.display = 'none';
+                this.classList.add('is-valid');
+                this.classList.remove('is-invalid');
             } else {
-                boxomniaAlert.style.display = 'none';
-                this.classList.remove('invalid');
-                if (this.value && this.checkValidity()) {
-                    this.classList.add('valid');
-                }
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="bi bi-person-plus"></i> Registrati';
+                emailWarning.style.display = 'none';
+                this.classList.remove('is-valid', 'is-invalid');
             }
         });
 
-        // Validazione password in tempo reale
-        document.getElementById('password').addEventListener('input', function() {
+        // ✅ VALIDAZIONE PASSWORD CON INDICAZIONI
+        passwordField.addEventListener('input', function() {
             const password = this.value;
-            const strengthIndicator = document.getElementById('passwordStrength');
-            const progressBar = strengthIndicator.querySelector('.progress-bar');
-            const strengthText = strengthIndicator.querySelector('.strength-text');
+            const isValid = password.length >= 6;
 
-            if (password.length > 0) {
-                strengthIndicator.style.display = 'block';
-
-                let strength = 0;
-                let strengthLabel = 'Molto debole';
-                let strengthColor = '#dc3545';
-
-                // Calcola forza password
-                if (password.length >= 6) strength += 25;
-                if (password.length >= 8) strength += 25;
-                if (/[A-Z]/.test(password)) strength += 25;
-                if (/[0-9]/.test(password)) strength += 25;
-
-                if (strength >= 75) {
-                    strengthLabel = 'Forte';
-                    strengthColor = '#28a745';
-                } else if (strength >= 50) {
-                    strengthLabel = 'Media';
-                    strengthColor = '#ffc107';
-                } else if (strength >= 25) {
-                    strengthLabel = 'Debole';
-                    strengthColor = '#fd7e14';
-                }
-
-                progressBar.style.width = strength + '%';
-                progressBar.style.backgroundColor = strengthColor;
-                strengthText.textContent = strengthLabel;
-
-                // Validazione visiva
-                if (password.length >= 6) {
-                    this.classList.add('valid');
-                    this.classList.remove('invalid');
-                } else {
-                    this.classList.add('invalid');
-                    this.classList.remove('valid');
-                }
+            if (password.length === 0) {
+                passwordRequirements.textContent = 'La password deve contenere almeno 6 caratteri';
+                passwordRequirements.className = 'password-requirements';
+                this.classList.remove('is-valid', 'is-invalid');
+            } else if (isValid) {
+                passwordRequirements.textContent = '✓ Password valida';
+                passwordRequirements.className = 'password-requirements valid';
+                this.classList.add('is-valid');
+                this.classList.remove('is-invalid');
             } else {
-                strengthIndicator.style.display = 'none';
-                this.classList.remove('valid', 'invalid');
+                passwordRequirements.textContent = `✗ Servono almeno ${6 - password.length} caratteri in più`;
+                passwordRequirements.className = 'password-requirements invalid';
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+            }
+
+            // Rivalidare conferma password
+            if (confirmPasswordField.value) {
+                validatePasswordMatch();
             }
         });
 
-        // Validazione form prima dell'invio
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
-            const email = document.getElementById('email').value.toLowerCase();
-            const password = document.getElementById('password').value;
-            const nome = document.getElementById('nome').value.trim();
-            const cognome = document.getElementById('cognome').value.trim();
+        // ✅ VALIDAZIONE CONFERMA PASSWORD
+        function validatePasswordMatch() {
+            const password = passwordField.value;
+            const confirmPassword = confirmPasswordField.value;
 
-            // Controlla email @boxomnia.it
-            if (email.includes('@boxomnia.it')) {
-                e.preventDefault();
-                alert('Le email con dominio @boxomnia.it non sono consentite per la registrazione normale.');
-                return false;
+            if (confirmPassword.length === 0) {
+                confirmPasswordField.classList.remove('is-valid', 'is-invalid');
+            } else if (password === confirmPassword) {
+                confirmPasswordField.classList.add('is-valid');
+                confirmPasswordField.classList.remove('is-invalid');
+            } else {
+                confirmPasswordField.classList.add('is-invalid');
+                confirmPasswordField.classList.remove('is-valid');
             }
+        }
 
-            // Controlla campi vuoti
-            if (!nome || !cognome || !email || !password) {
-                e.preventDefault();
-                alert('Per favore compila tutti i campi obbligatori.');
-                return false;
-            }
+        confirmPasswordField.addEventListener('input', validatePasswordMatch);
 
-            // Controlla lunghezza password
-            if (password.length < 6) {
-                e.preventDefault();
-                alert('La password deve essere lunga almeno 6 caratteri.');
-                return false;
-            }
-
-            // Feedback visivo
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.innerHTML = '<i class="spinner-border spinner-border-sm"></i> Registrazione...';
-            submitBtn.disabled = true;
+        // ✅ VALIDAZIONE NOME E COGNOME
+        [nomeField, cognomeField].forEach(field => {
+            field.addEventListener('input', function() {
+                if (this.value.trim().length >= 2) {
+                    this.classList.add('is-valid');
+                    this.classList.remove('is-invalid');
+                } else if (this.value.length > 0) {
+                    this.classList.add('is-invalid');
+                    this.classList.remove('is-valid');
+                } else {
+                    this.classList.remove('is-valid', 'is-invalid');
+                }
+            });
         });
-    </script>
 
-<?php
-include __DIR__ . '/../footer.php';
-?>
+        // ✅ VALIDAZIONE FINALE AL SUBMIT
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+
+            // Validazione nome
+            if (nomeField.value.trim().length < 2) {
+                nomeField.classList.add('is-invalid');
+                isValid = false;
+            }
+
+            // Validazione cognome
+            if (cognomeField.value.trim().length < 2) {
+                cognomeField.classList.add('is-invalid');
+                isValid = false;
+            }
+
+            // Validazione email
+            if (!emailField.validity.valid || emailField.value.toLowerCase().endsWith('@boxomnia.it')) {
+                emailField.classList.add('is-invalid');
+                isValid = false;
+
+                if (emailField.value.toLowerCase().endsWith('@boxomnia.it')) {
+                    alert('Non è possibile registrarsi con email del dominio aziendale @boxomnia.it');
+                }
+            }
+
+            // Validazione password
+            if (passwordField.value.length < 6) {
+                passwordField.classList.add('is-invalid');
+                isValid = false;
+            }
+
+            // Validazione conferma password
+            if (passwordField.value !== confirmPasswordField.value) {
+                confirmPasswordField.classList.add('is-invalid');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                alert('Correggi gli errori nel form prima di continuare');
+                return false;
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -28,10 +28,9 @@ include __DIR__ . '/header.php';
                     <?php foreach ($orders as $order): ?>
                         <div class="order-card">
                             <div class="order-image-container">
-                                <img src="<?php echo htmlspecialchars($order['image']); ?>"
+                                <img src="/images/yugioh.png"
                                      alt="Immagine Ordine <?php echo htmlspecialchars($order['id']); ?>"
-                                     class="order-image"
-                                     onerror="this.src='<?php echo BASE_URL; ?>/images/default_order.png'">
+                                     class="order-image">
                             </div>
                             <div class="order-details">
                                 <div class="order-header">
