@@ -2450,3 +2450,44 @@ body {
 .bg-secondary {
     background-color: #6c757d !important;
 }
+
+/* BARRA RICERCA FUNKO POP */
+/* Stili per la barra di ricerca */
+.search-bar-container {
+    width: 100%;
+    max-width: 400px;
+}
+
+.search-bar-input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.search-bar-input:focus {
+    box-shadow: none;
+}
+
+.clear-search-btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border: 1px solid #ced4da;
+    color: #495057;
+    background-color: #f8f9fa;
+}
+
+.clear-search-btn:hover {
+    background-color: #e9ecef;
+}
+
+/* Regola per l'allineamento dei filtri */
+.d-flex.justify-content-between.align-items-start.mb-4 {
+    flex-wrap: wrap; /* Permette agli elementi di andare a capo su schermi piccoli */
+}
+
+@media (min-width: 992px) {
+    .d-flex.justify-content-between.align-items-start.mb-4 {
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+}

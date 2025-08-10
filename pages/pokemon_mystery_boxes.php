@@ -176,6 +176,7 @@ $conn->close();
                                     <?php endif; ?>
                                     <div class="mystery-box-footer d-flex justify-content-between align-items-center mt-3">
                                         <p class="mystery-box-price">€<?php echo number_format($box['price'], 2); ?></p>
+                                        <span class="info-link-text">Premere per maggiori informazioni</span>
                                     </div>
                                 </div>
                             </a>

@@ -1,4 +1,6 @@
 <?php
+// C:\xampp\htdocs\LTDW-project\pages\funko_pop.php
+
 require_once __DIR__ . '/../include/session_manager.php';
 require_once __DIR__ . '/../include/config.inc.php';
 
@@ -82,6 +84,11 @@ if ($result_funko_pop->num_rows > 0) {
 }
 $no_funko_pops = empty($funko_pops);
 
+// Prepara la lista dei nomi per la datalist
+$funko_pop_names = array_map(function($funko) {
+    return $funko['name'];
+}, $funko_pops);
+
 $conn->close();
 
 ?>
@@ -91,6 +98,19 @@ $conn->close();
 
         <div class="d-flex justify-content-between align-items-start mb-4">
             <h2 class="category-title mb-0">Funko Pop</h2>
+            <div class="search-bar-container d-flex align-items-center me-3">
+                <div class="input-group">
+                    <input type="search" class="form-control search-bar-input" id="searchFunkoPop" placeholder="Cerca un Funko Pop..." list="funkoPopSuggestions">
+                    <datalist id="funkoPopSuggestions">
+                        <?php foreach ($funko_pop_names as $name): ?>
+                            <option value="<?php echo htmlspecialchars($name); ?>">
+                        <?php endforeach; ?>
+                    </datalist>
+                    <button class="btn btn-outline-secondary clear-search-btn" type="button" id="clearSearchBtn">
+                        <i class="bi bi-x-circle"></i>
+                    </button>
+                </div>
+            </div>
             <div class="filter-dropdown-container">
                 <div class="dropdown">
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="priceDropdownFunko" data-bs-toggle="dropdown" aria-expanded="false">
@@ -154,6 +174,7 @@ $conn->close();
                                     <?php endif; ?>
                                     <div class="mystery-box-footer d-flex justify-content-between align-items-center mt-3">
                                         <p class="mystery-box-price">€<?php echo number_format($funko['price'], 2); ?></p>
+                                        <span class="info-link-text">Premere per maggiori informazioni</span>
                                     </div>
                                 </div>
                             </a>
@@ -197,47 +218,39 @@ $conn->close();
         console.log('DOM loaded, inizializzazione filtri...');
         
         const funkoPopGrid = document.getElementById('funkoPopGrid');
+        const allItems = document.querySelectorAll('.funko-pop-item');
+        const searchInput = document.getElementById('searchFunkoPop');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+        const priceDropdownFunkoMenu = document.getElementById('priceDropdownFunko')?.nextElementSibling;
 
-        // Debug: controlla se gli elementi esistono
-        console.log('Funko Pop Grid:', funkoPopGrid);
+        let activeSearchTerm = '';
+        let activePriceFilter = 'all';
 
         // Forza la visibilità di tutte le card all'avvio
-        const allItems = document.querySelectorAll('.funko-pop-item');
         allItems.forEach(item => {
             item.style.display = 'block';
             item.style.opacity = '1';
             item.style.visibility = 'visible';
-            console.log('Item reso visibile:', item);
         });
 
-        const priceDropdownFunkoMenu = document.getElementById('priceDropdownFunko')?.nextElementSibling;
-
-        if (priceDropdownFunkoMenu) {
-            priceDropdownFunkoMenu.addEventListener('click', function(e) {
-                if (e.target.classList.contains('dropdown-item')) {
-                    e.preventDefault();
-                    priceDropdownFunkoMenu.querySelectorAll('.dropdown-item').forEach(item => item.classList.remove('active'));
-                    e.target.classList.add('active');
-                    document.getElementById('priceDropdownFunko').textContent = e.target.textContent;
-                    applyFunkoPopFilters();
-                }
-            });
-        }
-
         function applyFunkoPopFilters() {
-            const selectedPriceRange = priceDropdownFunkoMenu?.querySelector('.dropdown-item.active')?.dataset.price || 'all';
-            filterAndSortItems(funkoPopGrid.querySelectorAll('.funko-pop-item'), funkoPopGrid, 'all', selectedPriceRange);
+            filterAndSortItems(funkoPopGrid.querySelectorAll('.funko-pop-item'), funkoPopGrid, activeSearchTerm, activePriceFilter);
         }
 
-        function filterAndSortItems(items, grid, rarityValue, priceRangeValue) {
-            console.log('Applicazione filtri:', { rarityValue, priceRangeValue, itemsCount: items.length });
+        function filterAndSortItems(items, grid, searchTerm, priceRangeValue) {
+            console.log('Applicazione filtri:', { searchTerm, priceRangeValue, itemsCount: items.length });
             
             let sortedItems = Array.from(items);
 
-            if (rarityValue !== 'all') {
-                sortedItems = sortedItems.filter(item => item.dataset.rarity === rarityValue);
+            // Filtra per termine di ricerca
+            if (searchTerm && searchTerm !== '') {
+                const lowerCaseSearchTerm = searchTerm.toLowerCase();
+                sortedItems = sortedItems.filter(item => 
+                    item.dataset.name.toLowerCase().includes(lowerCaseSearchTerm)
+                );
             }
 
+            // Filtra e ordina per prezzo
             if (priceRangeValue === 'asc' || priceRangeValue === 'desc') {
                 sortedItems.sort((a, b) => {
                     const priceA = parseFloat(a.dataset.price);
@@ -247,39 +260,40 @@ $conn->close();
             } else if (priceRangeValue !== 'all') {
                 sortedItems = sortedItems.filter(item => {
                     const itemPrice = parseFloat(item.dataset.price);
-                    if (priceRangeValue === 'under10') return itemPrice < 10;
-                    if (priceRangeValue === '10-25') return itemPrice >= 10 && itemPrice <= 25;
-                    if (priceRangeValue === '25-50') return itemPrice > 25 && itemPrice <= 50;
-                    if (priceRangeValue === 'over50') return itemPrice > 50;
-                    return true;
+                    switch (priceRangeValue) {
+                        case 'under10': return itemPrice < 10;
+                        case '10-25': return itemPrice >= 10 && itemPrice <= 25;
+                        case '25-50': return itemPrice > 25 && itemPrice <= 50;
+                        case 'over50': return itemPrice > 50;
+                        default: return true;
+                    }
                 });
             }
 
-            // Remove previous no-items message if it exists
-            const existingNoItemsMessage = grid.querySelector('.alert');
+            // Rimuove il messaggio "Nessun elemento" precedente se esiste
+            const existingNoItemsMessage = grid.querySelector('.no-items-message');
             if (existingNoItemsMessage) {
-                existingNoItemsMessage.parentNode.removeChild(existingNoItemsMessage);
+                existingNoItemsMessage.remove();
             }
 
-            // Hide all items FIRST
+            // Nasconde tutti gli elementi PRIMA di mostrare quelli filtrati
             items.forEach(item => {
                 item.style.display = 'none';
                 item.style.opacity = '0';
             });
             
             if (sortedItems.length > 0) {
-                // Show filtered items with explicit styling
+                // Mostra gli elementi filtrati con uno stile esplicito
                 sortedItems.forEach(item => {
                     item.style.display = 'block';
                     item.style.opacity = '1';
                     item.style.visibility = 'visible';
                 });
-                console.log('Items mostrati:', sortedItems.length);
             } else {
                 const noItemsMessage = document.createElement('div');
-                noItemsMessage.className = 'col-12';
+                noItemsMessage.className = 'col-12 no-items-message';
                 noItemsMessage.innerHTML = `
-                    <div class="alert alert-info text-center" role="alert">
+                    <div class="alert alert-info text-center mt-4" role="alert">
                         <i class="bi bi-info-circle me-2"></i>
                         <h4>Nessun elemento trovato</h4>
                         <p>Nessun articolo corrisponde ai filtri selezionati.</p>
@@ -289,17 +303,38 @@ $conn->close();
             }
         }
 
-        // Debug finale: verifica lo stato delle card
-        setTimeout(() => {
-            const visibleCards = document.querySelectorAll('.funko-pop-item:not([style*="display: none"])');
-            console.log('Card visibili dopo inizializzazione:', visibleCards.length);
-            visibleCards.forEach((card, index) => {
-                console.log(`Card ${index + 1}:`, {
-                    display: window.getComputedStyle(card).display,
-                    opacity: window.getComputedStyle(card).opacity,
-                    visibility: window.getComputedStyle(card).visibility
-                });
+        // Event listener per il filtro prezzo
+        if (priceDropdownFunkoMenu) {
+            priceDropdownFunkoMenu.addEventListener('click', function(e) {
+                if (e.target.classList.contains('dropdown-item')) {
+                    e.preventDefault();
+                    priceDropdownFunkoMenu.querySelectorAll('.dropdown-item').forEach(item => item.classList.remove('active'));
+                    e.target.classList.add('active');
+                    document.getElementById('priceDropdownFunko').textContent = e.target.textContent;
+                    activePriceFilter = e.target.dataset.price;
+                    applyFunkoPopFilters();
+                }
             });
-        }, 1000);
+        }
+        
+        // Event listener per la barra di ricerca
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                activeSearchTerm = this.value;
+                applyFunkoPopFilters();
+            });
+        }
+
+        // Event listener per il bottone "pulisci ricerca"
+        if (clearSearchBtn) {
+            clearSearchBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                activeSearchTerm = '';
+                applyFunkoPopFilters();
+            });
+        }
+
+        // Esegui i filtri iniziali se ci sono
+        applyFunkoPopFilters();
     });
 </script>
