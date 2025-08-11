@@ -85,7 +85,7 @@ $sql_available_cards = "
     WHERE 
         co.tipo_oggetto = 'Carta Singola' 
     ORDER BY 
-        o.nome_oggetto ASC 
+        o.id_oggetto ASC 
 "; 
 
 $stmt_available_cards = $conn->prepare($sql_available_cards); 
