@@ -101,30 +101,35 @@ try {
 
     if ($result_check_user_card->num_rows > 0) {
         // La carta esiste già per l'utente, aggiorna la quantità
+        $current_row = $result_check_user_card->fetch_assoc();
+        $current_quantity = (int)$current_row['quantita_ogg'];
+        
         if ($card_quantity === 0) {
              $sql_update_card = "DELETE FROM oggetto_utente WHERE fk_utente = ? AND fk_oggetto = ?";
+             $stmt_update_card = $conn->prepare($sql_update_card);
+             if (!$stmt_update_card) {
+                 throw new Exception("Errore nella preparazione della query di delete: " . $conn->error);
+             }
+             $stmt_update_card->bind_param("ii", $user_id, $oggetto_id);
              $message = 'Carta rimossa dalla collezione.';
         } else {
-            // Aggiorniamo solo la quantità.
+            // CORREZIONE: Invece di sostituire, aggiungiamo alla quantità esistente
+            $new_quantity = $current_quantity + $card_quantity;
             $sql_update_card = "UPDATE oggetto_utente SET quantita_ogg = ? WHERE fk_utente = ? AND fk_oggetto = ?";
-            $message = 'Quantità della carta aggiornata con successo!';
+            $stmt_update_card = $conn->prepare($sql_update_card);
+            if (!$stmt_update_card) {
+                throw new Exception("Errore nella preparazione della query di update: " . $conn->error);
+            }
+            $stmt_update_card->bind_param("iii", $new_quantity, $user_id, $oggetto_id);
+            $message = 'Quantità della carta aggiornata con successo! (Totale: ' . $new_quantity . ')';
         }
         
-        $stmt_update_card = $conn->prepare($sql_update_card);
-        if (!$stmt_update_card) {
-            throw new Exception("Errore nella preparazione della query di update/delete: " . $conn->error);
-        }
-        if ($card_quantity === 0) {
-            $stmt_update_card->bind_param("ii", $user_id, $oggetto_id);
-        } else {
-            $stmt_update_card->bind_param("iii", $card_quantity, $user_id, $oggetto_id);
-        }
         $stmt_update_card->execute();
         $stmt_update_card->close();
     } else {
         // La carta non esiste per l'utente, inserisci una nuova riga (solo se quantità > 0)
         if ($card_quantity > 0) {
-            // Inseriamo solo la quantità
+            // Inseriamo la quantità specificata
             $sql_insert_card = "INSERT INTO oggetto_utente (fk_utente, fk_oggetto, quantita_ogg) VALUES (?, ?, ?)";
             $stmt_insert_card = $conn->prepare($sql_insert_card);
             if (!$stmt_insert_card) {
@@ -133,11 +138,12 @@ try {
             $stmt_insert_card->bind_param("iii", $user_id, $oggetto_id, $card_quantity);
             $stmt_insert_card->execute();
             $stmt_insert_card->close();
-            $message = 'Carta aggiunta alla collezione con successo!';
+            $message = 'Carta aggiunta alla collezione con successo! (Quantità: ' . $card_quantity . ')';
         } else {
             $message = 'Quantità specificata è zero, nessuna azione necessaria.';
         }
     }
+    $stmt_check_user_card->close();
 
     // Reindirizza con successo
     header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/pages/collezione.php?add_status=success&add_message=' . urlencode($message));

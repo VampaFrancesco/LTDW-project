@@ -444,9 +444,9 @@ input.mail_bt::placeholder {
 }
 
 /* ===============================
-   COLLEZIONE CSS
-   Stili specifici per la pagina della collezione
-   =============================== */
+   COLLEZIONE CSS
+   Stili specifici per la pagina della collezione
+   =============================== */
 
 /* Titolo della pagina */
 .collection-page .fashion_taital {
@@ -456,8 +456,8 @@ input.mail_bt::placeholder {
 }
 
 /* ===============================
-   Filtro di Navigazione in Alto
-   =============================== */
+   Filtro di Navigazione in Alto
+   =============================== */
 
 .collection-header {
     display: flex;
@@ -493,8 +493,8 @@ input.mail_bt::placeholder {
 }
 
 /* ===============================
-   Filtro per Rarità
-   =============================== */
+   Filtro per Rarità
+   =============================== */
 
 .rarity-filter-section {
     background-color: #f8f8f8;
@@ -543,8 +543,8 @@ input.mail_bt::placeholder {
 }
 
 /* ===============================
-   Sezione Categorie Carte
-   =============================== */
+   Sezione Categorie Carte
+   =============================== */
 
 .card-category-section .category-title {
     font-size: 30px;
@@ -557,8 +557,8 @@ input.mail_bt::placeholder {
 }
 
 /* ===============================
-   Griglia e Card
-   =============================== */
+   Griglia e Card
+   =============================== */
 
 .card-grid {
     display: flex;
@@ -585,8 +585,8 @@ input.mail_bt::placeholder {
 }
 
 /* ===============================
-   Card Box (ottenute)
-   =============================== */
+   Card Box (ottenute)
+   =============================== */
 
 .card-box {
     background-color: #ffffff;
@@ -655,8 +655,8 @@ input.mail_bt::placeholder {
 }
 
 /* ===============================
-   Card Box (non ottenute)
-   =============================== */
+   Card Box (non ottenute)
+   =============================== */
 
 .card-box.not-obtained {
     background-color: #f2f2f2;
@@ -720,8 +720,58 @@ input.mail_bt::placeholder {
 }
 
 /* ===============================
-   Messaggi di Sistema (Successo / Errore)
-   =============================== */
+   Sezione Aggiungi Carta
+   =============================== */
+.add-card-section {
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-top: 50px;
+}
+
+.add-card-form-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.add-card-form-container .form-label {
+    font-weight: bold;
+    color: #30302e;
+}
+
+.add-card-form-container .form-control {
+    border-radius: 20px;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.add-card-form-container .form-control:focus {
+    border-color: #f26522;
+    box-shadow: 0 0 0 0.25rem rgba(242, 101, 34, 0.25);
+}
+
+.btn-add-card {
+    background-color: #f26522;
+    color: #ffffff;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 100%;
+}
+
+.btn-add-card:hover {
+    background-color: #e05e1a;
+    transform: translateY(-2px);
+}
+
+/* ===============================
+   Messaggi di Sistema (Successo / Errore)
+   =============================== */
 
 .alert {
     padding: 15px;

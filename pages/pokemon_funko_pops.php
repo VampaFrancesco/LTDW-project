@@ -84,11 +84,6 @@ if ($result_funko_pop->num_rows > 0) {
 }
 $no_funko_pops = empty($funko_pops);
 
-// Prepara la lista dei nomi per la datalist
-$funko_pop_names = array_map(function($funko) {
-    return $funko['name'];
-}, $funko_pops);
-
 $conn->close();
 
 ?>
@@ -100,12 +95,7 @@ $conn->close();
             <h2 class="category-title mb-0">Funko Pop</h2>
             <div class="search-bar-container d-flex align-items-center me-3">
                 <div class="input-group">
-                    <input type="search" class="form-control search-bar-input" id="searchFunkoPop" placeholder="Cerca un Funko Pop..." list="funkoPopSuggestions">
-                    <datalist id="funkoPopSuggestions">
-                        <?php foreach ($funko_pop_names as $name): ?>
-                            <option value="<?php echo htmlspecialchars($name); ?>">
-                        <?php endforeach; ?>
-                    </datalist>
+                    <input type="search" class="form-control search-bar-input" id="searchFunkoPop" placeholder="Cerca un Funko Pop...">
                     <button class="btn btn-outline-secondary clear-search-btn" type="button" id="clearSearchBtn">
                         <i class="bi bi-x-circle"></i>
                     </button>
@@ -118,10 +108,8 @@ $conn->close();
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="priceDropdownFunko">
                         <li><a class="dropdown-item active" href="#" data-price="all">Tutti</a></li>
-                        <li><a class="dropdown-item" href="#" data-price="under10">&lt; 10€</a></li>
-                        <li><a class="dropdown-item" href="#" data-price="10-25">10-25€</a></li>
-                        <li><a class="dropdown-item" href="#" data-price="25-50">25-50€</a></li>
-                        <li><a class="dropdown-item" href="#" data-price="over50">&gt; 50€</a></li>
+                        <li><a class="dropdown-item" href="#" data-price="under15">&lt; 15€</a></li>
+                        <li><a class="dropdown-item" href="#" data-price="over15">&gt; 15€</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="#" data-price="asc">Prezzo crescente</a></li>
                         <li><a class="dropdown-item" href="#" data-price="desc">Prezzo decrescente</a></li>
@@ -174,7 +162,7 @@ $conn->close();
                                     <?php endif; ?>
                                     <div class="mystery-box-footer d-flex justify-content-between align-items-center mt-3">
                                         <p class="mystery-box-price">€<?php echo number_format($funko['price'], 2); ?></p>
-                                        <span class="info-link-text">Premere per maggiori informazioni</span>
+                                        <span class="info-link-text">Premi e aggiungilo alla squadra!</span>
                                     </div>
                                 </div>
                             </a>
@@ -250,23 +238,24 @@ $conn->close();
                 );
             }
 
-            // Filtra e ordina per prezzo
+            // Filtra per prezzo (solo fasce semplificate)
+            if (priceRangeValue === 'under15' || priceRangeValue === 'over15') {
+                sortedItems = sortedItems.filter(item => {
+                    const itemPrice = parseFloat(item.dataset.price);
+                    switch (priceRangeValue) {
+                        case 'under15': return itemPrice < 15;
+                        case 'over15': return itemPrice >= 15;
+                        default: return true;
+                    }
+                });
+            }
+
+            // Ordina per prezzo (questo era il problema!)
             if (priceRangeValue === 'asc' || priceRangeValue === 'desc') {
                 sortedItems.sort((a, b) => {
                     const priceA = parseFloat(a.dataset.price);
                     const priceB = parseFloat(b.dataset.price);
                     return priceRangeValue === 'asc' ? priceA - priceB : priceB - priceA;
-                });
-            } else if (priceRangeValue !== 'all') {
-                sortedItems = sortedItems.filter(item => {
-                    const itemPrice = parseFloat(item.dataset.price);
-                    switch (priceRangeValue) {
-                        case 'under10': return itemPrice < 10;
-                        case '10-25': return itemPrice >= 10 && itemPrice <= 25;
-                        case '25-50': return itemPrice > 25 && itemPrice <= 50;
-                        case 'over50': return itemPrice > 50;
-                        default: return true;
-                    }
                 });
             }
 
@@ -283,6 +272,19 @@ $conn->close();
             });
             
             if (sortedItems.length > 0) {
+                // Riordina gli elementi nel DOM per l'ordinamento
+                if (priceRangeValue === 'asc' || priceRangeValue === 'desc') {
+                    // Rimuovi tutti gli elementi dal DOM
+                    sortedItems.forEach(item => {
+                        item.remove();
+                    });
+                    
+                    // Reinseriscili nell'ordine corretto
+                    sortedItems.forEach(item => {
+                        grid.appendChild(item);
+                    });
+                }
+                
                 // Mostra gli elementi filtrati con uno stile esplicito
                 sortedItems.forEach(item => {
                     item.style.display = 'block';
@@ -317,10 +319,10 @@ $conn->close();
             });
         }
         
-        // Event listener per la barra di ricerca
+        // Event listener per la barra di ricerca - filtraggio in tempo reale
         if (searchInput) {
             searchInput.addEventListener('input', function() {
-                activeSearchTerm = this.value;
+                activeSearchTerm = this.value.trim();
                 applyFunkoPopFilters();
             });
         }
@@ -334,7 +336,7 @@ $conn->close();
             });
         }
 
-        // Esegui i filtri iniziali se ci sono
+        // Esegui i filtri iniziali
         applyFunkoPopFilters();
     });
 </script>

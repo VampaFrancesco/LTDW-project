@@ -37,28 +37,8 @@ if ($conn->connect_error) {
 // Abilita la reportistica degli errori MySQLi (utile per il debug) 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT); 
 
-// CODICE AGGIUNTO: Recupera tutti i nomi delle carte singole disponibili per la tendina
-$card_names = [];
-$sql_all_card_names = "
-    SELECT 
-        o.nome_oggetto
-    FROM 
-        oggetto o
-    JOIN
-        categoria_oggetto co ON o.fk_categoria_oggetto = co.id_categoria
-    WHERE
-        co.tipo_oggetto = 'Carta Singola'
-    ORDER BY
-        o.nome_oggetto ASC
-";
-$result_all_card_names = $conn->query($sql_all_card_names);
-if ($result_all_card_names) {
-    while ($row = $result_all_card_names->fetch_assoc()) {
-        $card_names[] = $row['nome_oggetto'];
-    }
-} else {
-    error_log("Errore nel recupero dei nomi delle carte per la tendina: " . $conn->error);
-}
+// CODICE AGGIORNATO: Non più necessario recuperare i nomi per la datalist
+// Rimosso il codice per $card_names
 
 // 1. Recupera le rarità e i loro colori 
 $rarities_db = []; 
@@ -296,12 +276,8 @@ foreach ($available_cards as $card_id => $card) {
                         <div class="row">
                             <div class="col-md-12 mb-3">
                                 <label for="cardName" class="form-label">Nome Carta</label>
-                                <input type="text" class="form-control" id="cardName" name="card_name" placeholder="Inizia a digitare..." list="card_list" required>
-                                <datalist id="card_list">
-                                    <?php foreach ($card_names as $name) : ?>
-                                        <option value="<?php echo htmlspecialchars($name); ?>">
-                                    <?php endforeach; ?>
-                                </datalist>
+                                <input type="text" class="form-control" id="cardName" name="card_name" placeholder="Scrivi il nome della carta..." required>
+                                <small class="form-text text-muted">Inserisci il nome esatto della carta che vuoi aggiungere alla collezione.</small>
                             </div>
                         </div>
                         <div class="mb-4">
