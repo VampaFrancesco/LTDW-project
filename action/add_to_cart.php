@@ -16,7 +16,8 @@ $id_prodotto = intval($_POST['id_prodotto'] ?? 0);
 $nome_prodotto = trim($_POST['nome_prodotto'] ?? '');
 $prezzo = floatval($_POST['prezzo'] ?? 0);
 $quantita = intval($_POST['quantita'] ?? 1);
-$tipo = trim($_POST['tipo'] ?? 'mystery_box'); // mystery_box o oggetto
+$tipo = 'SELECT 
+        FROM categoria_oggetto WHERE id_categoria = $id_prodotto';
 $redirect_url = $_POST['redirect_url'] ?? BASE_URL . '/pages/home_utente.php';
 
 // Validazione input

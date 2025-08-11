@@ -417,7 +417,7 @@ $conn->close();
     <!-- Messaggi Flash -->
     <?php if ($flash_message): ?>
         <div class="alert alert-<?php echo $flash_message['type']; ?> alert-dismissible fade show">
-            <?php echo htmlspecialchars($flash_message['message']); ?>
+            <?php echo htmlspecialchars($flash_message['content'] ?? ''); ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
