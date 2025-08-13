@@ -1,4 +1,5 @@
 <?php
+// action/add_to_cart.php - VERSIONE CORRETTA COMPLETA
 ob_start();
 
 require_once __DIR__ . '/../include/session_manager.php';
@@ -16,8 +17,15 @@ $id_prodotto = intval($_POST['id_prodotto'] ?? 0);
 $nome_prodotto = trim($_POST['nome_prodotto'] ?? '');
 $prezzo = floatval($_POST['prezzo'] ?? 0);
 $quantita = intval($_POST['quantita'] ?? 1);
-$tipo = 'SELECT 
-        FROM categoria_oggetto WHERE id_categoria = $id_prodotto';
+
+// ⚠️ CORREZIONE: Supporta sia 'tipo' che 'tipo_prodotto'
+$tipo = $_POST['tipo'] ?? $_POST['tipo_prodotto'] ?? '';
+
+// Se il tipo è 'funko_pop', convertilo in 'oggetto' (i Funko Pop sono oggetti nel DB)
+if ($tipo === 'funko_pop') {
+    $tipo = 'oggetto';
+}
+
 $redirect_url = $_POST['redirect_url'] ?? BASE_URL . '/pages/home_utente.php';
 
 // Validazione input
@@ -26,8 +34,10 @@ if ($id_prodotto <= 0) $errors[] = "ID prodotto non valido";
 if ($quantita <= 0) $errors[] = "Quantità non valida";
 if ($quantita > 99) $errors[] = "Quantità massima: 99";
 if (empty($nome_prodotto)) $errors[] = "Nome prodotto mancante";
-if ($prezzo <= 0) $errors[] = "Prezzo non valido";
-if (!in_array($tipo, ['mystery_box', 'oggetto'])) $errors[] = "Tipo prodotto non valido";
+if ($prezzo < 0) $errors[] = "Prezzo non valido"; // Cambiato da <= a < per permettere prodotti gratuiti
+if (!in_array($tipo, ['mystery_box', 'oggetto'])) {
+    $errors[] = "Tipo prodotto non valido (ricevuto: '$tipo')";
+}
 
 if (!empty($errors)) {
     SessionManager::setFlashMessage(implode(', ', $errors), 'danger');
@@ -72,9 +82,10 @@ try {
             throw new Exception("Quantità richiesta non disponibile (disponibili: {$product['quantita_box']})");
         }
 
-        // Verifica prezzo
+        // Verifica prezzo (con tolleranza per arrotondamenti)
         if (abs($prezzo - $product['prezzo_box']) > 0.01) {
-            throw new Exception("Prezzo non corrispondente");
+            // Non bloccare per piccole differenze di prezzo, usa il prezzo del DB
+            $prezzo = $product['prezzo_box'];
         }
 
     } else { // oggetto
@@ -82,137 +93,143 @@ try {
             SELECT o.*, c.nome_categoria 
             FROM oggetto o
             LEFT JOIN categoria_oggetto c ON o.fk_categoria_oggetto = c.id_categoria
-            WHERE o.id_oggetto = ? AND (o.quant_oggetto IS NULL OR o.quant_oggetto > 0)
-            AND o.prezzo_oggetto IS NOT NULL
+            WHERE o.id_oggetto = ? 
+            AND (o.quant_oggetto IS NULL OR o.quant_oggetto >= ?)
         ");
-        $stmt->bind_param("i", $id_prodotto);
+        $stmt->bind_param("ii", $id_prodotto, $quantita);
         $stmt->execute();
         $product = $stmt->get_result()->fetch_assoc();
         $stmt->close();
 
         if (!$product) {
-            throw new Exception("Oggetto non trovato, non disponibile o non vendibile singolarmente");
+            throw new Exception("Oggetto non trovato o quantità non disponibile");
         }
 
+        // Per oggetti con quantità NULL (illimitata), permettiamo l'acquisto
         if ($product['quant_oggetto'] !== null && $quantita > $product['quant_oggetto']) {
             throw new Exception("Quantità richiesta non disponibile (disponibili: {$product['quant_oggetto']})");
         }
 
-        // Verifica prezzo
-        if (abs($prezzo - $product['prezzo_oggetto']) > 0.01) {
-            throw new Exception("Prezzo non corrispondente");
+        // Verifica prezzo - solo se l'oggetto ha un prezzo
+        if ($product['prezzo_oggetto'] !== null) {
+            if (abs($prezzo - $product['prezzo_oggetto']) > 0.01) {
+                // Usa il prezzo del DB per sicurezza
+                $prezzo = $product['prezzo_oggetto'];
+            }
+        } else {
+            // Se l'oggetto non ha prezzo nel DB, usa 0
+            $prezzo = 0;
         }
     }
 
-} catch (Exception $e) {
-    SessionManager::setFlashMessage($e->getMessage(), 'danger');
-    header('Location: ' . $redirect_url);
-    exit();
-}
+    // Se l'utente è loggato, salva nel database
+    if (SessionManager::isLoggedIn()) {
+        $user_id = SessionManager::get('user_id');
 
-// Se utente è loggato, salva nel database
-if (SessionManager::isLoggedIn()) {
-    $id_utente = SessionManager::get('user_id');
-
-    try {
-        // Controlla se il prodotto è già nel carrello
-        $check_sql = "SELECT id_carrello, quantita FROM carrello WHERE fk_utente = ? AND ";
+        // Verifica se l'item è già nel carrello attivo
         if ($tipo === 'mystery_box') {
-            $check_sql .= "fk_mystery_box = ? AND fk_oggetto IS NULL";
+            $check_stmt = $conn->prepare("
+                SELECT id_carrello, quantita 
+                FROM carrello 
+                WHERE fk_utente = ? 
+                AND fk_mystery_box = ? 
+                AND fk_oggetto IS NULL
+                AND stato = 'attivo'
+            ");
+            $check_stmt->bind_param("ii", $user_id, $id_prodotto);
         } else {
-            $check_sql .= "fk_oggetto = ? AND fk_mystery_box IS NULL";
+            $check_stmt = $conn->prepare("
+                SELECT id_carrello, quantita 
+                FROM carrello 
+                WHERE fk_utente = ? 
+                AND fk_oggetto = ? 
+                AND fk_mystery_box IS NULL
+                AND stato = 'attivo'
+            ");
+            $check_stmt->bind_param("ii", $user_id, $id_prodotto);
         }
 
-        $stmt = $conn->prepare($check_sql);
-        $stmt->bind_param("ii", $id_utente, $id_prodotto);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        $check_stmt->execute();
+        $existing = $check_stmt->get_result()->fetch_assoc();
+        $check_stmt->close();
 
-        if ($result->num_rows > 0) {
+        if ($existing) {
             // Aggiorna quantità esistente
-            $row = $result->fetch_assoc();
-            $new_quantity = $row['quantita'] + $quantita;
-            $new_total = $new_quantity * $prezzo;
+            $nuova_quantita = $existing['quantita'] + $quantita;
+            $nuovo_totale = $nuova_quantita * $prezzo;
 
-            $stmt->close();
-            $stmt = $conn->prepare("UPDATE carrello SET quantita = ?, totale = ? WHERE id_carrello = ?");
-            $stmt->bind_param("idi", $new_quantity, $new_total, $row['id_carrello']);
+            $update_stmt = $conn->prepare("
+                UPDATE carrello 
+                SET quantita = ?, 
+                    totale = ?, 
+                    data_ultima_modifica = NOW() 
+                WHERE id_carrello = ?
+            ");
+            $update_stmt->bind_param("idi", $nuova_quantita, $nuovo_totale, $existing['id_carrello']);
 
-            if ($stmt->execute()) {
-                SessionManager::setFlashMessage("Quantità aggiornata nel carrello!", 'success');
-            } else {
-                throw new Exception('Errore nell\'aggiornare il carrello');
+            if (!$update_stmt->execute()) {
+                throw new Exception("Errore nell'aggiornamento del carrello");
             }
-            $stmt->close();
+            $update_stmt->close();
 
+            $message = "Quantità aggiornata nel carrello";
         } else {
-            // Inserisci nuovo item nel carrello
-            $stmt->close();
+            // Inserisci nuovo item
             $totale = $quantita * $prezzo;
 
             if ($tipo === 'mystery_box') {
-                $stmt = $conn->prepare("
-                    INSERT INTO carrello (fk_utente, fk_mystery_box, fk_oggetto, quantita, totale) 
-                    VALUES (?, ?, NULL, ?, ?)
+                $insert_stmt = $conn->prepare("
+                    INSERT INTO carrello 
+                    (fk_utente, fk_mystery_box, fk_oggetto, quantita, totale, stato, data_creazione) 
+                    VALUES (?, ?, NULL, ?, ?, 'attivo', NOW())
                 ");
-                $stmt->bind_param("iiid", $id_utente, $id_prodotto, $quantita, $totale);
+                $insert_stmt->bind_param("iiid", $user_id, $id_prodotto, $quantita, $totale);
             } else {
-                $stmt = $conn->prepare("
-                    INSERT INTO carrello (fk_utente, fk_mystery_box, fk_oggetto, quantita, totale) 
-                    VALUES (?, NULL, ?, ?, ?)
+                $insert_stmt = $conn->prepare("
+                    INSERT INTO carrello 
+                    (fk_utente, fk_mystery_box, fk_oggetto, quantita, totale, stato, data_creazione) 
+                    VALUES (?, NULL, ?, ?, ?, 'attivo', NOW())
                 ");
-                $stmt->bind_param("iiid", $id_utente, $id_prodotto, $quantita, $totale);
+                $insert_stmt->bind_param("iiid", $user_id, $id_prodotto, $quantita, $totale);
             }
 
-            if ($stmt->execute()) {
-                SessionManager::setFlashMessage("Prodotto aggiunto al carrello!", 'success');
-            } else {
-                throw new Exception('Errore nell\'aggiungere il prodotto: ' . $stmt->error);
+            if (!$insert_stmt->execute()) {
+                throw new Exception("Errore nell'inserimento nel carrello: " . $insert_stmt->error);
             }
-            $stmt->close();
+            $insert_stmt->close();
+
+            $message = "Prodotto aggiunto al carrello";
+        }
+    } else {
+        // Utente non loggato - salva in sessione
+        $cart = SessionManager::get('cart', []);
+        $item_key = $tipo . '_' . $id_prodotto;
+
+        if (isset($cart[$item_key])) {
+            $cart[$item_key]['quantita'] += $quantita;
+        } else {
+            $cart[$item_key] = [
+                'id' => $id_prodotto,
+                'nome' => $nome_prodotto,
+                'prezzo' => $prezzo,
+                'quantita' => $quantita,
+                'tipo' => $tipo,
+                'fk_mystery_box' => ($tipo === 'mystery_box') ? $id_prodotto : null,
+                'fk_oggetto' => ($tipo === 'oggetto') ? $id_prodotto : null
+            ];
         }
 
-        // Aggiorna contatore carrello nel database
-        $stmt = $conn->prepare("SELECT SUM(quantita) as total FROM carrello WHERE fk_utente = ?");
-        $stmt->bind_param("i", $id_utente);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $row = $result->fetch_assoc();
-        $stmt->close();
-
-        SessionManager::set('cart_items_count', $row['total'] ?? 0);
-
-    } catch (Exception $e) {
-        SessionManager::setFlashMessage($e->getMessage(), 'danger');
-        header('Location: ' . $redirect_url);
-        exit();
+        SessionManager::set('cart', $cart);
+        $message = "Prodotto aggiunto al carrello (accedi per salvare)";
     }
 
-} else {
-    // Utente non loggato - usa sessione con il TUO SessionManager
-    try {
-        // Prepara dati prodotto per sessione
-        $product_data = [
-            'id' => $id_prodotto,
-            'nome' => $nome_prodotto,
-            'prezzo' => $prezzo,
-            'quantita' => $quantita,
-            'tipo' => $tipo
-        ];
+    SessionManager::setFlashMessage($message, 'success');
 
-        // Usa i metodi del TUO SessionManager
-        SessionManager::addToCart($id_prodotto, $product_data);
-        SessionManager::setFlashMessage('Prodotto aggiunto al carrello!', 'success');
-
-    } catch (Exception $e) {
-        SessionManager::setFlashMessage('Errore nell\'aggiungere al carrello: ' . $e->getMessage(), 'danger');
-    }
+} catch (Exception $e) {
+    SessionManager::setFlashMessage($e->getMessage(), 'danger');
+} finally {
+    $conn->close();
 }
 
-$conn->close();
-
-// Redirect con messaggio di successo
 header('Location: ' . $redirect_url);
 exit();
-
-ob_end_flush();
