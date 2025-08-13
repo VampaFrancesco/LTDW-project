@@ -2501,6 +2501,7 @@ body {
     background-color: #6c757d !important;
 }
 
+
 /* BARRA RICERCA FUNKO POP */
 /* Stili per la barra di ricerca */
 .search-bar-container {
@@ -2540,4 +2541,11 @@ body {
         align-items: center;
         flex-wrap: nowrap;
     }
+=======
+
+/* ABOUT */
+
+.h2-about{
+    color: #ED308C !important; 
+>>>>>>> Stashed changes
 }
