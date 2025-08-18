@@ -1,150 +1,330 @@
 <?php
 require_once __DIR__.'/../include/session_manager.php';
-require_once __DIR__.'/../include/config.inc.php';
+$config = require_once __DIR__.'/../include/config.inc.php';
 
-// ✅ Controllo login senza loop
-if (!SessionManager::isLoggedIn()) {
-    header('Location: ' . BASE_URL . '/pages/auth/login.php');
-    exit;
+// Connessione al database usando la configurazione
+try {
+    $pdo = new PDO(
+        "mysql:host=" . $config['dbms']['localhost']['host'] . ";dbname=" . $config['dbms']['localhost']['dbname'] . ";charset=utf8mb4", 
+        $config['dbms']['localhost']['user'], 
+        $config['dbms']['localhost']['passwd']
+    );
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Errore di connessione al database: " . $e->getMessage());
 }
 
-$userId = SessionManager::getUserId();
-
-// ✅ CONNESSIONE DATABASE
-$db_config = $config['dbms']['localhost'];
-$conn = new mysqli(
-    $db_config['host'],
-    $db_config['user'],
-    $db_config['passwd'],
-    $db_config['dbname']
-);
-
-if ($conn->connect_error) {
-    error_log("Database connection failed: " . $conn->connect_error);
-    SessionManager::setFlashMessage('Servizio temporaneamente non disponibile. Riprova più tardi.', 'danger');
-    // Redirect a una pagina di errore interna, non login
-    header('Location: ' . BASE_URL . '/pages/errors.php');
-    exit;
-}
-
-// ✅ Recupera dati utente
-$stmt = $conn->prepare(" SELECT u.nome, u.email, i.via, i.citta, i.cap, i.provincia 
-    FROM utente u 
-    LEFT JOIN indirizzo_spedizione i ON u.id = i.id_utente
-    WHERE u.id = ?
-");
-if (!$stmt) {
-    error_log("Query preparation failed: " . $conn->error);
-    SessionManager::setFlashMessage('Errore interno. Riprova più tardi.', 'danger');
-    $conn->close();
-    header('Location: ' . BASE_URL . '/pages/errors.php');
-    exit;
-}
-
-$stmt->bind_param("i", $userId);
-$stmt->execute();
-$result = $stmt->get_result();
-$utente = $result->fetch_assoc();
-
-// ✅ Se form inviato → aggiorna dati
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nome      = trim($_POST['nome']);
-    $email     = trim($_POST['email']);
-    $via       = trim($_POST['via']);
-    $citta     = trim($_POST['citta']);
-    $cap       = trim($_POST['cap']);
-    $provincia = trim($_POST['provincia']);
-
-    // Aggiorna utente
-    $stmtUser = $conn->prepare("UPDATE utente SET nome = ?, email = ? WHERE id = ?");
-    $stmtUser->bind_param("ssi", $nome, $email, $userId);
-    $stmtUser->execute();
-
-    // Controlla indirizzo
-    $stmtCheck = $conn->prepare("SELECT COUNT(*) FROM indirizzo_spedizione WHERE id_utente = ?");
-    $stmtCheck->bind_param("i", $userId);
-    $stmtCheck->execute();
-    $stmtCheck->bind_result($count);
-    $stmtCheck->fetch();
-    $stmtCheck->close();
-
-    if ($count > 0) {
-        $sqlAddr = "UPDATE indirizzo_spedizione 
-                    SET via = ?, citta = ?, cap = ?, provincia = ?
-                    WHERE id_utente = ?";
-    } else {
-        $sqlAddr = "INSERT INTO indirizzo_spedizione (via, citta, cap, provincia, id_utente)
-                    VALUES (?, ?, ?, ?, ?)";
-    }
-
-    $stmtAddr = $conn->prepare($sqlAddr);
-    $stmtAddr->bind_param("ssssi", $via, $citta, $cap, $provincia, $userId);
-    $stmtAddr->execute();
-
-    // Aggiorna sessione
-    SessionManager::set('user_nome', $nome);
-    SessionManager::set('user_email', $email);
-
-    SessionManager::setFlashMessage('Profilo aggiornato con successo!', 'success');
-
-    // Redirect dopo salvataggio
-    header("Location: profilo.php");
-    exit;
-}
-
-// ✅ Ora posso includere l'header (nessun output prima)
 include __DIR__ . '/header.php';
+
+// Richiede login, reindirizza se non loggato
+SessionManager::requireLogin();
+
+$message = '';
+$messageType = '';
+
+// Recupera l'ID utente dalla sessione
+$userId = SessionManager::get('user_id');
+
+// Recupera i dati attuali dell'utente dal database
+try {
+    $stmt = $pdo->prepare("SELECT nome, cognome, email, telefono FROM utente WHERE id_utente = ?");
+    $stmt->execute([$userId]);
+    $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$userData) {
+        throw new Exception("Utente non trovato");
+    }
+} catch (Exception $e) {
+    $message = "Errore nel caricamento dei dati: " . $e->getMessage();
+    $messageType = 'error';
+    $userData = [
+        'nome' => '',
+        'cognome' => '',
+        'email' => '',
+        'telefono' => ''
+    ];
+}
+
+// Gestione del form di modifica
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $nome = trim($_POST['nome'] ?? '');
+    $cognome = trim($_POST['cognome'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $telefono = trim($_POST['telefono'] ?? '');
+    $nuovaPassword = trim($_POST['nuova_password'] ?? '');
+    $confermaPassword = trim($_POST['conferma_password'] ?? '');
+    $passwordAttuale = trim($_POST['password_attuale'] ?? '');
+    
+    $errors = [];
+    
+    // Validazioni
+    if (empty($nome)) {
+        $errors[] = "Il nome è obbligatorio";
+    }
+    
+    if (empty($cognome)) {
+        $errors[] = "Il cognome è obbligatorio";
+    }
+    
+    if (empty($email)) {
+        $errors[] = "L'email è obbligatoria";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "L'email non è valida";
+    }
+    
+    // Verifica se l'email è già in uso da un altro utente
+    if (!empty($email) && $email !== $userData['email']) {
+        try {
+            $stmt = $pdo->prepare("SELECT id_utente FROM utente WHERE email = ? AND id_utente != ?");
+            $stmt->execute([$email, $userId]);
+            if ($stmt->rowCount() > 0) {
+                $errors[] = "L'email è già utilizzata da un altro utente";
+            }
+        } catch (Exception $e) {
+            $errors[] = "Errore nella verifica dell'email";
+        }
+    }
+    
+    // Validazione telefono (opzionale)
+    if (!empty($telefono) && !preg_match('/^[0-9\+\-\s\(\)]+$/', $telefono)) {
+        $errors[] = "Il numero di telefono non è valido";
+    }
+    
+    // Se viene inserita una nuova password, validarla
+    $cambiaPassword = false;
+    if (!empty($nuovaPassword) || !empty($confermaPassword)) {
+        if (empty($passwordAttuale)) {
+            $errors[] = "Per cambiare la password, inserisci la password attuale";
+        } else {
+            // Verifica la password attuale
+            try {
+                $stmt = $pdo->prepare("SELECT password FROM utente WHERE id_utente = ?");
+                $stmt->execute([$userId]);
+                $currentHash = $stmt->fetchColumn();
+                
+                if (!password_verify($passwordAttuale, $currentHash)) {
+                    $errors[] = "La password attuale non è corretta";
+                }
+            } catch (Exception $e) {
+                $errors[] = "Errore nella verifica della password";
+            }
+        }
+        
+        if (strlen($nuovaPassword) < 6) {
+            $errors[] = "La nuova password deve essere di almeno 6 caratteri";
+        }
+        
+        if ($nuovaPassword !== $confermaPassword) {
+            $errors[] = "Le password non corrispondono";
+        }
+        
+        $cambiaPassword = true;
+    }
+    
+    // Se non ci sono errori, aggiorna i dati
+    if (empty($errors)) {
+        try {
+            $pdo->beginTransaction();
+            
+            if ($cambiaPassword) {
+                // Aggiorna con la nuova password
+                $hashedPassword = password_hash($nuovaPassword, PASSWORD_DEFAULT);
+                $stmt = $pdo->prepare("UPDATE utente SET nome = ?, cognome = ?, email = ?, telefono = ?, password = ? WHERE id_utente = ?");
+                $stmt->execute([$nome, $cognome, $email, $telefono ?: null, $hashedPassword, $userId]);
+            } else {
+                // Aggiorna senza cambiare la password
+                $stmt = $pdo->prepare("UPDATE utente SET nome = ?, cognome = ?, email = ?, telefono = ? WHERE id_utente = ?");
+                $stmt->execute([$nome, $cognome, $email, $telefono ?: null, $userId]);
+            }
+            
+            $pdo->commit();
+            
+            // Aggiorna i dati in sessione
+            SessionManager::set('user_nome', $nome);
+            SessionManager::set('user_cognome', $cognome);
+            SessionManager::set('user_email', $email);
+            
+            $message = "Profilo aggiornato con successo!";
+            $messageType = 'success';
+            
+            // Aggiorna i dati per la visualizzazione
+            $userData = [
+                'nome' => $nome,
+                'cognome' => $cognome,
+                'email' => $email,
+                'telefono' => $telefono
+            ];
+            
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            $message = "Errore nell'aggiornamento: " . $e->getMessage();
+            $messageType = 'error';
+        }
+    } else {
+        $message = implode('<br>', $errors);
+        $messageType = 'error';
+    }
+}
+
 ?>
+
 <main class="background-custom">
     <div class="container section">
+        
         <h1 class="fashion_taital">Modifica Profilo</h1>
-        <div class="register-container" style="max-width: 500px;">
-            <form method="POST">
 
-                <div class="form-group">
-                    <label for="nome">Nome completo</label>
-                    <input type="text" id="nome" name="nome" class="form-control" 
-                           value="<?php echo htmlspecialchars($utente['nome'] ?? ''); ?>" required>
+        <div style="max-width: 600px; margin: 0 auto;">
+            
+            <?php if (!empty($message)): ?>
+                <div class="alert alert-<?php echo $messageType === 'success' ? 'success' : 'danger'; ?>" 
+                     style="margin-bottom: 20px; padding: 15px; border-radius: 5px; 
+                            background-color: <?php echo $messageType === 'success' ? '#d4edda' : '#f8d7da'; ?>; 
+                            color: <?php echo $messageType === 'success' ? '#155724' : '#721c24'; ?>; 
+                            border: 1px solid <?php echo $messageType === 'success' ? '#c3e6cb' : '#f5c6cb'; ?>;">
+                    <?php echo $message; ?>
                 </div>
+            <?php endif; ?>
 
-                <div class="form-group">
-                    <label for="email">Indirizzo Email</label>
-                    <input type="email" id="email" name="email" class="form-control" 
-                           value="<?php echo htmlspecialchars($utente['email'] ?? ''); ?>" required>
-                </div>
-
-                <hr>
-                <h3 style="margin-bottom: 15px;">Indirizzo di Spedizione</h3>
-
-                <div class="form-group">
-                    <label for="via">Via</label>
-                    <input type="text" id="via" name="via" class="form-control" 
-                           value="<?php echo htmlspecialchars($utente['via'] ?? ''); ?>">
-                </div>
-
-                <div class="form-group">
-                    <label for="citta">Città</label>
-                    <input type="text" id="citta" name="citta" class="form-control" 
-                           value="<?php echo htmlspecialchars($utente['citta'] ?? ''); ?>">
-                </div>
-
-                <div class="form-group">
-                    <label for="cap">CAP</label>
-                    <input type="text" id="cap" name="cap" class="form-control" 
-                           value="<?php echo htmlspecialchars($utente['cap'] ?? ''); ?>">
-                </div>
-
-                <div class="form-group">
-                    <label for="provincia">Provincia</label>
-                    <input type="text" id="provincia" name="provincia" class="form-control" 
-                           value="<?php echo htmlspecialchars($utente['provincia'] ?? ''); ?>">
-                </div>
-
-                <button type="submit" class="btn">Salva Modifiche</button>
-            </form>
+            <div style="background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+                
+                <form method="POST" action="">
+                    
+                    <!-- Dati personali -->
+                    <h3 style="margin-bottom: 20px; color: #333;">Dati Personali</h3>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label for="nome" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">Nome *</label>
+                        <input type="text" 
+                               id="nome" 
+                               name="nome" 
+                               value="<?php echo htmlspecialchars($userData['nome']); ?>" 
+                               required
+                               style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 5px; font-size: 16px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label for="cognome" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">Cognome *</label>
+                        <input type="text" 
+                               id="cognome" 
+                               name="cognome" 
+                               value="<?php echo htmlspecialchars($userData['cognome']); ?>" 
+                               required
+                               style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 5px; font-size: 16px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label for="email" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">Email *</label>
+                        <input type="email" 
+                               id="email" 
+                               name="email" 
+                               value="<?php echo htmlspecialchars($userData['email']); ?>" 
+                               required
+                               style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 5px; font-size: 16px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 30px;">
+                        <label for="telefono" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">Telefono</label>
+                        <input type="tel" 
+                               id="telefono" 
+                               name="telefono" 
+                               value="<?php echo htmlspecialchars($userData['telefono'] ?? ''); ?>" 
+                               placeholder="Opzionale"
+                               style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 5px; font-size: 16px;">
+                    </div>
+                    
+                    <!-- Cambio password -->
+                    <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+                    
+                    <h3 style="margin-bottom: 20px; color: #333;">Cambio Password (opzionale)</h3>
+                    <p style="color: #666; margin-bottom: 20px; font-size: 14px;">Lascia vuoto se non vuoi cambiare la password</p>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label for="password_attuale" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">Password Attuale</label>
+                        <input type="password" 
+                               id="password_attuale" 
+                               name="password_attuale" 
+                               style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 5px; font-size: 16px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label for="nuova_password" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">Nuova Password</label>
+                        <input type="password" 
+                               id="nuova_password" 
+                               name="nuova_password" 
+                               minlength="6"
+                               style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 5px; font-size: 16px;">
+                        <small style="color: #666;">Minimo 6 caratteri</small>
+                    </div>
+                    
+                    <div style="margin-bottom: 30px;">
+                        <label for="conferma_password" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">Conferma Nuova Password</label>
+                        <input type="password" 
+                               id="conferma_password" 
+                               name="conferma_password" 
+                               minlength="6"
+                               style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 5px; font-size: 16px;">
+                    </div>
+                    
+                    <!-- Pulsanti -->
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;">
+                        <button type="submit" class="btn-add-to-cart" style="border: none; cursor: pointer;">
+                            💾 Salva Modifiche
+                        </button>
+                        <a href="profilo.php" class="btn-add-to-cart" style="text-decoration: none; background-color: #6c757d;">
+                            ← Torna al Profilo
+                        </a>
+                    </div>
+                    
+                </form>
+                
+            </div>
         </div>
+
     </div>
 </main>
+
+<script>
+// Validazione lato client per le password
+document.addEventListener('DOMContentLoaded', function() {
+    const nuovaPassword = document.getElementById('nuova_password');
+    const confermaPassword = document.getElementById('conferma_password');
+    const passwordAttuale = document.getElementById('password_attuale');
+    
+    function checkPasswordsMatch() {
+        if (nuovaPassword.value !== confermaPassword.value) {
+            confermaPassword.setCustomValidity('Le password non corrispondono');
+        } else {
+            confermaPassword.setCustomValidity('');
+        }
+    }
+    
+    function checkPasswordRequired() {
+        const hasNewPassword = nuovaPassword.value.length > 0 || confermaPassword.value.length > 0;
+        
+        if (hasNewPassword) {
+            passwordAttuale.setAttribute('required', 'required');
+            nuovaPassword.setAttribute('required', 'required');
+            confermaPassword.setAttribute('required', 'required');
+        } else {
+            passwordAttuale.removeAttribute('required');
+            nuovaPassword.removeAttribute('required');
+            confermaPassword.removeAttribute('required');
+        }
+    }
+    
+    nuovaPassword.addEventListener('input', function() {
+        checkPasswordsMatch();
+        checkPasswordRequired();
+    });
+    
+    confermaPassword.addEventListener('input', function() {
+        checkPasswordsMatch();
+        checkPasswordRequired();
+    });
+    
+    passwordAttuale.addEventListener('input', checkPasswordRequired);
+});
+</script>
 
 <?php
 include __DIR__ . '/footer.php';
