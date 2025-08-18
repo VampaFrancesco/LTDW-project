@@ -16,7 +16,7 @@
                 <h6>Informazioni</h6>
                 <ul class="list-unstyled">
                     <li><a href="about.php">Chi siamo</a></li>
-                    <li><a href="../contatti.php">Contatti</a></li>
+                    <li><a href="contatti.php">Contatti</a></li>
                     <li><a href="../partners.php">Partners</a></li>
                     <li><a href="../eventi.php">Eventi</a></li>
                     <li><a href="../lavora.php">Lavora con noi</a></li>
