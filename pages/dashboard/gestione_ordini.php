@@ -224,12 +224,12 @@ $result = $conn->query("SELECT COUNT(*) as total FROM ordine WHERE DATE(data_ord
 $stats['ordini_oggi'] = $result->fetch_assoc()['total'];
 
 $result = $conn->query("
-    SELECT IFNULL(SUM(c.totale), 0) as total 
-    FROM ordine o 
-    LEFT JOIN carrello c ON o.fk_carrello = c.id_carrello 
-    WHERE DATE_FORMAT(o.data_ordine, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
+    SELECT COALESCE(SUM(totale_fattura), 0) as total 
+    FROM fattura 
+    WHERE DATE_FORMAT(data_emissione, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
 ");
-$stats['fatturato_mese'] = $result->fetch_assoc()['total'];
+$fatturato_centesimi = $result->fetch_assoc()['total'];
+$stats['fatturato_mese'] = $fatturato_centesimi;
 
 // Statistiche carrelli per stato
 $result = $conn->query("

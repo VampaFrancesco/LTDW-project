@@ -1,13 +1,18 @@
 <?php
+/**
+ * cart.php - Pagina del carrello con gestione AJAX corretta
+ * Compatibile con update_cart.php e get_cart.php
+ */
+
 // 1. PRIMA di qualsiasi output
 require_once __DIR__.'/../include/session_manager.php';
 require_once __DIR__.'/../include/config.inc.php';
 
 // 2. Include la logica per recuperare il carrello
-$cart_data = include '../action/get_cart.php';
+$cart_data = include __DIR__.'/../action/get_cart.php';
 
-// 3. Include header
-include  'header.php';
+// 3. Include header DOPO aver processato la logica
+include __DIR__.'/header.php';
 ?>
 
     <main class="background-custom">
@@ -37,7 +42,7 @@ include  'header.php';
                         <div class="col-lg-8">
                             <div class="cart-items">
                                 <?php foreach ($cart_data['items'] as $item): ?>
-                                    <div class="cart-item" data-item-id="<?php echo $item['cart_key']; ?>">
+                                    <div class="cart-item" data-item-id="<?php echo htmlspecialchars($item['cart_key']); ?>">
                                         <div class="cart-item-image">
                                             <img src="<?php echo htmlspecialchars($item['image']); ?>"
                                                  alt="<?php echo htmlspecialchars($item['nome']); ?>"
@@ -51,24 +56,35 @@ include  'header.php';
                                             </span>
                                             </p>
                                             <div class="cart-item-price">
-                                                €<?php echo number_format($item['prezzo'], 2); ?>
+                                                €<?php echo number_format($item['prezzo'], 2, ',', '.'); ?>
                                             </div>
                                         </div>
                                         <div class="cart-item-quantity">
                                             <label>Quantità:</label>
                                             <div class="quantity-controls">
-                                                <button type="button" class="btn-quantity" onclick="updateQuantity('<?php echo $item['cart_key']; ?>', -1)">-</button>
-                                                <input type="number" value="<?php echo $item['quantita']; ?>"
-                                                       min="1" max="99" class="quantity-input"
-                                                       onchange="updateQuantity('<?php echo $item['cart_key']; ?>', 0, this.value)">
-                                                <button type="button" class="btn-quantity" onclick="updateQuantity('<?php echo $item['cart_key']; ?>', 1)">+</button>
+                                                <button type="button" class="btn-quantity"
+                                                        onclick="updateQuantity('<?php echo htmlspecialchars($item['cart_key']); ?>', -1)">
+                                                    -
+                                                </button>
+                                                <input type="number"
+                                                       value="<?php echo $item['quantita']; ?>"
+                                                       min="1"
+                                                       max="99"
+                                                       class="quantity-input"
+                                                       data-original-value="<?php echo $item['quantita']; ?>"
+                                                       onchange="updateQuantity('<?php echo htmlspecialchars($item['cart_key']); ?>', 0, this.value)">
+                                                <button type="button" class="btn-quantity"
+                                                        onclick="updateQuantity('<?php echo htmlspecialchars($item['cart_key']); ?>', 1)">
+                                                    +
+                                                </button>
                                             </div>
                                         </div>
                                         <div class="cart-item-total">
-                                            €<?php echo number_format($item['prezzo'] * $item['quantita'], 2); ?>
+                                            €<?php echo number_format($item['prezzo'] * $item['quantita'], 2, ',', '.'); ?>
                                         </div>
                                         <div class="cart-item-remove">
-                                            <button type="button" class="btn-remove" onclick="removeItem('<?php echo $item['cart_key']; ?>')">
+                                            <button type="button" class="btn-remove"
+                                                    onclick="removeItem('<?php echo htmlspecialchars($item['cart_key']); ?>')">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
@@ -83,39 +99,36 @@ include  'header.php';
                                 <h4>Riepilogo Ordine</h4>
                                 <div class="summary-item">
                                     <span>Subtotale (<?php echo $cart_data['total_items']; ?> articoli):</span>
-                                    <span>€<?php echo number_format($cart_data['subtotal'], 2); ?></span>
+                                    <span id="cart-subtotal">€<?php echo number_format($cart_data['subtotal'], 2, ',', '.'); ?></span>
                                 </div>
                                 <div class="summary-item">
                                     <span>Spedizione:</span>
-                                    <span><?php echo $cart_data['subtotal'] >= 50 ? 'Gratuita' : '€5.00'; ?></span>
+                                    <span id="shipping-cost">
+                                    <?php if($cart_data['subtotal'] >= 50): ?>
+                                        <span class="text-success">GRATIS</span>
+                                    <?php else: ?>
+                                        €<?php echo number_format($cart_data['shipping_cost'], 2, ',', '.'); ?>
+                                    <?php endif; ?>
+                                </span>
                                 </div>
-                                <?php if ($cart_data['subtotal'] < 50): ?>
-                                    <div class="summary-note">
+                                <?php if($cart_data['subtotal'] < 50): ?>
+                                    <div class="free-shipping-notice">
                                         <i class="bi bi-info-circle"></i>
-                                        Spendi altri €<?php echo number_format(50 - $cart_data['subtotal'], 2); ?> per la spedizione gratuita!
+                                        Spendi ancora €<?php echo number_format(50 - $cart_data['subtotal'], 2, ',', '.'); ?>
+                                        per la spedizione gratuita!
                                     </div>
                                 <?php endif; ?>
                                 <hr>
                                 <div class="summary-total">
-                                    <span>Totale:</span>
-                                    <span>€<?php echo number_format($cart_data['total'], 2); ?></span>
+                                    <strong>Totale:</strong>
+                                    <strong id="cart-total">€<?php echo number_format($cart_data['total'], 2, ',', '.'); ?></strong>
                                 </div>
-
-                                <?php if (SessionManager::isLoggedIn()): ?>
-                                    <button class="btn btn-success btn-lg w-100 mt-3" onclick="proceedToCheckout()">
-                                        <i class="bi bi-credit-card"></i> Procedi al Pagamento
-                                    </button>
-                                <?php else: ?>
-                                    <div class="login-required mt-3">
-                                        <p><i class="bi bi-info-circle"></i> Devi effettuare l'accesso per completare l'acquisto</p>
-                                        <a href="<?php echo BASE_URL; ?>/pages/auth/login.php" class="btn btn-primary w-100">
-                                            <i class="bi bi-person"></i> Accedi
-                                        </a>
-                                    </div>
-                                <?php endif; ?>
-
-                                <a href="<?php echo BASE_URL; ?>/pages/pokémon.php" class="btn btn-outline-primary w-100 mt-2">
-                                    <i class="bi bi-arrow-left"></i> Continua Shopping
+                                <button type="button" class="btn btn-primary btn-lg w-100 mt-3"
+                                        onclick="proceedToCheckout()">
+                                    <i class="bi bi-lock-fill"></i> Procedi al Checkout
+                                </button>
+                                <a href="<?php echo BASE_URL; ?>/pages/pokémon.php" class="btn btn-outline-secondary w-100 mt-2">
+                                    Continua lo Shopping
                                 </a>
                             </div>
                         </div>
@@ -125,279 +138,482 @@ include  'header.php';
         </div>
     </main>
 
-    <script>
-        // Funzione per creare alert personalizzati
-        function showCustomAlert(message, type = 'danger', duration = 5000) {
-            const alertContainer = document.getElementById('alertContainer');
+    <!-- Stili CSS -->
+    <style>
+        .cart-container {
+            margin-top: 20px;
+        }
 
-            const alertElement = document.createElement('div');
-            alertElement.className = `alert-custom alert-custom-${type} alert-dismissible fade show`;
-            alertElement.innerHTML = `
-                <i class="bi bi-${type === 'danger' ? 'exclamation-triangle' : type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
-                <div class="alert-custom-content">
-                    <strong>${type === 'danger' ? 'Errore!' : type === 'success' ? 'Successo!' : type === 'warning' ? 'Attenzione!' : 'Info:'}</strong>
-                    ${message}
-                </div>
-                <button type="button" class="alert-custom-close" onclick="this.parentElement.remove()">
-                    <i class="bi bi-x"></i>
-                </button>
-            `;
+        .cart-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
 
-            alertContainer.appendChild(alertElement);
+        .cart-item:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
 
-            // Auto-rimuovi dopo il duration specificato
-            if (duration > 0) {
-                setTimeout(() => {
-                    if (alertElement && alertElement.parentElement) {
-                        alertElement.classList.add('fade-out');
-                        setTimeout(() => alertElement.remove(), 300);
-                    }
-                }, duration);
+        .cart-item-image {
+            width: 100px;
+            height: 100px;
+            flex-shrink: 0;
+        }
+
+        .cart-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .cart-item-details {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            margin: 0 0 10px 0;
+            font-size: 1.1rem;
+        }
+
+        .cart-item-price {
+            font-size: 1.2rem;
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .cart-item-quantity {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-quantity {
+            width: 35px;
+            height: 35px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-quantity:hover {
+            background: #f8f9fa;
+            border-color: #007bff;
+        }
+
+        .quantity-input {
+            width: 60px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+        .cart-item-total {
+            font-size: 1.3rem;
+            font-weight: bold;
+            min-width: 100px;
+            text-align: right;
+        }
+
+        .btn-remove {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-remove:hover {
+            background: #c82333;
+        }
+
+        .cart-summary {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 20px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.3rem;
+            margin-top: 15px;
+        }
+
+        .free-shipping-notice {
+            background: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-size: 0.9rem;
+        }
+
+        .empty-cart-container {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .empty-cart-icon {
+            font-size: 5rem;
+            color: #dee2e6;
+            margin-bottom: 20px;
+        }
+
+        /* Alert personalizzati */
+        .alert-custom {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        .alert-custom-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-custom-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-custom-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
             }
         }
 
-        function updateQuantity(itemKey, change, newValue = null) {
-            let quantity;
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease;
+        }
 
-            if (newValue !== null) {
-                quantity = parseInt(newValue);
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .cart-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .cart-item-total {
+                text-align: center;
+                margin: 10px 0;
+            }
+
+            .cart-summary {
+                margin-top: 30px;
+                position: static;
+            }
+        }
+    </style>
+
+    <!-- JavaScript -->
+    <script>
+        // Funzione per mostrare alert personalizzati
+        function showCustomAlert(message, type = 'success', duration = 3000) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert-custom alert-custom-${type}`;
+            alertDiv.innerHTML = `
+            <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-triangle' : 'info-circle'}"></i>
+            ${message}
+        `;
+
+            alertContainer.appendChild(alertDiv);
+
+            setTimeout(() => {
+                alertDiv.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => alertDiv.remove(), 300);
+            }, duration);
+        }
+
+        // Funzione per aggiornare la quantità
+        function updateQuantity(itemKey, change, directValue = null) {
+            console.log('updateQuantity chiamata:', { itemKey, change, directValue });
+
+            const cartItem = document.querySelector(`[data-item-id="${itemKey}"]`);
+            const input = cartItem?.querySelector('.quantity-input');
+
+            if (!input) {
+                console.error('Input non trovato per:', itemKey);
+                return;
+            }
+
+            let quantity;
+            if (directValue !== null) {
+                quantity = parseInt(directValue);
             } else {
-                const input = document.querySelector(`[data-item-id="${itemKey}"] .quantity-input`);
                 quantity = parseInt(input.value) + change;
             }
 
+            // Validazione quantità
             if (quantity < 1) {
-                showCustomAlert('La quantità minima è 1.', 'warning', 3000);
+                showCustomAlert('La quantità minima è 1', 'warning');
                 quantity = 1;
             }
             if (quantity > 99) {
-                showCustomAlert('La quantità massima è 99.', 'warning', 3000);
+                showCustomAlert('La quantità massima è 99', 'warning');
                 quantity = 99;
             }
 
-            // Aggiorna l'input visivamente
-            const input = document.querySelector(`[data-item-id="${itemKey}"] .quantity-input`);
-            if (input) {
-                input.value = quantity;
-            }
+            // Aggiorna visualmente l'input
+            input.value = quantity;
 
-            console.log('Sending request with:', {
-                action: 'update',
-                item_key: itemKey,
-                quantity: quantity
-            });
-
-            // Mostra feedback visivo
-            const cartItem = document.querySelector(`[data-item-id="${itemKey}"]`);
+            // Feedback visivo
             if (cartItem) {
                 cartItem.style.opacity = '0.6';
-                cartItem.style.transform = 'scale(0.98)';
             }
 
-            // Aggiorna via AJAX
+            // Chiamata AJAX
+            const formData = new FormData();
+            formData.append('action', 'update');
+            formData.append('item_key', itemKey);
+            formData.append('quantity', quantity);
+
             fetch('<?php echo BASE_URL; ?>/action/update_cart.php', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `action=update&item_key=${encodeURIComponent(itemKey)}&quantity=${quantity}`
+                body: formData
             })
                 .then(response => {
-                    console.log('Response status:', response.status);
-
-                    // Prima ottieni il testo della risposta
-                    return response.text().then(text => {
-                        console.log('Raw response text:', text);
-
-                        // Controlla se la risposta inizia con '<' (potrebbe essere HTML di errore)
-                        if (text.trim().startsWith('<')) {
-                            throw new Error('Received HTML instead of JSON. Check PHP errors.');
-                        }
-
-                        // Prova a fare il parse del JSON
-                        try {
-                            const data = JSON.parse(text);
-                            return data;
-                        } catch (e) {
-                            console.error('JSON parse error:', e);
-                            console.error('Failed to parse:', text);
-                            throw new Error('Invalid JSON response');
-                        }
-                    });
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
                 })
-                .then(data => {
-                    console.log('Parsed data:', data);
-                    if (data.success) {
-                        showCustomAlert('Quantità aggiornata con successo!', 'success', 2000);
-                        setTimeout(() => location.reload(), 1000);
-                    } else {
-                        showCustomAlert(data.message || 'Impossibile aggiornare la quantità', 'danger');
-                        // Ripristina valore precedente
-                        if (input) {
-                            input.value = input.defaultValue;
+                .then(text => {
+                    console.log('Response raw:', text);
+
+                    // Prova a parsare come JSON
+                    try {
+                        const data = JSON.parse(text);
+                        console.log('Parsed data:', data);
+
+                        if (data.success) {
+                            // Aggiorna UI
+                            updateCartUI(data);
+                            showCustomAlert('Quantità aggiornata!', 'success');
+
+                            // Salva il nuovo valore come originale
+                            input.setAttribute('data-original-value', quantity);
+                        } else {
+                            throw new Error(data.message || 'Errore sconosciuto');
+                        }
+                    } catch (e) {
+                        console.error('Parse error:', e);
+                        // Se il response contiene HTML di errore PHP
+                        if (text.includes('Fatal error') || text.includes('Warning')) {
+                            console.error('PHP Error:', text);
+                            throw new Error('Errore del server');
+                        } else {
+                            throw e;
                         }
                     }
                 })
                 .catch(error => {
-                    console.error('Fetch error:', error);
-                    showCustomAlert('Errore di connessione. Riprova più tardi.', 'danger');
-                    // Ripristina valore precedente
-                    if (input) {
-                        input.value = input.defaultValue;
+                    console.error('Error:', error);
+                    showCustomAlert('Errore: ' + error.message, 'danger');
+
+                    // Ripristina valore originale
+                    const originalValue = input.getAttribute('data-original-value');
+                    if (originalValue) {
+                        input.value = originalValue;
                     }
                 })
                 .finally(() => {
-                    // Ripristina stile visivo
+                    // Ripristina opacità
                     if (cartItem) {
                         cartItem.style.opacity = '1';
-                        cartItem.style.transform = 'scale(1)';
                     }
                 });
         }
 
+        // Funzione per rimuovere un item
         function removeItem(itemKey) {
             const cartItem = document.querySelector(`[data-item-id="${itemKey}"]`);
             const itemName = cartItem?.querySelector('.cart-item-name')?.textContent || 'questo articolo';
 
-            // Mostra conferma personalizzata
-            showRemoveConfirmation(itemName, () => {
-                console.log('Removing item:', itemKey);
+            if (!confirm(`Sei sicuro di voler rimuovere "${itemName}" dal carrello?`)) {
+                return;
+            }
 
-                // Animazione di rimozione
-                if (cartItem) {
-                    cartItem.style.transform = 'translateX(-100%)';
-                    cartItem.style.opacity = '0.3';
-                }
+            // Animazione rimozione
+            if (cartItem) {
+                cartItem.style.opacity = '0.3';
+                cartItem.style.transform = 'translateX(-20px)';
+            }
 
-                fetch('<?php echo BASE_URL; ?>/action/update_cart.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `action=remove&item_key=${encodeURIComponent(itemKey)}`
+            const formData = new FormData();
+            formData.append('action', 'remove');
+            formData.append('item_key', itemKey);
+
+            fetch('<?php echo BASE_URL; ?>/action/update_cart.php', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
                 })
-                    .then(response => {
-                        console.log('Remove response status:', response.status);
+                .then(text => {
+                    console.log('Remove response:', text);
 
-                        return response.text().then(text => {
-                            console.log('Raw remove response:', text);
+                    try {
+                        const data = JSON.parse(text);
 
-                            if (text.trim().startsWith('<')) {
-                                throw new Error('Received HTML instead of JSON');
-                            }
-
-                            try {
-                                return JSON.parse(text);
-                            } catch (e) {
-                                console.error('JSON parse error:', e);
-                                throw new Error('Invalid JSON response');
-                            }
-                        });
-                    })
-                    .then(data => {
-                        console.log('Remove response data:', data);
                         if (data.success) {
-                            showCustomAlert('Articolo rimosso dal carrello!', 'success', 2000);
-                            setTimeout(() => location.reload(), 1000);
-                        } else {
-                            showCustomAlert(data.message || 'Impossibile rimuovere l\'articolo', 'danger');
-                            // Ripristina stile
+                            showCustomAlert('Prodotto rimosso dal carrello', 'success');
+
+                            // Rimuovi elemento con animazione
                             if (cartItem) {
-                                cartItem.style.transform = '';
-                                cartItem.style.opacity = '';
+                                cartItem.style.transition = 'all 0.3s ease';
+                                cartItem.style.transform = 'translateX(-100%)';
+                                cartItem.style.opacity = '0';
+                                setTimeout(() => {
+                                    cartItem.remove();
+
+                                    // Se il carrello è vuoto, ricarica la pagina
+                                    if (document.querySelectorAll('.cart-item').length === 0) {
+                                        location.reload();
+                                    } else {
+                                        // Aggiorna UI
+                                        updateCartUI(data);
+                                    }
+                                }, 300);
                             }
+                        } else {
+                            throw new Error(data.message || 'Errore nella rimozione');
                         }
-                    })
-                    .catch(error => {
-                        console.error('Remove error:', error);
-                        showCustomAlert('Errore nella rimozione. Riprova più tardi.', 'danger');
-                        // Ripristina stile
-                        if (cartItem) {
-                            cartItem.style.transform = '';
-                            cartItem.style.opacity = '';
-                        }
-                    });
-            });
+                    } catch (e) {
+                        console.error('Parse error:', e);
+                        throw new Error('Errore del server');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showCustomAlert('Errore: ' + error.message, 'danger');
+
+                    // Ripristina visualizzazione
+                    if (cartItem) {
+                        cartItem.style.opacity = '1';
+                        cartItem.style.transform = '';
+                    }
+                });
         }
 
-        function showRemoveConfirmation(itemName, onConfirm) {
-            const alertElement = document.createElement('div');
-            alertElement.className = 'alert-custom alert-custom-warning alert-dismissible fade show';
-            alertElement.style.position = 'fixed';
-            alertElement.style.top = '50%';
-            alertElement.style.left = '50%';
-            alertElement.style.transform = 'translate(-50%, -50%)';
-            alertElement.style.zIndex = '9999';
-            alertElement.style.maxWidth = '400px';
-            alertElement.style.boxShadow = '0 10px 40px rgba(0,0,0,0.3)';
+        // Funzione per aggiornare l'UI del carrello
+        function updateCartUI(data) {
+            // Aggiorna subtotale
+            const subtotalEl = document.getElementById('cart-subtotal');
+            if (subtotalEl) {
+                subtotalEl.textContent = '€' + data.cart_subtotal;
+            }
 
-            alertElement.innerHTML = `
-                <i class="bi bi-question-circle"></i>
-                <div class="alert-custom-content">
-                    <strong>Conferma rimozione</strong>
-                    Sei sicuro di voler rimuovere "${itemName}" dal carrello?
-                </div>
-                <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end;">
-                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="this.closest('.alert-custom').remove()">
-                        Annulla
-                    </button>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.alert-custom').remove(); (${onConfirm.toString()})()">
-                        Rimuovi
-                    </button>
-                </div>
-            `;
+            // Aggiorna spedizione
+            const shippingEl = document.getElementById('shipping-cost');
+            if (shippingEl) {
+                if (data.is_shipping_free) {
+                    shippingEl.innerHTML = '<span class="text-success">GRATIS</span>';
+                } else {
+                    shippingEl.textContent = '€' + data.shipping_cost;
+                }
+            }
 
-            document.body.appendChild(alertElement);
+            // Aggiorna totale
+            const totalEl = document.getElementById('cart-total');
+            if (totalEl) {
+                totalEl.textContent = '€' + data.cart_total;
+            }
+
+            // Aggiorna contatore nel header se esiste
+            const cartCountEl = document.querySelector('.cart-count');
+            if (cartCountEl) {
+                cartCountEl.textContent = data.cart_total_items;
+            }
         }
 
+        // Funzione per procedere al checkout
         function proceedToCheckout() {
-            const button = event.target;
-            const originalText = button.innerHTML;
-
-            // Mostra feedback
-            button.innerHTML = '<i class="spinner-border spinner-border-sm"></i> Preparazione...';
-            button.disabled = true;
-
-            showCustomAlert('Preparazione checkout in corso...', 'info', 2000);
-
-            // Reindirizza a checkout_action.php che preparerà i dati per pagamento.php
-            setTimeout(() => {
-                window.location.href = '<?php echo BASE_URL; ?>/action/checkout_action.php';
-            }, 1000);
+            window.location.href = '<?php echo BASE_URL; ?>/action/checkout_action.php';
         }
 
-        // Animazioni al caricamento pagina
+        // Inizializzazione al caricamento della pagina
         document.addEventListener('DOMContentLoaded', function() {
-            // Aggiungi animazioni agli elementi del carrello
+            // Aggiungi animazioni
             const cartItems = document.querySelectorAll('.cart-item');
             cartItems.forEach((item, index) => {
                 item.style.animationDelay = `${index * 0.1}s`;
                 item.classList.add('fade-in-up');
             });
 
-            // Auto-salva input quantità quando si cambia focus
+            // Gestione input quantità con Enter
             const quantityInputs = document.querySelectorAll('.quantity-input');
             quantityInputs.forEach(input => {
-                let originalValue = input.value;
-
-                input.addEventListener('focus', function() {
-                    originalValue = this.value;
-                });
-
-                input.addEventListener('blur', function() {
-                    if (this.value !== originalValue && this.value >= 1 && this.value <= 99) {
-                        const itemKey = this.closest('.cart-item').dataset.itemId;
-                        updateQuantity(itemKey, 0, this.value);
-                    }
-                });
-
                 input.addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') {
-                        this.blur();
+                        e.preventDefault();
+                        const itemKey = this.closest('.cart-item').dataset.itemId;
+                        updateQuantity(itemKey, 0, this.value);
                     }
                 });
             });
         });
     </script>
 
-<?php include __DIR__ . '/footer.php'; ?>
+<?php include __DIR__.'/footer.php'; ?>

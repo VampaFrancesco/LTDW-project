@@ -1,5 +1,7 @@
 <?php
-// Evita output prima degli header
+// process_payment_action.php - Versione che NON usa metodo_pagamento
+// (compatibile con la struttura database attuale)
+
 ob_start();
 
 require_once __DIR__.'/../include/session_manager.php';
@@ -16,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 // Recupera i dati dal form
 $indirizzo_id = intval($_POST['indirizzo_id'] ?? 0);
-$payment_method = $_POST['payment_method'] ?? 'carta_credito';
+$payment_method = $_POST['payment_method'] ?? 'carta_credito'; // Lo salviamo per uso futuro
 $note_ordine = trim($_POST['note_ordine'] ?? '');
 
 // Recupera i dati del checkout dalla sessione
@@ -26,7 +28,7 @@ $user_id = SessionManager::get('user_id');
 // Validazione
 if (!$checkout_data || !isset($checkout_data['items']) || $indirizzo_id <= 0) {
     SessionManager::setFlashMessage('Dati di pagamento non validi. Riprova.', 'danger');
-    header('Location: ' . BASE_URL . '/pages/carrello.php');
+    header('Location: ' . BASE_URL . '/pages/cart.php');
     exit();
 }
 
@@ -41,7 +43,7 @@ $conn = new mysqli(
 
 if ($conn->connect_error) {
     SessionManager::setFlashMessage('Errore di connessione al database', 'danger');
-    header('Location: ' . BASE_URL . '/pages/carrello.php');
+    header('Location: ' . BASE_URL . '/pages/cart.php');
     exit();
 }
 
@@ -60,11 +62,28 @@ try {
     }
     $stmt->close();
 
-    // 2. Crea l'ordine principale
-    // Nota: assumiamo che ci sia solo un carrello attivo per utente
-    // In un sistema reale, dovresti gestire meglio questa parte
-    $carrello_id = $checkout_data['items'][0]['id_carrello']; // Prendi l'ID del primo item
+    // 2. Recupera gli ID del carrello per questo utente
+    $stmt = $conn->prepare("
+        SELECT id_carrello 
+        FROM carrello 
+        WHERE fk_utente = ? 
+        AND stato = 'attivo'
+        ORDER BY id_carrello DESC
+        LIMIT 1
+    ");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
+    if ($result->num_rows === 0) {
+        throw new Exception("Nessun carrello attivo trovato");
+    }
+
+    $carrello_row = $result->fetch_assoc();
+    $carrello_id = $carrello_row['id_carrello'];
+    $stmt->close();
+
+    // 3. Crea l'ordine principale (SENZA metodo_pagamento che non esiste nella tabella)
     $stmt = $conn->prepare("
         INSERT INTO ordine (data_ordine, tracking, stato_ordine, fk_utente, fk_indirizzo, fk_carrello) 
         VALUES (NOW(), NULL, 0, ?, ?, ?)
@@ -73,59 +92,86 @@ try {
     $stmt->bind_param("iii", $user_id, $indirizzo_id, $carrello_id);
 
     if (!$stmt->execute()) {
-        throw new Exception("Errore nella creazione dell'ordine");
+        throw new Exception("Errore nella creazione dell'ordine: " . $stmt->error);
     }
 
     $ordine_id = $conn->insert_id;
     $stmt->close();
 
-    // 3. Per ogni item nel carrello, crea un record in info_ordine (se hai mystery box)
+    // 4. Se hai mystery box nel carrello, crea record in info_ordine
     foreach ($checkout_data['items'] as $item) {
-        if ($item['fk_mystery_box']) {
-            $stmt = $conn->prepare("
-                INSERT INTO info_ordine (fk_ordine, fk_box, quantita_ordine, totale_ordine) 
-                VALUES (?, ?, ?, ?)
-            ");
+        if (isset($item['fk_mystery_box']) && $item['fk_mystery_box']) {
+            // Verifica se la mystery box esiste
+            $stmt = $conn->prepare("SELECT id_box FROM mystery_box WHERE id_box = ?");
+            $stmt->bind_param("i", $item['fk_mystery_box']);
+            $stmt->execute();
+            $result = $stmt->get_result();
 
-            $stmt->bind_param("iiid",
-                $ordine_id,
-                $item['fk_mystery_box'],
-                $item['quantita'],
-                $item['totale']
-            );
+            if ($result->num_rows > 0) {
+                $stmt->close();
 
-            if (!$stmt->execute()) {
-                throw new Exception("Errore nel salvataggio dei dettagli dell'ordine");
+                $stmt = $conn->prepare("
+                    INSERT INTO info_ordine (fk_ordine, fk_box, quantita_ordine, totale_ordine) 
+                    VALUES (?, ?, ?, ?)
+                ");
+
+                $stmt->bind_param("iiid",
+                    $ordine_id,
+                    $item['fk_mystery_box'],
+                    $item['quantita'],
+                    $item['totale']
+                );
+
+                if (!$stmt->execute()) {
+                    // Log error ma continua
+                    error_log("Errore info_ordine: " . $stmt->error);
+                }
+                $stmt->close();
             }
-            $stmt->close();
         }
     }
 
-    // 4. Svuota il carrello dell'utente
-    $stmt = $conn->prepare("DELETE FROM carrello WHERE fk_utente = ?");
+    // 5. Aggiorna lo stato del carrello a 'completato'
+    $stmt = $conn->prepare("
+        UPDATE carrello 
+        SET stato = 'completato' 
+        WHERE fk_utente = ? 
+        AND stato = 'attivo'
+    ");
     $stmt->bind_param("i", $user_id);
 
     if (!$stmt->execute()) {
-        throw new Exception("Errore nello svuotamento del carrello");
+        throw new Exception("Errore nell'aggiornamento del carrello");
     }
     $stmt->close();
 
-    // 5. Se tutto è andato bene, conferma la transazione
+    // 6. Crea log dell'ordine
+    $stmt = $conn->prepare("
+        INSERT INTO ordine_log (fk_ordine, stato_precedente, stato_nuovo, note, data_modifica) 
+        VALUES (?, NULL, 0, 'Ordine creato', NOW())
+    ");
+    $stmt->bind_param("i", $ordine_id);
+    $stmt->execute();
+    $stmt->close();
+
+    // 7. Se tutto è andato bene, conferma la transazione
     $conn->commit();
 
-    // 6. Rimuovi i dati di checkout dalla sessione
+    // 8. Rimuovi i dati di checkout dalla sessione
     SessionManager::remove('checkout_data');
+    SessionManager::set('cart_items_count', 0);
 
-    // 7. Salva i dati dell'ordine per la pagina di conferma
+    // 9. Salva i dati dell'ordine per la pagina di conferma
     SessionManager::set('ultimo_ordine', [
         'id' => $ordine_id,
-        'totale' => $checkout_data['totale'],
-        'metodo_pagamento' => $payment_method,
+        'totale' => $checkout_data['totale'] ?? 0,
+        'metodo_pagamento' => $payment_method, // Lo salviamo in sessione anche se non nel DB
         'timestamp' => time()
     ]);
 
-    // 8. Redirect alla pagina di conferma
-    header('Location: ' . BASE_URL . '/pages/conferma_ordine.php');
+    // 10. Redirect alla pagina di conferma
+    SessionManager::setFlashMessage('Ordine completato con successo!', 'success');
+    header('Location: ' . BASE_URL . '/pages/conferma_ordine.php?order_id=' . $ordine_id);
     exit();
 
 } catch (Exception $e) {
@@ -134,11 +180,12 @@ try {
 
     error_log("Errore processo pagamento: " . $e->getMessage());
 
-    SessionManager::setFlashMessage('Si è verificato un errore durante l\'elaborazione del pagamento. Riprova.', 'danger');
-    header('Location: ' . BASE_URL . '/pages/pagamento.php');
+    SessionManager::setFlashMessage('Errore nell\'elaborazione del pagamento: ' . $e->getMessage(), 'danger');
+    header('Location: ' . BASE_URL . '/pages/checkout.php');
     exit();
 } finally {
     $conn->close();
 }
 
 ob_end_flush();
+?>

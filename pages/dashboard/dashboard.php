@@ -27,15 +27,24 @@ try {
 
     // 2. Ordini di oggi
     $today = date('Y-m-d');
-    $result = $conn->query("SELECT COUNT(*) as total FROM ordine WHERE DATE(data_ordine) = '$today'");
-    $stats['ordini_oggi'] = $result ? $result->fetch_assoc()['total'] : 0;
-
-    // 3. Fatturato mensile (convertito da centesimi)
+    $stmt = $conn->prepare("SELECT COUNT(*) as total FROM ordine WHERE DATE(data_ordine) = ?");
+    $stmt->bind_param("s", $today);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $stats['ordini_oggi'] = $result->fetch_assoc()['total'];
+    $stmt->close();
+    // 3. Fatturato mensile (valori già in EURO)
     $currentMonth = date('Y-m');
-    $result = $conn->query("SELECT COALESCE(SUM(totale_fattura), 0) as total FROM fattura WHERE DATE_FORMAT(data_emissione, '%Y-%m') = '$currentMonth'");
-    $fatturato_centesimi = $result ? $result->fetch_assoc()['total'] : 0;
-    $stats['fatturato_mensile'] = $fatturato_centesimi / 100; // Converti da centesimi a euro
-
+    $stmt = $conn->prepare("
+    SELECT COALESCE(SUM(totale_fattura), 0) as total 
+    FROM fattura 
+    WHERE DATE_FORMAT(data_emissione, '%Y-%m') = ?
+");
+    $stmt->bind_param("s", $currentMonth);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $stats['fatturato_mensile'] = $result->fetch_assoc()['total']; // NON DIVIDERE PER 100!
+    $stmt->close();
     // 4. Prodotti attivi
     $result1 = $conn->query("SELECT COUNT(*) as total FROM oggetto WHERE quant_oggetto IS NULL OR quant_oggetto > 0");
     $oggetti_attivi = $result1 ? $result1->fetch_assoc()['total'] : 0;
@@ -67,7 +76,7 @@ try {
             END as stato_nome
         FROM ordine o
         JOIN utente u ON o.fk_utente = u.id_utente
-        JOIN carrello c ON o.fk_carrello = c.id_carrello
+        LEFT JOIN carrello c ON o.fk_carrello = c.id_carrello
         ORDER BY o.data_ordine DESC
         LIMIT 5
     ");
@@ -337,7 +346,7 @@ $conn->close();
                                                     <td>#<?php echo str_pad($ordine['id_ordine'], 3, '0', STR_PAD_LEFT); ?></td>
                                                     <td><?php echo htmlspecialchars($ordine['cliente_nome']); ?></td>
                                                     <td><?php echo date('d/m/Y H:i', strtotime($ordine['data_ordine'])); ?></td>
-                                                    <td>€<?php echo number_format($ordine['totale'], 2); ?></td>
+                                                    <td>€<?php echo number_format((float)($ordine['totale'] ?? 0), 2, ',', '.'); ?></td>
                                                     <td>
                                                         <?php
                                                         $badge_class = match($ordine['stato_ordine']) {

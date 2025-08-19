@@ -70,8 +70,7 @@ try {
         }
 
         if ($action === 'remove') {
-            // Rimuovi item dal carrello
-            $stmt = $conn->prepare("DELETE FROM carrello WHERE $where_clause");
+            $stmt = $conn->prepare("DELETE FROM carrello WHERE $where_clause AND stato = 'attivo'");
             $stmt->bind_param("ii", $user_id, $product_id);
 
             if ($stmt->execute()) {
@@ -85,44 +84,48 @@ try {
             }
             $stmt->close();
 
-        } else { // update
-            // Recupera prezzo corrente
-            if (strpos($item_key, 'mystery_box_') === 0) {
-                $stmt = $conn->prepare("SELECT prezzo_box FROM mystery_box WHERE id_box = ?");
-            } else {
-                $stmt = $conn->prepare("SELECT prezzo_oggetto FROM oggetto WHERE id_oggetto = ?");
-            }
-            $stmt->bind_param("i", $product_id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $price_row = $result->fetch_assoc();
-            $stmt->close();
+        }} else { // update
+        // ✅ NUOVA VERIFICA: Controlla disponibilità stock prima di aggiornare
+        if (strpos($item_key, 'mystery_box_') === 0) {
+            // Verifica stock Mystery Box
+            $check_stock = $conn->prepare("SELECT quantita_box FROM mystery_box WHERE id_box = ?");
+            $check_stock->bind_param("i", $product_id);
+            $check_stock->execute();
+            $stock_result = $check_stock->get_result()->fetch_assoc();
+            $check_stock->close();
 
-            if (!$price_row) {
+            if (!$stock_result) {
+                throw new Exception('Mystery Box non trovata');
+            }
+
+            if ($quantity > $stock_result['quantita_box']) {
+                throw new Exception("Quantità richiesta ({$quantity}) supera lo stock disponibile ({$stock_result['quantita_box']})");
+            }
+
+            $stmt = $conn->prepare("SELECT prezzo_box FROM mystery_box WHERE id_box = ?");
+        } else {
+            // Verifica stock Oggetto
+            $check_stock = $conn->prepare("SELECT quant_oggetto FROM oggetto WHERE id_oggetto = ?");
+            $check_stock->bind_param("i", $product_id);
+            $check_stock->execute();
+            $stock_result = $check_stock->get_result()->fetch_assoc();
+            $check_stock->close();
+
+            if (!$stock_result) {
                 throw new Exception('Prodotto non trovato');
             }
 
-            $price = strpos($item_key, 'mystery_box_') === 0 ? $price_row['prezzo_box'] : $price_row['prezzo_oggetto'];
-            $new_total = $price * $quantity;
-
-            // Aggiorna quantità e totale
-            $stmt = $conn->prepare("UPDATE carrello SET quantita = ?, totale = ? WHERE $where_clause");
-            $stmt->bind_param("idii", $quantity, $new_total, $user_id, $product_id);
-
-            if ($stmt->execute()) {
-                if ($stmt->affected_rows > 0) {
-                    $message = 'Quantità aggiornata';
-                } else {
-                    throw new Exception('Prodotto non trovato nel carrello');
-                }
-            } else {
-                throw new Exception('Errore nell\'aggiornamento');
+            // Se quant_oggetto è NULL, quantità illimitata
+            if ($stock_result['quant_oggetto'] !== null && $quantity > $stock_result['quant_oggetto']) {
+                throw new Exception("Quantità richiesta ({$quantity}) supera lo stock disponibile ({$stock_result['quant_oggetto']})");
             }
-            $stmt->close();
+
+            $stmt = $conn->prepare("SELECT prezzo_oggetto FROM oggetto WHERE id_oggetto = ?");
         }
+        
 
         // Aggiorna contatore carrello
-        $stmt = $conn->prepare("SELECT SUM(quantita) as total FROM carrello WHERE fk_utente = ?");
+        $stmt = $conn->prepare("SELECT SUM(quantita) as total FROM carrello WHERE fk_utente = ? AND stato = 'attivo'");
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -148,27 +151,51 @@ try {
         }
     }
 
-    // Recupera dati carrello aggiornati usando il TUO get_cart.php
+    // Recupera dati carrello aggiornati usando get_cart.php
     $cart_data = include __DIR__ . '/get_cart.php';
+
+    // Assicurati che i dati siano validi
+    if (!is_array($cart_data)) {
+        $cart_data = [
+            'total_items' => 0,
+            'subtotal' => 0,
+            'total' => 0,
+            'shipping_cost' => 0
+        ];
+    }
 
     echo json_encode([
         'success' => true,
         'message' => $message,
-        'cart_total_items' => $cart_data['total_items'],
-        'cart_subtotal' => number_format($cart_data['subtotal'], 2, ',', '.'),
-        'cart_total' => number_format($cart_data['total'], 2, ',', '.'),
-        'shipping_cost' => number_format($cart_data['shipping_cost'], 2, ',', '.'),
-        'is_shipping_free' => $cart_data['shipping_cost'] == 0
+        'cart_total_items' => $cart_data['total_items'] ?? 0,
+        'cart_subtotal' => number_format($cart_data['subtotal'] ?? 0, 2, ',', '.'),
+        'cart_total' => number_format($cart_data['total'] ?? 0, 2, ',', '.'),
+        'shipping_cost' => number_format($cart_data['shipping_cost'] ?? 0, 2, ',', '.'),
+        'is_shipping_free' => ($cart_data['shipping_cost'] ?? 0) == 0
     ]);
 
 } catch (Exception $e) {
     error_log("Errore in update_cart.php: " . $e->getMessage());
-    echo json_encode([
-        'success' => false,
-        'message' => $e->getMessage()
-    ]);
-}
 
-$conn->close();
-ob_end_flush();
+    // Risposta di errore più dettagliata per debug
+    $error_response = [
+        'success' => false,
+        'message' => 'Si è verificato un errore. Riprova più tardi.'
+    ];
+
+    // Solo in ambiente di sviluppo, mostra l'errore reale
+    if (defined('DEBUG') && DEBUG === true) {
+        $error_response['debug_message'] = $e->getMessage();
+    }
+
+    echo json_encode($error_response);
+} finally {
+    // Chiudi la connessione se ancora aperta
+    if (isset($conn) && $conn instanceof mysqli) {
+        $conn->close();
+    }
+
+    // Pulisci il buffer di output
+    ob_end_flush();
+}
 ?>
