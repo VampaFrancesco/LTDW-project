@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Ago 11, 2025 alle 17:21
+-- Creato il: Ago 22, 2025 alle 18:59
 -- Versione del server: 10.4.32-MariaDB
 -- Versione PHP: 8.2.12
 
@@ -293,7 +293,28 @@ INSERT INTO `immagine` (`id_immagine`, `nome_img`, `descrizione_img`, `dimension
 (103, 'oscuri.png', NULL, NULL, 64, NULL),
 (104, 'proibito.png', NULL, NULL, 65, NULL),
 (105, 'ra.png', NULL, NULL, 66, NULL),
-(106, 'tormentatore.png', NULL, NULL, 67, NULL);
+(106, 'tormentatore.png', NULL, NULL, 67, NULL),
+(107, 'pikachu.png', NULL, NULL, 2, NULL),
+(108, 'caterpie.png', NULL, NULL, 68, NULL),
+(109, 'charmander.png', NULL, NULL, 69, NULL),
+(110, 'squirtle.png', NULL, NULL, 70, NULL),
+(111, 'bulbasaur.png', NULL, NULL, 71, NULL),
+(112, 'eevee.png', NULL, NULL, 72, NULL),
+(113, 'raichu.png', NULL, NULL, 73, NULL),
+(114, 'arcanine.png', NULL, NULL, 74, NULL),
+(115, 'lapras.png', NULL, NULL, 75, NULL),
+(116, 'charizard.png', NULL, NULL, 76, NULL),
+(117, 'gengar.png', NULL, NULL, 77, NULL),
+(118, 'dragonite.png', NULL, NULL, 78, NULL),
+(119, 'mew.png', NULL, NULL, 79, NULL),
+(120, 'lucario.png', NULL, NULL, 80, NULL),
+(121, 'gyarados.png', NULL, NULL, 81, NULL),
+(122, 'mewtwo.png', NULL, NULL, 82, NULL),
+(123, 'rayquaza.png', NULL, NULL, 83, NULL),
+(124, 'darkrai.png', NULL, NULL, 84, NULL),
+(125, 'reshiram.png', NULL, NULL, 85, NULL),
+(126, 'zekrom.png', NULL, NULL, 86, NULL),
+(127, 'giratina.png', NULL, NULL, 87, NULL);
 
 -- --------------------------------------------------------
 
@@ -461,7 +482,27 @@ INSERT INTO `oggetto` (`id_oggetto`, `nome_oggetto`, `desc_oggetto`, `prezzo_ogg
 (64, 'Re Distruggi Memoria', 'Mostro di tipo Demone', NULL, NULL, 1, 5),
 (65, 'Exodia il Proibito', 'Mostro di tipo Incantesimo', NULL, NULL, 1, 6),
 (66, 'Drago Alato di Ra', 'Mostro di tipo Divino-Bestia', NULL, NULL, 1, 6),
-(67, 'Obelisk il Tormentatore', 'Mostro di tipo Divino-Bestia', NULL, NULL, 1, 6);
+(67, 'Obelisk il Tormentatore', 'Mostro di tipo Divino-Bestia', NULL, NULL, 1, 6),
+(68, 'Caterpie', 'Pokémon di tipo Erba', NULL, NULL, 2, 1),
+(69, 'Charmander', 'Pokémon di tipo Fuoco', NULL, NULL, 2, 1),
+(70, 'Squirtle', 'Pokémon di tipo Acqua', NULL, NULL, 2, 1),
+(71, 'Bulbasaur', 'Pokémon di tipo Erba', NULL, NULL, 2, 1),
+(72, 'Eevee', 'Pokémon di tipo Normale', NULL, NULL, 2, 1),
+(73, 'Raichu', 'Pokémon di tipo Elettro', NULL, NULL, 2, 2),
+(74, 'Arcanine', 'Pokémon di tipo Fuoco', NULL, NULL, 2, 2),
+(75, 'Lapras', 'Pokémon di tipo Acqua', NULL, NULL, 2, 2),
+(76, 'Charizard', 'Pokémon di tipo Fuoco', NULL, NULL, 2, 3),
+(77, 'Gengar', 'Pokémon di tipo Spettro', NULL, NULL, 2, 3),
+(78, 'Dragonite', 'Pokémon di tipo Drago', NULL, NULL, 2, 3),
+(79, 'Mew', 'Pokémon di tipo Psico', NULL, NULL, 2, 4),
+(80, 'Lucario', 'Pokémon di tipo Lotta/Acciaio', NULL, NULL, 2, 4),
+(81, 'Gyarados', 'Pokémon di tipo Acqua', NULL, NULL, 2, 4),
+(82, 'Mewtwo', 'Pokémon di tipo Psico', NULL, NULL, 2, 5),
+(83, 'Rayquaza', 'Pokémon di tipo Drago', NULL, NULL, 2, 5),
+(84, 'Darkrai', 'Pokémon di tipo Buio', NULL, NULL, 2, 5),
+(85, 'Reshiram', 'Pokémon di tipo Drago/Fuoco', NULL, NULL, 2, 6),
+(86, 'Zekrom', 'Pokémon di tipo Drago/Elettro', NULL, NULL, 2, 6),
+(87, 'Giratina', 'Pokémon di tipo Spettro/Drago', NULL, NULL, 2, 6);
 
 -- --------------------------------------------------------
 
@@ -481,7 +522,7 @@ CREATE TABLE `oggetto_collezione` (
 
 INSERT INTO `oggetto_collezione` (`fk_oggetto`, `numero_carta`, `valore_stimato`) VALUES
 (1, 'YGO-001', 10.00),
-(2, 'POK-001', 1.00),
+(2, 'PKM-001', 1.00),
 (48, 'YGO-002', 0.50),
 (49, 'YGO-003', 0.60),
 (50, 'YGO-004', 0.40),
@@ -501,7 +542,27 @@ INSERT INTO `oggetto_collezione` (`fk_oggetto`, `numero_carta`, `valore_stimato`
 (64, 'YGO-018', 42.00),
 (65, 'YGO-019', 80.00),
 (66, 'YGO-020', 95.00),
-(67, 'YGO-021', 90.00);
+(67, 'YGO-021', 90.00),
+(68, 'PKM-002', 0.50),
+(69, 'PKM-003', 0.70),
+(70, 'PKM-004', 0.65),
+(71, 'PKM-005', 0.75),
+(72, 'PKM-006', 0.90),
+(73, 'PKM-007', 3.50),
+(74, 'PKM-008', 3.00),
+(75, 'PKM-009', 3.20),
+(76, 'PKM-010', 15.00),
+(77, 'PKM-011', 14.00),
+(78, 'PKM-012', 16.00),
+(79, 'PKM-013', 25.00),
+(80, 'PKM-014', 23.00),
+(81, 'PKM-015', 27.00),
+(82, 'PKM-016', 40.00),
+(83, 'PKM-017', 42.00),
+(84, 'PKM-018', 38.00),
+(85, 'PKM-019', 70.00),
+(86, 'PKM-020', 65.00),
+(87, 'PKM-021', 68.00);
 
 -- --------------------------------------------------------
 
@@ -523,6 +584,7 @@ INSERT INTO `oggetto_utente` (`fk_utente`, `fk_oggetto`, `quantita_ogg`) VALUES
 (1, 1, 6),
 (1, 2, 6),
 (1, 48, 1),
+(1, 85, 1),
 (2, 1, 1),
 (2, 2, 1);
 
@@ -974,7 +1036,7 @@ ALTER TABLE `fattura`
 -- AUTO_INCREMENT per la tabella `immagine`
 --
 ALTER TABLE `immagine`
-  MODIFY `id_immagine` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=107;
+  MODIFY `id_immagine` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=128;
 
 --
 -- AUTO_INCREMENT per la tabella `indirizzo_spedizione`
@@ -992,7 +1054,7 @@ ALTER TABLE `mystery_box`
 -- AUTO_INCREMENT per la tabella `oggetto`
 --
 ALTER TABLE `oggetto`
-  MODIFY `id_oggetto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
+  MODIFY `id_oggetto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
 
 --
 -- AUTO_INCREMENT per la tabella `ordine`
