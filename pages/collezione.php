@@ -175,9 +175,15 @@ foreach ($available_cards as $card_id => $card) {
                                  style="border: 3px solid <?php echo htmlspecialchars($border_color); ?>;">
                                 <?php if ($card['obtained']): ?>
                                     <?php if (!empty($card['image_url'])): ?>
-                                        <img src="<?php echo htmlspecialchars($card['image_url']); ?>"
-                                             alt="<?php echo htmlspecialchars($card['name']); ?>"
-                                             class="card-img-top">
+                                        <div class="card-image-container">
+                                             <img src="<?php echo htmlspecialchars($card['image_url']); ?>"
+                                                  alt="<?php echo htmlspecialchars($card['name']); ?>"
+                                                  class="card-img-top card-zoom-target"
+                                                  data-img-url="<?php echo htmlspecialchars($card['image_url']); ?>">
+                                             <div class="zoom-icon">
+                                                 <i class="bi bi-eye-fill"></i>
+                                             </div>
+                                        </div>
                                     <?php endif; ?>
                                     <div class="card-info">
                                         <h4 class="card-name"><?php echo htmlspecialchars($card['name']); ?></h4>
@@ -230,9 +236,15 @@ foreach ($available_cards as $card_id => $card) {
                                  style="border: 3px solid <?php echo htmlspecialchars($border_color); ?>;">
                                 <?php if ($card['obtained']): ?>
                                     <?php if (!empty($card['image_url'])): ?>
-                                        <img src="<?php echo htmlspecialchars($card['image_url']); ?>"
-                                             alt="<?php echo htmlspecialchars($card['name']); ?>"
-                                             class="card-img-top">
+                                         <div class="card-image-container">
+                                             <img src="<?php echo htmlspecialchars($card['image_url']); ?>"
+                                                  alt="<?php echo htmlspecialchars($card['name']); ?>"
+                                                  class="card-img-top card-zoom-target"
+                                                  data-img-url="<?php echo htmlspecialchars($card['image_url']); ?>">
+                                             <div class="zoom-icon">
+                                                 <i class="bi bi-eye-fill"></i>
+                                             </div>
+                                        </div>
                                     <?php endif; ?>
                                     <div class="card-info">
                                         <h4 class="card-name"><?php echo htmlspecialchars($card['name']); ?></h4>
@@ -291,6 +303,12 @@ foreach ($available_cards as $card_id => $card) {
             </div>
         </div>
     </div>
+    
+    <div id="card-zoom-popup" class="card-zoom-popup">
+        <span class="close-popup">&times;</span>
+        <img id="zoomed-card-image" src="" alt="Carta ingrandita">
+    </div>
+
 </main>
 
 <?php include __DIR__ . '/footer.php'; ?>
@@ -333,5 +351,30 @@ foreach ($available_cards as $card_id => $card) {
                 alert.remove();
             }, 5000);
         }
+
+        // Funzionalità di zoom della carta
+        const zoomTargets = document.querySelectorAll('.card-zoom-target');
+        const popup = document.getElementById('card-zoom-popup');
+        const zoomedImage = document.getElementById('zoomed-card-image');
+        const closeBtn = document.querySelector('.close-popup');
+
+        zoomTargets.forEach(target => {
+            target.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const imageUrl = this.getAttribute('data-img-url');
+                zoomedImage.src = imageUrl;
+                popup.classList.add('active');
+            });
+        });
+
+        closeBtn.addEventListener('click', function () {
+            popup.classList.remove('active');
+        });
+
+        popup.addEventListener('click', function (e) {
+            if (e.target === popup) {
+                popup.classList.remove('active');
+            }
+        });
     });
 </script>

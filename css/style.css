@@ -793,6 +793,131 @@ input.mail_bt::placeholder {
     border: 1px solid #f5c6cb;
 }
 
+/* ===============================
+   MODIFICHE PER AVVICINARE LE SCRITTE NELLA CARD
+   =============================== */
+
+.card-info .card-name {
+    margin-bottom: 5px; /* Riduci lo spazio sotto il nome della carta */
+}
+
+.card-info .card-number {
+    margin-top: 0; /* Rimuovi lo spazio sopra il numero della carta */
+    margin-bottom: 5px; /* Riduci lo spazio sotto il numero */
+}
+
+.card-info .card-value {
+    margin-top: 0; /* Rimuovi lo spazio sopra il valore */
+    margin-bottom: 5px; /* Riduci lo spazio sotto il valore */
+}
+
+.card-info .card-description {
+    margin-top: 0; /* Rimuovi lo spazio sopra la descrizione */
+    margin-bottom: 5px; /* Riduci lo spazio sotto la descrizione */
+}
+
+.card-quantity {
+    margin-top: 5px; /* Aggiungi un piccolo margine per separare la quantità */
+}
+
+/* Assicurati che non ci siano margini extra sulle immagini */
+.card-box .card-img-top {
+    margin-bottom: 5px; /* Riduci lo spazio sotto l'immagine per avvicinare il testo */
+}
+
+/* ===============================
+   STILI PER L'INGRANDIMENTO AL CLICK
+   =============================== */
+
+/* Stili per il popup di ingrandimento della carta */
+.card-zoom-popup {
+    display: none; /* Inizialmente nascosto */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.9);
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+}
+
+.card-zoom-popup.active {
+    display: flex; /* Mostra il popup quando è attivo */
+    opacity: 1;
+}
+
+.card-zoom-popup img {
+    margin: auto;
+    display: block;
+    width: auto; /* La larghezza si adatta al contenitore */
+    height: auto; /* L'altezza si adatta al contenitore */
+    max-width: 90%; /* Limita la larghezza massima al 90% dello schermo */
+    max-height: 90%; /* Limita l'altezza massima al 90% dello schermo */
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.card-zoom-popup.active img {
+    transform: scale(1); /* Effetto di zoom quando il popup è attivo */
+}
+
+.close-popup {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.close-popup:hover,
+.close-popup:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Stili per l'icona di ingrandimento al passaggio del mouse */
+.card-image-container {
+    position: relative; /* Necessario per posizionare l'icona rispetto all'immagine */
+    cursor: pointer; /* Cambia il cursore per indicare la cliccabilità */
+}
+
+.zoom-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centra l'icona */
+    font-size: 3rem; /* Dimensione dell'icona */
+    color: white;
+    border-radius: 50%;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0; /* Inizialmente nascosta */
+    transition: opacity 0.3s ease-in-out;
+    pointer-events: none; /* L'icona non blocca il click sull'immagine sottostante */
+}
+
+/* Mostra l'icona quando il cursore passa sopra il contenitore della card */
+.card-box:hover .zoom-icon {
+    opacity: 1;
+}
+
+/* Oscura leggermente l'immagine al passaggio del mouse per evidenziare l'icona */
+.card-box:hover .card-img-top {
+    filter: brightness(0.8);
+}
 
 
 /* LOGIN CSS*/

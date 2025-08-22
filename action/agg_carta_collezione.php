@@ -140,7 +140,7 @@ try {
             $stmt_insert_card->close();
             $message = 'Carta aggiunta alla collezione con successo! (Quantità: ' . $card_quantity . ')';
         } else {
-            $message = 'Quantità specificata è zero, nessuna azione necessaria.';
+            $message = 'Quantità specificata è zero, nessuna azione necessaria';
         }
     }
     $stmt_check_user_card->close();
