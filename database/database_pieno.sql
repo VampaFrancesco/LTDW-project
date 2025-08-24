@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Ago 22, 2025 alle 18:59
+-- Creato il: Ago 24, 2025 alle 19:14
 -- Versione del server: 10.4.32-MariaDB
 -- Versione PHP: 8.2.12
 
@@ -314,7 +314,25 @@ INSERT INTO `immagine` (`id_immagine`, `nome_img`, `descrizione_img`, `dimension
 (124, 'darkrai.png', NULL, NULL, 84, NULL),
 (125, 'reshiram.png', NULL, NULL, 85, NULL),
 (126, 'zekrom.png', NULL, NULL, 86, NULL),
-(127, 'giratina.png', NULL, NULL, 87, NULL);
+(127, 'giratina.png', NULL, NULL, 87, NULL),
+(128, 'funko_jaden.png', NULL, NULL, 88, NULL),
+(129, 'funko_yubel.png', NULL, NULL, 89, NULL),
+(130, 'funko_alexis.png', NULL, NULL, 90, NULL),
+(131, 'funko_seto.png', NULL, NULL, 91, NULL),
+(132, 'funko_yami.png', NULL, NULL, 92, NULL),
+(133, 'funko_dark.png', NULL, NULL, 93, NULL),
+(134, 'funko_rainbow.png', NULL, NULL, 94, NULL),
+(135, 'funko_cyber.png', NULL, NULL, 95, NULL),
+(136, 'funko_neos.png', NULL, NULL, 96, NULL),
+(137, 'funko_kuribo.png', NULL, NULL, 97, NULL),
+(138, 'funko_harpie.png', NULL, NULL, 98, NULL),
+(139, 'funko_joey.png', NULL, NULL, 99, NULL),
+(140, 'funko_zane.png', NULL, NULL, 100, NULL),
+(141, 'funko_ojama.png', NULL, NULL, 101, NULL),
+(142, 'funko_harpie3.png', NULL, NULL, 102, NULL),
+(143, 'funko_avian.png', NULL, NULL, 103, NULL),
+(144, 'funko_jinzo.png', NULL, NULL, 104, NULL),
+(145, 'funko_harpiepet.png', NULL, NULL, 105, NULL);
 
 -- --------------------------------------------------------
 
@@ -502,7 +520,25 @@ INSERT INTO `oggetto` (`id_oggetto`, `nome_oggetto`, `desc_oggetto`, `prezzo_ogg
 (84, 'Darkrai', 'Pokémon di tipo Buio', NULL, NULL, 2, 5),
 (85, 'Reshiram', 'Pokémon di tipo Drago/Fuoco', NULL, NULL, 2, 6),
 (86, 'Zekrom', 'Pokémon di tipo Drago/Elettro', NULL, NULL, 2, 6),
-(87, 'Giratina', 'Pokémon di tipo Spettro/Drago', NULL, NULL, 2, 6);
+(87, 'Giratina', 'Pokémon di tipo Spettro/Drago', NULL, NULL, 2, 6),
+(88, 'Funko POP: Jaden Yuki', 'Funko Pop da collezione di Jaden Yuki, protagonista di Yu-Gi-Oh! GX, raffigurato con la sua divisa rossa della Duel Academy e lo sguardo deciso da vero duellante. Dimensione: 9,5cm.\r\n', 16.00, 5, 10, NULL),
+(89, 'Funko POP: Yubel', 'Funko Pop da collezione di Yubel, l’enigmatica creatura di Yu-Gi-Oh! GX, raffigurata con dettagli fedeli alle sue forme mostruose e al suo aspetto oscuro. Dimensione: 9,5cm.\r\n', 15.00, 5, 10, NULL),
+(90, 'Funko POP: Alexis Rhodes', 'Funko Pop da collezione di Alexis Rhodes, elegante duellante di Yu-Gi-Oh! GX, rappresentata con la divisa della Duel Academy e il suo atteggiamento sicuro e determinato. Dimensione: 9,5cm.\r\n', 15.00, 5, 10, NULL),
+(91, 'Funko POP: Seto Kaiba', 'Funko Pop da collezione di Seto Kaiba, il geniale e ambizioso duellante di Yu-Gi-Oh!, raffigurato con il suo iconico cappotto blu e lo sguardo fiero da rivale temibile. Dimensione: 9,5cm.\n', 15.50, 5, 10, NULL),
+(92, 'Funko POP: Yami Yugi', 'Funko Pop da collezione di Yami Yugi, il leggendario duellante di Yu-Gi-Oh!, raffigurato con i capelli bicolore iconici, il Puzzle Millenario e lo sguardo deciso da campione. Dimensione: 9,5cm.\r\n', 20.00, 5, 10, NULL),
+(93, 'Funko POP: Dark Magician', 'Funko Pop da collezione di Dark Magician, il potente incantatore di Yu-Gi-Oh!, raffigurato con il suo costume viola e il bastone magico pronto a lanciare incantesimi. Dimensione: 9,5cm.\r\n', 20.00, 5, 10, NULL),
+(94, 'Funko POP: Rainbow Dragon', 'Funko Pop da collezione di Rainbow Dragon, il maestoso drago di Yu-Gi-Oh!, raffigurato con le ali variopinte e il corpo luminoso pronto a incantare ogni collezionista. Dimensione: 9,5cm.\r\n', 35.00, 2, 10, NULL),
+(95, 'Funko POP: Cyber Dragon', 'Funko Pop da collezione di Cyber Dragon, il leggendario drago meccanico di Yu-Gi-Oh!, raffigurato con il corpo argentato e il design futuristico pronto per il duello. Dimensione: 9,5cm.\r\n', 17.00, 4, 10, NULL),
+(96, 'Funko POP: Neos', 'Funko Pop da collezione di Elemental HERO Neos, l’eroe leggendario di Yu-Gi-Oh! GX, raffigurato con la sua armatura bianca e rosa e l’aspetto eroico pronto a combattere. Dimensione: 9,5cm.\r\n', 19.00, 3, 10, NULL),
+(97, 'Funko POP: Kuribo', 'Funko Pop da collezione di Kuriboh, la piccola e adorabile creatura di Yu-Gi-Oh!, raffigurata con il suo corpo marrone peloso e gli occhi grandi e espressivi. Dimensione: 9,5cm.\r\n', 15.00, 5, 10, NULL),
+(98, 'Funko POP: Harpie Lady', 'Funko Pop da collezione di Harpie Lady, l’agile e temibile guerriera alata di Yu-Gi-Oh!, raffigurata con le piume blu e il caratteristico sguardo deciso. Dimensione: 9,5cm.\n', 15.00, 5, 10, NULL),
+(99, 'Funko POP: Joey Wheeler', 'Funko Pop da collezione di Joey Wheeler, il leale e coraggioso duellante di Yu-Gi-Oh!, raffigurato con i capelli biondi, la giacca verde e lo sguardo da vero amico di Yugi. Dimensione: 9,5cm.\n', 15.00, 5, 10, NULL),
+(100, 'Funko POP: Zane Truesdale', 'Funko Pop da collezione di Zane Truesdale, il talentuoso e strategico duellante di Yu-Gi-Oh! GX, raffigurato con la divisa chiara della Duel Academy e lo sguardo concentrato. Dimensione: 9,5cm.\n', 15.00, 5, 10, NULL),
+(101, 'Funko POP: Ojama Yellow', 'Funko Pop da collezione di Ojama Yellow, il buffo e divertente mostriciattolo di Yu-Gi-Oh!, raffigurato con il corpo giallo, le espressioni comiche e il suo caratteristico sorriso. Dimensione: 9,5cm.\r\n', 15.00, 5, 10, NULL),
+(102, 'Funko POP: Harpie Lady 3', 'Funko Pop da collezione di Harpie Lady 3, l’elegante guerriera alata di Yu-Gi-Oh!, raffigurata con le piume viola, il costume caratteristico e lo sguardo determinato da duellante temibile. Dimensione: 9,5cm.\r\n', 23.00, 5, 10, NULL),
+(103, 'Funko POP: Avian', 'Funko Pop da collezione di Avian, il maestoso mostro alato di Yu-Gi-Oh!, raffigurato con le ali spiegate e il corpo verde pronto al duello. Dimensione: 9,5cm.\n', 35.00, 2, 10, NULL),
+(104, 'Funko POP: Jinzo e Time Wizard', 'Funko Pop da collezione di Jinzo, il potente duellante meccanico di Yu-Gi-Oh! e Time Wizard, il piccolo ma potente incantatore di Yu-Gi-Oh!. Dimensione: 9,5cm.', 40.00, 3, 10, NULL),
+(105, 'Funko POP: Harpie\'s Pet Dragon', 'Funko Pop da collezione di Harpie’s Pet Dragon, il drago alato di Yu-Gi-Oh!, raffigurato con le ali, il corpo sinuoso e lo sguardo feroce pronto al duello. Dimensione: 9,5cm.\r\n', 25.00, 5, 10, NULL);
 
 -- --------------------------------------------------------
 
@@ -1036,7 +1072,7 @@ ALTER TABLE `fattura`
 -- AUTO_INCREMENT per la tabella `immagine`
 --
 ALTER TABLE `immagine`
-  MODIFY `id_immagine` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=128;
+  MODIFY `id_immagine` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=146;
 
 --
 -- AUTO_INCREMENT per la tabella `indirizzo_spedizione`
@@ -1054,7 +1090,7 @@ ALTER TABLE `mystery_box`
 -- AUTO_INCREMENT per la tabella `oggetto`
 --
 ALTER TABLE `oggetto`
-  MODIFY `id_oggetto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
+  MODIFY `id_oggetto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=106;
 
 --
 -- AUTO_INCREMENT per la tabella `ordine`
