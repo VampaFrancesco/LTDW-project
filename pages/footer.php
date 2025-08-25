@@ -17,19 +17,14 @@
                 <ul class="list-unstyled">
                     <li><a href="about.php">Chi siamo</a></li>
                     <li><a href="contatti.php">Contatti</a></li>
-                    <li><a href="../partners.php">Partners</a></li>
-                    <li><a href="../eventi.php">Eventi</a></li>
-                    <li><a href="../lavora.php">Lavora con noi</a></li>
                 </ul>
             </div>
             <div class="col-md-3 mb-4">
                 <h6>Assistenza</h6>
                 <ul class="list-unstyled">
-                    <li><a href="../spedizioni.php">Spedizioni</a></li>
-                    <li><a href="../pagamenti.php">Metodi di pagamento</a></li>
-                    <li><a href="../prevendite.php">Prevendite</a></li>
-                    <li><a href="../faq.php">Domande frequenti</a></li>
-                    <li><a href="../resi.php">Resi e rimborsi</a></li>
+                    <li><a href="info_pagamenti.php">Metodi di pagamento</a></li>
+                    <li><a href="domande_frequenti.php">Domande frequenti</a></li>
+                    
                 </ul>
             </div>
         </div>
