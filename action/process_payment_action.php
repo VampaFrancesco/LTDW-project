@@ -133,17 +133,21 @@ try {
 
     // 5. Aggiorna lo stato del carrello a 'completato'
     $stmt = $conn->prepare("
-        UPDATE carrello 
-        SET stato = 'completato' 
-        WHERE fk_utente = ? 
-        AND stato = 'attivo'
-    ");
-    $stmt->bind_param("i", $user_id);
+    UPDATE carrello 
+    SET stato = 'completato',
+        data_ultima_modifica = NOW()
+    WHERE id_carrello = ? 
+    AND fk_utente = ?
+");
+    $stmt->bind_param("ii", $carrello_id, $user_id);
 
     if (!$stmt->execute()) {
         throw new Exception("Errore nell'aggiornamento del carrello");
     }
     $stmt->close();
+
+// 5b. IMPORTANTE: Aggiorna contatore carrello nella sessione
+    SessionManager::set('cart_items_count', 0);
 
     // 6. Crea log dell'ordine
     $stmt = $conn->prepare("

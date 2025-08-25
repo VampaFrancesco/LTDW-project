@@ -1,619 +1,393 @@
 <?php
 /**
- * cart.php - Pagina del carrello con gestione AJAX corretta
- * Compatibile con update_cart.php e get_cart.php
+ * pages/cart.php - Pagina carrello con sistema robusto
  */
 
-// 1. PRIMA di qualsiasi output
 require_once __DIR__.'/../include/session_manager.php';
 require_once __DIR__.'/../include/config.inc.php';
+require_once __DIR__.'/../include/Cart.php';
 
-// 2. Include la logica per recuperare il carrello
-$cart_data = include __DIR__.'/../action/get_cart.php';
+// Inizializza variabili con valori di default sicuri
+$cart_items = [];
+$total_items = 0;
+$subtotal = 0;
+$shipping_cost = 5.00;
+$total = 5.00;
 
-// 3. Include header DOPO aver processato la logica
+// Inizializza carrello con configurazione database
+try {
+    $cart = new Cart($config['dbms']['localhost']);
+    // Ottieni dati carrello
+    $cart_data = $cart->getTotals();
+
+    // Valida e assegna solo se la struttura è corretta
+        $cart_items = $cart_data['items'];
+        $array_prodotti = $cart_items;
+        $total_items = intval($cart_data['total_items'] ?? 0);
+        $subtotal = floatval($cart_data['subtotal'] ?? 0);
+        $shipping_cost = floatval($cart_data['shipping'] ?? 5.00);
+        $total = floatval($cart_data['total'] ?? 5.00);
+} catch (Exception $e) {
+    error_log("Errore inizializzazione carrello: " . $e->getMessage());
+    // I valori di default sono già impostati sopra
+}
+
 include __DIR__.'/header.php';
 ?>
 
-    <main class="background-custom">
-        <div class="container py-5">
-            <h1 class="fashion_taital mb-5">Il tuo Carrello</h1>
+    <div class="container my-5">
+        <h1 class="mb-4">Il Tuo Carrello</h1>
 
-            <!-- Container per alert personalizzati -->
-            <div id="alertContainer"></div>
+        <!-- Alert container per messaggi dinamici -->
+        <div id="alert-container"></div>
 
-            <?php if (empty($cart_data['items'])): ?>
-                <!-- Carrello vuoto -->
-                <div class="empty-cart-container fade-in-up">
-                    <div class="empty-cart-icon">
-                        <i class="bi bi-cart-x"></i>
-                    </div>
-                    <h3>Il tuo carrello è vuoto</h3>
-                    <p>Aggiungi qualche prodotto dal nostro catalogo per iniziare!</p>
-                    <a href="<?php echo BASE_URL; ?>/pages/pokémon.php" class="btn btn-primary btn-lg">
-                        <i class="bi bi-shop"></i> Vai al Catalogo
-                    </a>
-                </div>
-            <?php else: ?>
-                <!-- Carrello con prodotti -->
-                <div class="cart-container fade-in-up">
-                    <div class="row">
-                        <!-- Lista prodotti -->
-                        <div class="col-lg-8">
-                            <div class="cart-items">
-                                <?php foreach ($cart_data['items'] as $item): ?>
-                                    <div class="cart-item" data-item-id="<?php echo htmlspecialchars($item['cart_key']); ?>">
-                                        <div class="cart-item-image">
+        <?php if (empty($array_prodotti)): ?>
+            <!-- Carrello vuoto -->
+            <div class="alert alert-info text-center py-5">
+                <i class="fas fa-shopping-cart fa-3x mb-3 text-muted"></i>
+                <h3>Il tuo carrello è vuoto</h3>
+                <p class="mb-4">Aggiungi alcuni prodotti per iniziare il tuo shopping!</p>
+                <a href="<?php echo BASE_URL; ?>/pages/home_utente.php" class="btn btn-primary btn-lg">
+                    <i class="fas fa-shopping-bag"></i> Vai allo Shop
+                </a>
+            </div>
+
+        <?php else: ?>
+            <!-- Carrello con prodotti -->
+            <div class="row">
+                <!-- Lista prodotti -->
+                <div class="col-lg-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">
+                                <i class="fas fa-shopping-cart"></i>
+                                Prodotti nel carrello (<?php echo count($array_prodotti); ?>)
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <?php foreach ($array_prodotti as $item): ?>
+                                <div class="cart-item border-bottom p-3"
+                                     id="item-<?php echo htmlspecialchars($item['cart_key']); ?>"
+                                     data-price="<?php echo $item['prezzo']; ?>">
+                                    <div class="row align-items-center">
+                                        <!-- Immagine prodotto -->
+                                        <div class="col-md-2 col-3">
                                             <img src="<?php echo htmlspecialchars($item['image']); ?>"
+                                                 class="img-fluid rounded border"
                                                  alt="<?php echo htmlspecialchars($item['nome']); ?>"
+                                                 style="max-height: 80px; object-fit: cover;"
                                                  onerror="this.src='<?php echo BASE_URL; ?>/images/default_product.png'">
                                         </div>
-                                        <div class="cart-item-details">
-                                            <h5 class="cart-item-name"><?php echo htmlspecialchars($item['nome']); ?></h5>
-                                            <p class="cart-item-type">
-                                            <span class="badge bg-<?php echo $item['tipo'] === 'mystery_box' ? 'primary' : 'secondary'; ?>">
-                                                <?php echo $item['tipo'] === 'mystery_box' ? 'Mystery Box' : 'Accessorio'; ?>
-                                            </span>
-                                            </p>
-                                            <div class="cart-item-price">
-                                                €<?php echo number_format($item['prezzo'], 2, ',', '.'); ?>
-                                            </div>
+
+                                        <!-- Dettagli prodotto -->
+                                        <div class="col-md-4 col-9">
+                                            <h6 class="mb-1"><?php echo htmlspecialchars($item['nome']); ?></h6>
+                                            <span class="badge bg-<?php echo $item['tipo'] === 'mystery_box' ? 'primary' : 'secondary'; ?> mb-1">
+                                            <?php echo $item['tipo'] === 'mystery_box' ? 'Mystery Box' : 'Oggetto'; ?>
+                                        </span>
+                                            <br>
+                                            <small class="text-muted">
+                                                Prezzo unitario: €<?php echo number_format($item['prezzo'], 2, ',', '.'); ?>
+                                            </small>
+                                            <?php if ($item['stock_disponibile'] !== null): ?>
+                                                <br>
+                                                <small class="text-warning">
+                                                    Stock: <?php echo $item['stock_disponibile']; ?> disponibili
+                                                </small>
+                                            <?php endif; ?>
                                         </div>
-                                        <div class="cart-item-quantity">
-                                            <label>Quantità:</label>
-                                            <div class="quantity-controls">
-                                                <button type="button" class="btn-quantity"
+
+                                        <!-- Controlli quantità -->
+                                        <div class="col-md-3 col-6">
+                                            <div class="input-group input-group-sm">
+                                                <button class="btn btn-outline-secondary" type="button"
                                                         onclick="updateQuantity('<?php echo htmlspecialchars($item['cart_key']); ?>', -1)">
-                                                    -
+                                                    <i class="fas fa-minus"></i>
                                                 </button>
                                                 <input type="number"
-                                                       value="<?php echo $item['quantita']; ?>"
-                                                       min="1"
-                                                       max="99"
-                                                       class="quantity-input"
-                                                       data-original-value="<?php echo $item['quantita']; ?>"
-                                                       onchange="updateQuantity('<?php echo htmlspecialchars($item['cart_key']); ?>', 0, this.value)">
-                                                <button type="button" class="btn-quantity"
+                                                       id="qty-<?php echo htmlspecialchars($item['cart_key']); ?>"
+                                                       class="form-control text-center quantity-input"
+                                                       value="<?php echo intval($item['quantita']); ?>"
+                                                       min="1" max="99"
+                                                       data-original="<?php echo intval($item['quantita']); ?>"
+                                                       data-key="<?php echo htmlspecialchars($item['cart_key']); ?>"
+                                                       onchange="validateAndUpdateQuantity('<?php echo htmlspecialchars($item['cart_key']); ?>')">
+                                                <button class="btn btn-outline-secondary" type="button"
                                                         onclick="updateQuantity('<?php echo htmlspecialchars($item['cart_key']); ?>', 1)">
-                                                    +
+                                                    <i class="fas fa-plus"></i>
                                                 </button>
                                             </div>
                                         </div>
-                                        <div class="cart-item-total">
-                                            €<?php echo number_format($item['prezzo'] * $item['quantita'], 2, ',', '.'); ?>
-                                        </div>
-                                        <div class="cart-item-remove">
-                                            <button type="button" class="btn-remove"
-                                                    onclick="removeItem('<?php echo htmlspecialchars($item['cart_key']); ?>')">
-                                                <i class="bi bi-trash"></i>
+
+                                        <!-- Totale e rimozione -->
+                                        <div class="col-md-2 col-6 text-end">
+                                            <div class="mb-2">
+                                                <strong class="item-total">
+                                                    €<?php echo number_format($item['totale'], 2, ',', '.'); ?>
+                                                </strong>
+                                            </div>
+                                            <button class="btn btn-sm btn-outline-danger"
+                                                    onclick="removeFromCart('<?php echo htmlspecialchars($item['cart_key']); ?>')"
+                                                    title="Rimuovi prodotto">
+                                                <i class="fas fa-trash"></i>
                                             </button>
                                         </div>
                                     </div>
-                                <?php endforeach; ?>
-                            </div>
+                                </div>
+                            <?php endforeach; ?>
                         </div>
+                    </div>
+                </div>
 
-                        <!-- Riepilogo ordine -->
-                        <div class="col-lg-4">
-                            <div class="cart-summary">
-                                <h4>Riepilogo Ordine</h4>
-                                <div class="summary-item">
-                                    <span>Subtotale (<?php echo $cart_data['total_items']; ?> articoli):</span>
-                                    <span id="cart-subtotal">€<?php echo number_format($cart_data['subtotal'], 2, ',', '.'); ?></span>
-                                </div>
-                                <div class="summary-item">
-                                    <span>Spedizione:</span>
-                                    <span id="shipping-cost">
-                                    <?php if($cart_data['subtotal'] >= 50): ?>
-                                        <span class="text-success">GRATIS</span>
-                                    <?php else: ?>
-                                        €<?php echo number_format($cart_data['shipping_cost'], 2, ',', '.'); ?>
-                                    <?php endif; ?>
-                                </span>
-                                </div>
-                                <?php if($cart_data['subtotal'] < 50): ?>
-                                    <div class="free-shipping-notice">
-                                        <i class="bi bi-info-circle"></i>
-                                        Spendi ancora €<?php echo number_format(50 - $cart_data['subtotal'], 2, ',', '.'); ?>
-                                        per la spedizione gratuita!
-                                    </div>
+                <!-- Riepilogo ordine -->
+                <div class="col-lg-4">
+                    <div class="card shadow-sm sticky-top" style="top: 20px;">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">
+                                <i class="fas fa-calculator"></i> Riepilogo Ordine
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotale:</span>
+                                <span id="cart-subtotal">€<?php echo number_format($subtotal, 2, ',', '.'); ?></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Spedizione:</span>
+                                <span id="cart-shipping" class="<?php echo $shipping_cost == 0 ? 'text-success' : ''; ?>">
+                                <?php if ($shipping_cost == 0): ?>
+                                    <strong>GRATIS</strong>
+                                <?php else: ?>
+                                    €<?php echo number_format($shipping_cost, 2, ',', '.'); ?>
                                 <?php endif; ?>
-                                <hr>
-                                <div class="summary-total">
-                                    <strong>Totale:</strong>
-                                    <strong id="cart-total">€<?php echo number_format($cart_data['total'], 2, ',', '.'); ?></strong>
+                            </span>
+                            </div>
+
+                            <?php if ($subtotal < 50 && $subtotal > 0): ?>
+                                <div class="alert alert-info py-2 small" id="free-shipping-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    Spendi altri €<span id="amount-for-free-shipping"><?php echo number_format(50 - $subtotal, 2, ',', '.'); ?></span>
+                                    per la spedizione gratuita!
                                 </div>
-                                <button type="button" class="btn btn-primary btn-lg w-100 mt-3"
-                                        onclick="proceedToCheckout()">
-                                    <i class="bi bi-lock-fill"></i> Procedi al Checkout
-                                </button>
-                                <a href="<?php echo BASE_URL; ?>/pages/pokémon.php" class="btn btn-outline-secondary w-100 mt-2">
-                                    Continua lo Shopping
+                            <?php endif; ?>
+
+                            <hr>
+
+                            <div class="d-flex justify-content-between mb-3">
+                                <strong>Totale:</strong>
+                                <strong id="cart-total">€<?php echo number_format($total, 2, ',', '.'); ?></strong>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <a href="<?php echo BASE_URL; ?>/action/checkout_action.php"
+                                   class="btn btn-success btn-lg">
+                                    <i class="fas fa-credit-card"></i> Procedi al Checkout
+                                </a>
+                                <a href="<?php echo BASE_URL; ?>/pages/home_utente.php"
+                                   class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left"></i> Continua Shopping
                                 </a>
                             </div>
                         </div>
                     </div>
                 </div>
-            <?php endif; ?>
-        </div>
-    </main>
+            </div>
+        <?php endif; ?>
+    </div>
 
-    <!-- Stili CSS -->
-    <style>
-        .cart-container {
-            margin-top: 20px;
-        }
-
-        .cart-item {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-
-        .cart-item:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-        }
-
-        .cart-item-image {
-            width: 100px;
-            height: 100px;
-            flex-shrink: 0;
-        }
-
-        .cart-item-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-
-        .cart-item-details {
-            flex: 1;
-        }
-
-        .cart-item-name {
-            margin: 0 0 10px 0;
-            font-size: 1.1rem;
-        }
-
-        .cart-item-price {
-            font-size: 1.2rem;
-            color: #28a745;
-            font-weight: 600;
-        }
-
-        .cart-item-quantity {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .btn-quantity {
-            width: 35px;
-            height: 35px;
-            border: 1px solid #ddd;
-            background: white;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-quantity:hover {
-            background: #f8f9fa;
-            border-color: #007bff;
-        }
-
-        .quantity-input {
-            width: 60px;
-            text-align: center;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 5px;
-        }
-
-        .cart-item-total {
-            font-size: 1.3rem;
-            font-weight: bold;
-            min-width: 100px;
-            text-align: right;
-        }
-
-        .btn-remove {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-remove:hover {
-            background: #c82333;
-        }
-
-        .cart-summary {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 20px;
-        }
-
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
-
-        .summary-total {
-            display: flex;
-            justify-content: space-between;
-            font-size: 1.3rem;
-            margin-top: 15px;
-        }
-
-        .free-shipping-notice {
-            background: #fff3cd;
-            color: #856404;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 15px 0;
-            font-size: 0.9rem;
-        }
-
-        .empty-cart-container {
-            text-align: center;
-            padding: 60px 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .empty-cart-icon {
-            font-size: 5rem;
-            color: #dee2e6;
-            margin-bottom: 20px;
-        }
-
-        /* Alert personalizzati */
-        .alert-custom {
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            position: relative;
-            animation: slideIn 0.3s ease;
-        }
-
-        .alert-custom-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-custom-danger {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .alert-custom-warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .fade-in-up {
-            animation: fadeInUp 0.5s ease;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .cart-item {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .cart-item-total {
-                text-align: center;
-                margin: 10px 0;
-            }
-
-            .cart-summary {
-                margin-top: 30px;
-                position: static;
-            }
-        }
-    </style>
-
-    <!-- JavaScript -->
+    <!-- JavaScript per gestire il carrello -->
     <script>
         // Funzione per mostrare alert personalizzati
-        function showCustomAlert(message, type = 'success', duration = 3000) {
-            const alertContainer = document.getElementById('alertContainer');
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.getElementById('alert-container');
             const alertDiv = document.createElement('div');
-            alertDiv.className = `alert-custom alert-custom-${type}`;
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
             alertDiv.innerHTML = `
-            <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-triangle' : 'info-circle'}"></i>
-            ${message}
-        `;
-
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
             alertContainer.appendChild(alertDiv);
 
+            // Auto-remove dopo 5 secondi
             setTimeout(() => {
-                alertDiv.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => alertDiv.remove(), 300);
-            }, duration);
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
         }
 
-        // Funzione per aggiornare la quantità
-        function updateQuantity(itemKey, change, directValue = null) {
-            console.log('updateQuantity chiamata:', { itemKey, change, directValue });
+        // Aggiorna quantità con bottoni + e -
+        function updateQuantity(itemKey, delta) {
+            const qtyInput = document.getElementById('qty-' + itemKey);
+            if (!qtyInput) return;
 
-            const cartItem = document.querySelector(`[data-item-id="${itemKey}"]`);
-            const input = cartItem?.querySelector('.quantity-input');
+            let currentQty = parseInt(qtyInput.value) || 1;
+            let newQty = currentQty + delta;
 
-            if (!input) {
-                console.error('Input non trovato per:', itemKey);
-                return;
+            if (newQty < 1) newQty = 1;
+            if (newQty > 99) newQty = 99;
+
+            if (newQty === currentQty) return;
+
+            qtyInput.value = newQty;
+            performQuantityUpdate(itemKey, newQty);
+        }
+
+        // Valida e aggiorna quantità quando utente modifica input direttamente
+        function validateAndUpdateQuantity(itemKey) {
+            const qtyInput = document.getElementById('qty-' + itemKey);
+            if (!qtyInput) return;
+
+            let newQty = parseInt(qtyInput.value) || 1;
+
+            if (newQty < 1) newQty = 1;
+            if (newQty > 99) newQty = 99;
+
+            qtyInput.value = newQty;
+
+            // Controlla se è cambiata rispetto al valore originale
+            const originalQty = parseInt(qtyInput.getAttribute('data-original'));
+            if (newQty !== originalQty) {
+                performQuantityUpdate(itemKey, newQty);
             }
+        }
 
-            let quantity;
-            if (directValue !== null) {
-                quantity = parseInt(directValue);
-            } else {
-                quantity = parseInt(input.value) + change;
-            }
+        // Esegui aggiornamento quantità via AJAX
+        function performQuantityUpdate(itemKey, newQty) {
+            const qtyInput = document.getElementById('qty-' + itemKey);
+            const cartItem = document.getElementById('item-' + itemKey);
 
-            // Validazione quantità
-            if (quantity < 1) {
-                showCustomAlert('La quantità minima è 1', 'warning');
-                quantity = 1;
-            }
-            if (quantity > 99) {
-                showCustomAlert('La quantità massima è 99', 'warning');
-                quantity = 99;
-            }
+            // Disabilita input durante aggiornamento
+            qtyInput.disabled = true;
+            if (cartItem) cartItem.style.opacity = '0.6';
 
-            // Aggiorna visualmente l'input
-            input.value = quantity;
-
-            // Feedback visivo
-            if (cartItem) {
-                cartItem.style.opacity = '0.6';
-            }
-
-            // Chiamata AJAX
-            const formData = new FormData();
-            formData.append('action', 'update');
-            formData.append('item_key', itemKey);
-            formData.append('quantity', quantity);
-
-            fetch('<?php echo BASE_URL; ?>/action/update_cart.php', {
+            fetch('<?php echo BASE_URL; ?>/action/cart_ajax.php', {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `action=update&item_key=${encodeURIComponent(itemKey)}&quantity=${newQty}`
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.text();
-                })
-                .then(text => {
-                    console.log('Response raw:', text);
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('Quantità aggiornata!', 'success');
 
-                    // Prova a parsare come JSON
-                    try {
-                        const data = JSON.parse(text);
-                        console.log('Parsed data:', data);
+                        // Aggiorna valore originale
+                        qtyInput.setAttribute('data-original', newQty);
 
-                        if (data.success) {
-                            // Aggiorna UI
-                            updateCartUI(data);
-                            showCustomAlert('Quantità aggiornata!', 'success');
+                        // Aggiorna totali
+                        updateCartTotals(data.totals);
 
-                            // Salva il nuovo valore come originale
-                            input.setAttribute('data-original-value', quantity);
-                        } else {
-                            throw new Error(data.message || 'Errore sconosciuto');
+                        // Aggiorna totale riga
+                        const itemPrice = parseFloat(cartItem.getAttribute('data-price'));
+                        const itemTotal = cartItem.querySelector('.item-total');
+                        if (itemTotal) {
+                            itemTotal.textContent = '€' + (itemPrice * newQty).toFixed(2).replace('.', ',');
                         }
-                    } catch (e) {
-                        console.error('Parse error:', e);
-                        // Se il response contiene HTML di errore PHP
-                        if (text.includes('Fatal error') || text.includes('Warning')) {
-                            console.error('PHP Error:', text);
-                            throw new Error('Errore del server');
-                        } else {
-                            throw e;
-                        }
+                    } else {
+                        throw new Error(data.message || 'Errore nell\'aggiornamento');
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    showCustomAlert('Errore: ' + error.message, 'danger');
-
+                    console.error('Errore:', error);
+                    showAlert('Errore: ' + error.message, 'danger');
                     // Ripristina valore originale
-                    const originalValue = input.getAttribute('data-original-value');
-                    if (originalValue) {
-                        input.value = originalValue;
-                    }
+                    qtyInput.value = qtyInput.getAttribute('data-original');
                 })
                 .finally(() => {
-                    // Ripristina opacità
-                    if (cartItem) {
-                        cartItem.style.opacity = '1';
-                    }
+                    qtyInput.disabled = false;
+                    if (cartItem) cartItem.style.opacity = '1';
                 });
         }
 
-        // Funzione per rimuovere un item
-        function removeItem(itemKey) {
-            const cartItem = document.querySelector(`[data-item-id="${itemKey}"]`);
-            const itemName = cartItem?.querySelector('.cart-item-name')?.textContent || 'questo articolo';
-
-            if (!confirm(`Sei sicuro di voler rimuovere "${itemName}" dal carrello?`)) {
+        // Rimuovi prodotto dal carrello
+        function removeFromCart(itemKey) {
+            if (!confirm('Sei sicuro di voler rimuovere questo prodotto dal carrello?')) {
                 return;
             }
 
-            // Animazione rimozione
-            if (cartItem) {
-                cartItem.style.opacity = '0.3';
-                cartItem.style.transform = 'translateX(-20px)';
-            }
+            const cartItem = document.getElementById('item-' + itemKey);
+            if (cartItem) cartItem.style.opacity = '0.5';
 
-            const formData = new FormData();
-            formData.append('action', 'remove');
-            formData.append('item_key', itemKey);
-
-            fetch('<?php echo BASE_URL; ?>/action/update_cart.php', {
+            fetch('<?php echo BASE_URL; ?>/action/cart_ajax.php', {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `action=remove&item_key=${encodeURIComponent(itemKey)}`
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.text();
-                })
-                .then(text => {
-                    console.log('Remove response:', text);
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('Prodotto rimosso dal carrello', 'success');
 
-                    try {
-                        const data = JSON.parse(text);
-
-                        if (data.success) {
-                            showCustomAlert('Prodotto rimosso dal carrello', 'success');
-
-                            // Rimuovi elemento con animazione
-                            if (cartItem) {
-                                cartItem.style.transition = 'all 0.3s ease';
-                                cartItem.style.transform = 'translateX(-100%)';
-                                cartItem.style.opacity = '0';
-                                setTimeout(() => {
-                                    cartItem.remove();
-
-                                    // Se il carrello è vuoto, ricarica la pagina
-                                    if (document.querySelectorAll('.cart-item').length === 0) {
-                                        location.reload();
-                                    } else {
-                                        // Aggiorna UI
-                                        updateCartUI(data);
-                                    }
-                                }, 300);
-                            }
-                        } else {
-                            throw new Error(data.message || 'Errore nella rimozione');
+                        // Rimuovi elemento dal DOM
+                        if (cartItem) {
+                            cartItem.remove();
                         }
-                    } catch (e) {
-                        console.error('Parse error:', e);
-                        throw new Error('Errore del server');
+
+                        // Aggiorna totali
+                        updateCartTotals(data.totals);
+
+                        // Se carrello vuoto, ricarica pagina
+                        if (data.totals.total_items === 0) {
+                            setTimeout(() => location.reload(), 1000);
+                        }
+                    } else {
+                        throw new Error(data.message || 'Errore nella rimozione');
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    showCustomAlert('Errore: ' + error.message, 'danger');
-
-                    // Ripristina visualizzazione
-                    if (cartItem) {
-                        cartItem.style.opacity = '1';
-                        cartItem.style.transform = '';
-                    }
+                    console.error('Errore:', error);
+                    showAlert('Errore: ' + error.message, 'danger');
+                    if (cartItem) cartItem.style.opacity = '1';
                 });
         }
 
-        // Funzione per aggiornare l'UI del carrello
-        function updateCartUI(data) {
+        // Aggiorna totali carrello nel DOM
+        function updateCartTotals(totals) {
             // Aggiorna subtotale
             const subtotalEl = document.getElementById('cart-subtotal');
             if (subtotalEl) {
-                subtotalEl.textContent = '€' + data.cart_subtotal;
+                subtotalEl.textContent = '€' + totals.subtotal.toFixed(2).replace('.', ',');
             }
 
             // Aggiorna spedizione
-            const shippingEl = document.getElementById('shipping-cost');
+            const shippingEl = document.getElementById('cart-shipping');
             if (shippingEl) {
-                if (data.is_shipping_free) {
-                    shippingEl.innerHTML = '<span class="text-success">GRATIS</span>';
+                if (totals.shipping === 0) {
+                    shippingEl.innerHTML = '<strong>GRATIS</strong>';
+                    shippingEl.className = 'text-success';
                 } else {
-                    shippingEl.textContent = '€' + data.shipping_cost;
+                    shippingEl.textContent = '€' + totals.shipping.toFixed(2).replace('.', ',');
+                    shippingEl.className = '';
                 }
             }
 
             // Aggiorna totale
             const totalEl = document.getElementById('cart-total');
             if (totalEl) {
-                totalEl.textContent = '€' + data.cart_total;
+                totalEl.textContent = '€' + totals.total.toFixed(2).replace('.', ',');
             }
 
-            // Aggiorna contatore nel header se esiste
-            const cartCountEl = document.querySelector('.cart-count');
-            if (cartCountEl) {
-                cartCountEl.textContent = data.cart_total_items;
+            // Aggiorna info spedizione gratuita
+            const freeShippingInfo = document.getElementById('free-shipping-info');
+            const amountForFreeShipping = document.getElementById('amount-for-free-shipping');
+
+            if (totals.subtotal < 50 && totals.subtotal > 0) {
+                const remaining = 50 - totals.subtotal;
+                if (amountForFreeShipping) {
+                    amountForFreeShipping.textContent = remaining.toFixed(2).replace('.', ',');
+                }
+                if (freeShippingInfo) {
+                    freeShippingInfo.style.display = 'block';
+                }
+            } else if (freeShippingInfo) {
+                freeShippingInfo.style.display = 'none';
             }
         }
-
-        // Funzione per procedere al checkout
-        function proceedToCheckout() {
-            window.location.href = '<?php echo BASE_URL; ?>/action/checkout_action.php';
-        }
-
-        // Inizializzazione al caricamento della pagina
-        document.addEventListener('DOMContentLoaded', function() {
-            // Aggiungi animazioni
-            const cartItems = document.querySelectorAll('.cart-item');
-            cartItems.forEach((item, index) => {
-                item.style.animationDelay = `${index * 0.1}s`;
-                item.classList.add('fade-in-up');
-            });
-
-            // Gestione input quantità con Enter
-            const quantityInputs = document.querySelectorAll('.quantity-input');
-            quantityInputs.forEach(input => {
-                input.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const itemKey = this.closest('.cart-item').dataset.itemId;
-                        updateQuantity(itemKey, 0, this.value);
-                    }
-                });
-            });
-        });
     </script>
 
 <?php include __DIR__.'/footer.php'; ?>

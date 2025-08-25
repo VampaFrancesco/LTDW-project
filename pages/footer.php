@@ -48,4 +48,5 @@
 <script src="/LTDW-project/js/custom.js" defer></script>
 <script src="/LTDW-project/js/register.js" defer></script>
 <script src="/LTDW-project/js/session_manager.js" defer></script>
+<script src="/js/cart.js" defer></script>
 
