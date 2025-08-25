@@ -213,14 +213,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     
                     <div style="margin-bottom: 20px;">
-                        <label for="email" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">Email *</label>
+                        <label for="email" 
+                            style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">
+                            Email *
+                        </label>
                         <input type="email" 
-                               id="email" 
-                               name="email" 
-                               value="<?php echo htmlspecialchars($userData['email']); ?>" 
-                               required
-                               style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 5px; font-size: 16px;">
+                            id="email" 
+                            name="email" 
+                            value="<?php echo htmlspecialchars($userData['email']); ?>" 
+                            required
+                            style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 5px; font-size: 16px; box-sizing: border-box; overflow: hidden; text-overflow: ellipsis;">
                     </div>
+
                     
                     <div style="margin-bottom: 30px;">
                         <label for="telefono" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">Telefono</label>
