@@ -63,4 +63,8 @@ include __DIR__ . '/header.php';
         </div>
     </div>
 </div>
-     </main>
+</main>
+<?php 
+include __DIR__ . '/footer.php';
+?>
+

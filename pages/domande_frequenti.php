@@ -184,3 +184,7 @@ include __DIR__ . '/header.php';
     </script>
 </body>
 </html>
+
+<?php 
+include __DIR__ . '/footer.php';
+?>
