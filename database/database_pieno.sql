@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Ago 24, 2025 alle 19:14
+-- Creato il: Ago 27, 2025 alle 19:57
 -- Versione del server: 10.4.32-MariaDB
 -- Versione PHP: 8.2.12
 
@@ -409,9 +409,40 @@ INSERT INTO `mystery_box` (`id_box`, `nome_box`, `desc_box`, `prezzo_box`, `quan
 --
 
 CREATE TABLE `novita_box` (
-  `fk_box` int(11) NOT NULL,
-  `data_novita` datetime NOT NULL DEFAULT current_timestamp()
+  `fk_mystery_box` int(11) NOT NULL,
+  `data_novita` datetime NOT NULL,
+  `desc_novita` varchar(100) DEFAULT NULL,
+  `sconto_novita` decimal(10,0) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `novita_oggetto`
+--
+
+CREATE TABLE `novita_oggetto` (
+  `fk_oggetto` int(11) NOT NULL,
+  `novita_data` datetime NOT NULL,
+  `novita_desc` varchar(100) DEFAULT NULL,
+  `novita_sconto` decimal(10,0) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dump dei dati per la tabella `novita_oggetto`
+--
+
+INSERT INTO `novita_oggetto` (`fk_oggetto`, `novita_data`, `novita_desc`, `novita_sconto`) VALUES
+(30, '2025-08-27 16:28:49', NULL, 50),
+(32, '2025-08-27 18:07:50', NULL, 75),
+(34, '2025-08-27 18:12:16', NULL, 12),
+(36, '2025-08-27 18:12:16', NULL, 3),
+(38, '2025-08-27 18:13:03', NULL, 30),
+(39, '2025-08-27 16:25:49', NULL, 10),
+(90, '2025-08-27 16:28:24', NULL, 20),
+(93, '2025-08-27 18:57:54', 'Uno dei più ricercati!', NULL),
+(97, '2025-08-27 18:29:50', NULL, 1),
+(103, '2025-08-27 16:27:34', NULL, 5);
 
 -- --------------------------------------------------------
 
@@ -942,7 +973,13 @@ ALTER TABLE `mystery_box`
 -- Indici per le tabelle `novita_box`
 --
 ALTER TABLE `novita_box`
-  ADD PRIMARY KEY (`fk_box`);
+  ADD PRIMARY KEY (`fk_mystery_box`);
+
+--
+-- Indici per le tabelle `novita_oggetto`
+--
+ALTER TABLE `novita_oggetto`
+  ADD PRIMARY KEY (`fk_oggetto`);
 
 --
 -- Indici per le tabelle `oggetto`
@@ -1042,7 +1079,7 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT per la tabella `carrello`
 --
 ALTER TABLE `carrello`
-  MODIFY `id_carrello` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_carrello` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT per la tabella `carrello_salvato`
@@ -1212,7 +1249,13 @@ ALTER TABLE `mystery_box`
 -- Limiti per la tabella `novita_box`
 --
 ALTER TABLE `novita_box`
-  ADD CONSTRAINT `fk_box_novita_box` FOREIGN KEY (`fk_box`) REFERENCES `mystery_box` (`id_box`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_mystery_box_novita_box` FOREIGN KEY (`fk_mystery_box`) REFERENCES `mystery_box` (`id_box`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Limiti per la tabella `novita_oggetto`
+--
+ALTER TABLE `novita_oggetto`
+  ADD CONSTRAINT `fk_oggetto_novita_oggetto` FOREIGN KEY (`fk_oggetto`) REFERENCES `oggetto` (`id_oggetto`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Limiti per la tabella `oggetto`
