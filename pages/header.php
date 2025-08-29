@@ -105,6 +105,13 @@ if ($flash_message) {
                                         <i class="bi bi-collection"></i> La mia Collezione
                                     </a>
                                 </li>
+                                <!-- Scambio carte -->
+                                <li>
+                                    <a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/scambio.php">
+                                        <i class="bi bi-arrow-left-right"></i> Scambio
+                                    </a>
+                                </li>
+
 
                                 <?php if (!$isAdmin): ?>
                                     <!-- Ordini solo per utenti normali -->
