@@ -22,6 +22,11 @@ require_once __DIR__.'/../../include/config.inc.php';
             </a>
         </li>
         <li class="nav-item">
+            <a  href="<?php echo  BASE_URL; ?>/pages/scambio.php">
+                <i class="bi bi-arrow-left-right"></i> Scambio
+           </a>
+        </li>
+        <li class="nav-item">
             <a href="<?php echo BASE_URL; ?>/pages/ordini.php">
                 <i class="bi bi-clock-history"></i><span>Ordini</span>
             </a>
