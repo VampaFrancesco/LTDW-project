@@ -31,7 +31,7 @@ SessionManager::remove('login_form_data');
     <link rel="icon" href="<?php echo BASE_URL; ?>/images/favicon.ico" type="image/gif"/>
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/style.css">
 </head>
-<body>
+
 <main class="background-custom">
     <div class="login-container">
         <div class="text-center mb-4">

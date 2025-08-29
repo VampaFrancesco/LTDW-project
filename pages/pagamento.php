@@ -90,7 +90,7 @@ $conn->close();
 if (empty($indirizzi)) {
     SessionManager::setFlashMessage('Devi aggiungere un indirizzo di spedizione prima di completare l\'ordine.', 'warning');
     SessionManager::set('redirect_after_address', BASE_URL . '/pages/pagamento.php');
-    header('Location: ' . BASE_URL . '/pages/gestione_indirizzi.php');
+    header('Location: ' . BASE_URL . '/pages/aggiungi_indirizzo.php');
     exit();
 }
 

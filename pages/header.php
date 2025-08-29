@@ -18,11 +18,12 @@ if ($flash_message) {
     <title>Box Omnia</title>
 
     <!-- CSS -->
+    <link rel="stylesheet" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/css/style.css">
     <link rel="stylesheet" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="icon" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/images/favicon.ico" type="image/gif"/>
-    <link rel="stylesheet" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/css/style.css">
+
 
 </head>
 <body>
@@ -36,7 +37,7 @@ if ($flash_message) {
 
 <?php if (empty($hideNav)): ?>
     <header>
-        <div class="header-top bg-light py-2 background-custom">
+        <div class="header-top py-2 background-header" >
             <div class="container d-flex align-items-center">
 
                 <!-- 1) Logo a sinistra -->

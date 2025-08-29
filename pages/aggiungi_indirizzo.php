@@ -67,8 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($errors)) {
         try {
             $stmt = $pdo->prepare("
-                INSERT INTO indirizzo_spedizione (fk_utente, via, civico, cap, citta, provincia, nazione, created_at)
-                VALUES (:fk_utente, :via, :civico, :cap, :citta, :provincia, :nazione, NOW())
+                INSERT INTO indirizzo_spedizione (fk_utente, via, civico, cap, citta, provincia, nazione)
+                VALUES (:fk_utente, :via, :civico, :cap, :citta, :provincia, :nazione)
             ");
             $stmt->execute([
                 ':fk_utente' => $userId,

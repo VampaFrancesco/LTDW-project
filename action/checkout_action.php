@@ -94,7 +94,7 @@ if ($indirizzi_result->num_rows === 0) {
     SessionManager::set('redirect_after_address', BASE_URL . '/pages/pagamento.php');
     $stmt->close();
     $conn->close();
-    header('Location: ' . BASE_URL . '/pages/gestione_indirizzi.php');
+    header('Location: ' . BASE_URL . '/pages/aggiungi_indirizzo.php');
     exit();
 }
 
