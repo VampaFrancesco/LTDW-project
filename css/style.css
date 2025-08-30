@@ -247,12 +247,12 @@ img {
     font-size: 0.875rem;
     font-weight: 500;
     padding: 10px 14px;
-    border-radius: 12px;
+    border-radius: 10px;
     background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(5px);
     border: 1px solid var(--glass-border);
     transition: all var(--transition-speed) ease;
     min-width: 90px;
+    border-color: #3f51b5;
 }
 
 .nav-item a i {
@@ -275,12 +275,11 @@ img {
     left: 50%;
     transform: translateX(-50%);
     background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(15px);
     box-shadow: var(--shadow-heavy);
     list-style: none;
     padding: 15px;
     margin: 0;
-    margin-top: 10px;
+    margin-top: 0px;
     min-width: 180px;
     border-radius: var(--border-radius);
     border: 1px solid var(--glass-border);
@@ -368,8 +367,8 @@ img {
 
 /* POKEBALL ICON */
     .pokeball {
-        width: 40px;
-        height: 40px;
+        width: 35px;
+        height: 35px;
         background-color: white;
         border: 2px solid black;
         border-radius: 50%;
