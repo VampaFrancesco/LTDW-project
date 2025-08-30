@@ -2,7 +2,6 @@
 include __DIR__ . '/header.php';
 ?>
 
-<body>
     <main class="background-custom">
         <div class="container">
             
@@ -182,8 +181,7 @@ include __DIR__ . '/header.php';
             }
         });
     </script>
-</body>
-</html>
+
 
 <?php 
 include __DIR__ . '/footer.php';

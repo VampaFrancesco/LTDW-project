@@ -90,7 +90,7 @@ if ($flash_message) {
                                     <!-- Menu UTENTE NORMALE: Profilo invece di Dashboard -->
                                     <li>
                                         <a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/home_utente.php">
-                                            <i class="bi bi-house"></i> Dashboard
+                                            <i class="bi bi-house"></i> <?php echo SessionManager::isLoggedIn() ? 'Home Page' : 'Dashboard'; ?>
                                         </a>
                                     </li>
                                     <li>

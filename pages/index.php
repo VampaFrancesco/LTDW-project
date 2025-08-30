@@ -6,7 +6,6 @@ require_once __DIR__.'/../include/config.inc.php';
 
 // Controlla autenticazione PRIMA di qualsiasi output HTML
 SessionManager::requireLogin();
-
 // SOLO DOPO il controllo auth, includi header.php
 include 'header.php';
 ?>
