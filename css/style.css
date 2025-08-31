@@ -426,24 +426,39 @@ img {
 
 /* YUGIOH CARD ICON */
 .yugioh-card-icon {
-    display: inline-block;
-    width: 25px;
-    height: 35px;
-    background: linear-gradient(135deg, #d1b672, #f4e4bc);
-    border: 2px solid var(--primary-color);
-    border-radius: 3px;
-    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Proporzioni ufficiali Yu-Gi-Oh! (ratio ~0.714) */
+    width: 28px;
+    height: 39px;
+
+    /* Usa immagine del dorso */
+    background: url('../images/dorso_yugioh.png') no-repeat center center;
+    background-size: cover;
+
+    /* Bordo sottile per staccare l’icona dallo sfondo */
+    border: 1px solid #333;
+    border-radius: 2px;
+
+    /* Effetti visivi */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
     overflow: hidden;
-    box-shadow: var(--shadow-light);
-    transition: all var(--transition-speed) ease;
-    margin-right: 8px;
+    transition: all var(--transition-speed, 0.3s) ease;
+
+    margin: 0 auto;
     vertical-align: middle;
+    position: relative;
 }
 
+/* Hover */
 .nav-link:hover .yugioh-card-icon {
-    transform: rotate(360deg) scale(1.1);
-    box-shadow: var(--shadow-heavy);
+    transform: scale(1.1);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.35);
 }
+
+
 
 /* CARDS AND BOXES */
 .box-main {
