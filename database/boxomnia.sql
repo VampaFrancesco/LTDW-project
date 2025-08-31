@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Creato il: Ago 27, 2025 alle 19:57
--- Versione del server: 10.4.32-MariaDB
--- Versione PHP: 8.2.12
+-- Host: localhost:8889
+-- Creato il: Ago 31, 2025 alle 14:05
+-- Versione del server: 8.0.40
+-- Versione PHP: 8.3.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -62,11 +62,11 @@ DELIMITER ;
 --
 
 CREATE TABLE `admin` (
-  `id_admin` int(11) NOT NULL,
-  `fk_utente` int(11) NOT NULL,
-  `livello_admin` varchar(50) NOT NULL DEFAULT 'admin',
-  `data_creazione` datetime NOT NULL DEFAULT current_timestamp(),
-  `creato_da` int(11) DEFAULT NULL
+  `id_admin` int NOT NULL,
+  `fk_utente` int NOT NULL,
+  `livello_admin` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'admin',
+  `data_creazione` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `creato_da` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -84,11 +84,11 @@ INSERT INTO `admin` (`id_admin`, `fk_utente`, `livello_admin`, `data_creazione`,
 --
 
 CREATE TABLE `box_oggetto` (
-  `fk_box` int(11) NOT NULL,
-  `fk_oggetto` int(11) NOT NULL,
+  `fk_box` int NOT NULL,
+  `fk_oggetto` int NOT NULL,
   `probabilita` float NOT NULL,
-  `quantita_min` int(11) NOT NULL DEFAULT 1,
-  `quantita_max` int(11) NOT NULL DEFAULT 1
+  `quantita_min` int NOT NULL DEFAULT '1',
+  `quantita_max` int NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -105,16 +105,25 @@ INSERT INTO `box_oggetto` (`fk_box`, `fk_oggetto`, `probabilita`, `quantita_min`
 --
 
 CREATE TABLE `carrello` (
-  `id_carrello` int(11) NOT NULL,
-  `totale` decimal(10,2) NOT NULL DEFAULT 0.00,
-  `fk_utente` int(11) NOT NULL,
-  `data_creazione` datetime NOT NULL DEFAULT current_timestamp(),
-  `data_ultima_modifica` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `quantita` bigint(20) NOT NULL,
-  `stato` enum('attivo','checkout','completato','abbandonato') DEFAULT 'attivo',
-  `fk_mystery_box` int(11) DEFAULT NULL,
-  `fk_oggetto` int(11) DEFAULT NULL
+  `id_carrello` int NOT NULL,
+  `totale` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `fk_utente` int NOT NULL,
+  `data_creazione` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `data_ultima_modifica` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `quantita` bigint NOT NULL,
+  `stato` enum('attivo','checkout','completato','abbandonato') COLLATE utf8mb4_unicode_ci DEFAULT 'attivo',
+  `fk_mystery_box` int DEFAULT NULL,
+  `fk_oggetto` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dump dei dati per la tabella `carrello`
+--
+
+INSERT INTO `carrello` (`id_carrello`, `totale`, `fk_utente`, `data_creazione`, `data_ultima_modifica`, `quantita`, `stato`, `fk_mystery_box`, `fk_oggetto`) VALUES
+(19, 15.00, 1, '2025-08-28 18:33:37', '2025-08-28 18:33:43', 1, 'completato', NULL, 29),
+(20, 15.50, 1, '2025-08-28 18:34:34', '2025-08-28 18:34:39', 1, 'completato', NULL, 28),
+(22, 15.00, 1, '2025-08-30 00:22:47', '2025-08-30 00:23:55', 1, 'completato', NULL, 29);
 
 --
 -- Trigger `carrello`
@@ -133,12 +142,12 @@ DELIMITER ;
 --
 
 CREATE TABLE `carrello_salvato` (
-  `id_salvato` int(11) NOT NULL,
-  `fk_utente` int(11) NOT NULL,
-  `fk_mystery_box` int(11) DEFAULT NULL,
-  `fk_oggetto` int(11) DEFAULT NULL,
-  `quantita` int(11) NOT NULL DEFAULT 1,
-  `data_aggiunta` datetime DEFAULT current_timestamp()
+  `id_salvato` int NOT NULL,
+  `fk_utente` int NOT NULL,
+  `fk_mystery_box` int DEFAULT NULL,
+  `fk_oggetto` int DEFAULT NULL,
+  `quantita` int NOT NULL DEFAULT '1',
+  `data_aggiunta` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -148,9 +157,9 @@ CREATE TABLE `carrello_salvato` (
 --
 
 CREATE TABLE `carrello_utente` (
-  `fk_carrello` int(11) NOT NULL,
-  `fk_utente` int(11) NOT NULL,
-  `quantita` int(11) NOT NULL DEFAULT 1
+  `fk_carrello` int NOT NULL,
+  `fk_utente` int NOT NULL,
+  `quantita` int NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -160,9 +169,9 @@ CREATE TABLE `carrello_utente` (
 --
 
 CREATE TABLE `categoria_oggetto` (
-  `id_categoria` int(11) NOT NULL,
-  `nome_categoria` varchar(50) NOT NULL,
-  `tipo_oggetto` varchar(100) NOT NULL
+  `id_categoria` int NOT NULL,
+  `nome_categoria` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tipo_oggetto` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -189,10 +198,10 @@ INSERT INTO `categoria_oggetto` (`id_categoria`, `nome_categoria`, `tipo_oggetto
 --
 
 CREATE TABLE `classifica` (
-  `id_classifica` int(11) NOT NULL,
-  `nome_classifica` varchar(100) NOT NULL,
-  `tipo_classifica` varchar(50) NOT NULL,
-  `desc_classifica` text NOT NULL
+  `id_classifica` int NOT NULL,
+  `nome_classifica` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tipo_classifica` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `desc_classifica` text COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -202,11 +211,11 @@ CREATE TABLE `classifica` (
 --
 
 CREATE TABLE `fattura` (
-  `id_fattura` int(11) NOT NULL,
-  `tipo` varchar(100) NOT NULL,
+  `id_fattura` int NOT NULL,
+  `tipo` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `totale_fattura` decimal(10,2) NOT NULL,
   `data_emissione` datetime NOT NULL,
-  `fk_utente` int(11) NOT NULL
+  `fk_utente` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -216,12 +225,12 @@ CREATE TABLE `fattura` (
 --
 
 CREATE TABLE `immagine` (
-  `id_immagine` int(11) NOT NULL,
-  `nome_img` varchar(100) DEFAULT NULL,
-  `descrizione_img` varchar(100) DEFAULT NULL,
-  `dimensione` int(11) DEFAULT NULL,
-  `fk_oggetto` int(11) DEFAULT NULL,
-  `fk_mystery_box` int(11) DEFAULT NULL
+  `id_immagine` int NOT NULL,
+  `nome_img` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `descrizione_img` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dimensione` int DEFAULT NULL,
+  `fk_oggetto` int DEFAULT NULL,
+  `fk_mystery_box` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -341,14 +350,14 @@ INSERT INTO `immagine` (`id_immagine`, `nome_img`, `descrizione_img`, `dimension
 --
 
 CREATE TABLE `indirizzo_spedizione` (
-  `id_indirizzo` int(11) NOT NULL,
-  `via` varchar(100) NOT NULL,
-  `civico` bigint(20) NOT NULL,
-  `cap` bigint(20) NOT NULL,
-  `citta` varchar(100) NOT NULL,
-  `nazione` varchar(100) NOT NULL,
-  `provincia` varchar(100) NOT NULL,
-  `fk_utente` int(11) NOT NULL
+  `id_indirizzo` int NOT NULL,
+  `via` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `civico` bigint NOT NULL,
+  `cap` bigint NOT NULL,
+  `citta` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nazione` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `provincia` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fk_utente` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -365,9 +374,9 @@ INSERT INTO `indirizzo_spedizione` (`id_indirizzo`, `via`, `civico`, `cap`, `cit
 --
 
 CREATE TABLE `info_ordine` (
-  `fk_ordine` int(11) NOT NULL,
-  `fk_box` int(11) NOT NULL,
-  `quantita_ordine` int(11) NOT NULL,
+  `fk_ordine` int NOT NULL,
+  `fk_box` int NOT NULL,
+  `quantita_ordine` int NOT NULL,
   `totale_ordine` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -386,13 +395,13 @@ INSERT INTO `info_ordine` (`fk_ordine`, `fk_box`, `quantita_ordine`, `totale_ord
 --
 
 CREATE TABLE `mystery_box` (
-  `id_box` int(11) NOT NULL,
-  `nome_box` varchar(100) NOT NULL,
-  `desc_box` text NOT NULL,
+  `id_box` int NOT NULL,
+  `nome_box` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `desc_box` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `prezzo_box` decimal(10,2) NOT NULL,
-  `quantita_box` int(11) NOT NULL,
-  `fk_rarita` int(11) NOT NULL,
-  `fk_categoria_oggetto` int(11) NOT NULL
+  `quantita_box` int NOT NULL,
+  `fk_rarita` int NOT NULL,
+  `fk_categoria_oggetto` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -409,10 +418,11 @@ INSERT INTO `mystery_box` (`id_box`, `nome_box`, `desc_box`, `prezzo_box`, `quan
 --
 
 CREATE TABLE `novita_box` (
-  `fk_mystery_box` int(11) NOT NULL,
+  `fk_mystery_box` int NOT NULL,
   `data_novita` datetime NOT NULL,
-  `desc_novita` varchar(100) DEFAULT NULL,
-  `sconto_novita` decimal(10,0) DEFAULT NULL
+  `desc_novita` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sconto_novita` decimal(10,0) DEFAULT NULL,
+  `fine_novita` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -422,27 +432,28 @@ CREATE TABLE `novita_box` (
 --
 
 CREATE TABLE `novita_oggetto` (
-  `fk_oggetto` int(11) NOT NULL,
+  `fk_oggetto` int NOT NULL,
   `novita_data` datetime NOT NULL,
-  `novita_desc` varchar(100) DEFAULT NULL,
-  `novita_sconto` decimal(10,0) DEFAULT NULL
+  `novita_desc` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `novita_sconto` decimal(10,0) DEFAULT NULL,
+  `novita_fine` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dump dei dati per la tabella `novita_oggetto`
 --
 
-INSERT INTO `novita_oggetto` (`fk_oggetto`, `novita_data`, `novita_desc`, `novita_sconto`) VALUES
-(30, '2025-08-27 16:28:49', NULL, 50),
-(32, '2025-08-27 18:07:50', NULL, 75),
-(34, '2025-08-27 18:12:16', NULL, 12),
-(36, '2025-08-27 18:12:16', NULL, 3),
-(38, '2025-08-27 18:13:03', NULL, 30),
-(39, '2025-08-27 16:25:49', NULL, 10),
-(90, '2025-08-27 16:28:24', NULL, 20),
-(93, '2025-08-27 18:57:54', 'Uno dei più ricercati!', NULL),
-(97, '2025-08-27 18:29:50', NULL, 1),
-(103, '2025-08-27 16:27:34', NULL, 5);
+INSERT INTO `novita_oggetto` (`fk_oggetto`, `novita_data`, `novita_desc`, `novita_sconto`, `novita_fine`) VALUES
+(30, '2025-08-27 16:28:49', NULL, 50, '2025-09-01 16:04:40'),
+(32, '2025-08-27 18:07:50', NULL, 75, NULL),
+(34, '2025-08-27 18:12:16', NULL, 12, NULL),
+(36, '2025-08-27 18:12:16', NULL, 3, NULL),
+(38, '2025-08-27 18:13:03', NULL, 30, NULL),
+(39, '2025-08-27 16:25:49', NULL, 10, NULL),
+(90, '2025-08-27 16:28:24', NULL, 20, NULL),
+(93, '2025-08-27 18:57:54', 'Uno dei più ricercati!', NULL, NULL),
+(97, '2025-08-27 18:29:50', NULL, 1, NULL),
+(103, '2025-08-27 16:27:34', NULL, 5, NULL);
 
 -- --------------------------------------------------------
 
@@ -451,13 +462,13 @@ INSERT INTO `novita_oggetto` (`fk_oggetto`, `novita_data`, `novita_desc`, `novit
 --
 
 CREATE TABLE `oggetto` (
-  `id_oggetto` int(11) NOT NULL,
-  `nome_oggetto` varchar(100) NOT NULL,
-  `desc_oggetto` text NOT NULL,
+  `id_oggetto` int NOT NULL,
+  `nome_oggetto` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `desc_oggetto` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `prezzo_oggetto` decimal(10,2) DEFAULT NULL,
-  `quant_oggetto` int(11) DEFAULT NULL,
-  `fk_categoria_oggetto` int(11) NOT NULL,
-  `fk_rarita` int(11) DEFAULT NULL
+  `quant_oggetto` int DEFAULT NULL,
+  `fk_categoria_oggetto` int NOT NULL,
+  `fk_rarita` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -578,8 +589,8 @@ INSERT INTO `oggetto` (`id_oggetto`, `nome_oggetto`, `desc_oggetto`, `prezzo_ogg
 --
 
 CREATE TABLE `oggetto_collezione` (
-  `fk_oggetto` int(11) NOT NULL,
-  `numero_carta` varchar(100) NOT NULL,
+  `fk_oggetto` int NOT NULL,
+  `numero_carta` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `valore_stimato` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -638,9 +649,9 @@ INSERT INTO `oggetto_collezione` (`fk_oggetto`, `numero_carta`, `valore_stimato`
 --
 
 CREATE TABLE `oggetto_utente` (
-  `fk_utente` int(11) NOT NULL,
-  `fk_oggetto` int(11) NOT NULL,
-  `quantita_ogg` int(11) NOT NULL DEFAULT 1
+  `fk_utente` int NOT NULL,
+  `fk_oggetto` int NOT NULL,
+  `quantita_ogg` int NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -652,8 +663,9 @@ INSERT INTO `oggetto_utente` (`fk_utente`, `fk_oggetto`, `quantita_ogg`) VALUES
 (1, 2, 6),
 (1, 48, 1),
 (1, 85, 1),
-(2, 1, 1),
-(2, 2, 1);
+(7, 1, 4),
+(7, 2, 1),
+(7, 53, 1);
 
 -- --------------------------------------------------------
 
@@ -662,13 +674,13 @@ INSERT INTO `oggetto_utente` (`fk_utente`, `fk_oggetto`, `quantita_ogg`) VALUES
 --
 
 CREATE TABLE `ordine` (
-  `id_ordine` int(11) NOT NULL,
-  `data_ordine` datetime NOT NULL DEFAULT current_timestamp(),
-  `tracking` varchar(100) DEFAULT NULL,
+  `id_ordine` int NOT NULL,
+  `data_ordine` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `tracking` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `stato_ordine` tinyint(1) NOT NULL,
-  `fk_utente` int(11) NOT NULL,
-  `fk_indirizzo` int(11) NOT NULL,
-  `fk_carrello` int(11) DEFAULT NULL
+  `fk_utente` int NOT NULL,
+  `fk_indirizzo` int NOT NULL,
+  `fk_carrello` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -677,7 +689,10 @@ CREATE TABLE `ordine` (
 
 INSERT INTO `ordine` (`id_ordine`, `data_ordine`, `tracking`, `stato_ordine`, `fk_utente`, `fk_indirizzo`, `fk_carrello`) VALUES
 (2, '2025-08-10 17:45:30', 'ciaoèiltrackingquesto', 2, 1, 1, NULL),
-(3, '2025-08-10 17:56:37', '-', 4, 1, 1, NULL);
+(3, '2025-08-10 17:56:37', '-', 4, 1, 1, NULL),
+(4, '2025-08-28 18:33:43', NULL, 0, 1, 1, 19),
+(5, '2025-08-28 18:34:39', 'mamt', 1, 1, 1, 20),
+(6, '2025-08-30 00:23:55', NULL, 0, 1, 1, 22);
 
 -- --------------------------------------------------------
 
@@ -686,13 +701,13 @@ INSERT INTO `ordine` (`id_ordine`, `data_ordine`, `tracking`, `stato_ordine`, `f
 --
 
 CREATE TABLE `ordine_log` (
-  `id_log` int(11) NOT NULL,
-  `fk_ordine` int(11) NOT NULL,
+  `id_log` int NOT NULL,
+  `fk_ordine` int NOT NULL,
   `stato_precedente` tinyint(1) DEFAULT NULL,
   `stato_nuovo` tinyint(1) NOT NULL,
-  `note` text DEFAULT NULL,
-  `modificato_da` int(11) DEFAULT NULL,
-  `data_modifica` datetime DEFAULT current_timestamp()
+  `note` text COLLATE utf8mb4_unicode_ci,
+  `modificato_da` int DEFAULT NULL,
+  `data_modifica` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -702,7 +717,11 @@ CREATE TABLE `ordine_log` (
 INSERT INTO `ordine_log` (`id_log`, `fk_ordine`, `stato_precedente`, `stato_nuovo`, `note`, `modificato_da`, `data_modifica`) VALUES
 (1, 2, 0, 1, '', NULL, '2025-08-10 17:46:50'),
 (2, 2, 1, 2, '', NULL, '2025-08-10 17:54:40'),
-(3, 3, 0, 4, '', NULL, '2025-08-10 17:57:30');
+(3, 3, 0, 4, '', NULL, '2025-08-10 17:57:30'),
+(4, 4, NULL, 0, 'Ordine creato', NULL, '2025-08-28 18:33:43'),
+(5, 5, NULL, 0, 'Ordine creato', NULL, '2025-08-28 18:34:39'),
+(6, 5, 0, 1, '', NULL, '2025-08-30 00:05:35'),
+(7, 6, NULL, 0, 'Ordine creato', NULL, '2025-08-30 00:23:55');
 
 -- --------------------------------------------------------
 
@@ -711,10 +730,10 @@ INSERT INTO `ordine_log` (`id_log`, `fk_ordine`, `stato_precedente`, `stato_nuov
 --
 
 CREATE TABLE `punti_utente` (
-  `id_punti` int(11) NOT NULL,
-  `punti` int(11) NOT NULL DEFAULT 0,
-  `livello` int(11) NOT NULL DEFAULT 0,
-  `fk_utente` int(11) NOT NULL
+  `id_punti` int NOT NULL,
+  `punti` int NOT NULL DEFAULT '0',
+  `livello` int NOT NULL DEFAULT '0',
+  `fk_utente` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -724,10 +743,10 @@ CREATE TABLE `punti_utente` (
 --
 
 CREATE TABLE `rarita` (
-  `id_rarita` int(11) NOT NULL,
-  `nome_rarita` varchar(100) NOT NULL,
-  `colore` varchar(100) DEFAULT NULL,
-  `ordine` int(11) DEFAULT NULL,
+  `id_rarita` int NOT NULL,
+  `nome_rarita` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `colore` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ordine` int DEFAULT NULL,
   `probabilita` float DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -750,11 +769,21 @@ INSERT INTO `rarita` (`id_rarita`, `nome_rarita`, `colore`, `ordine`, `probabili
 --
 
 CREATE TABLE `scambio` (
-  `id_scambio` int(11) NOT NULL,
-  `data_scambio` datetime NOT NULL DEFAULT current_timestamp(),
-  `stato_scambio` varchar(50) NOT NULL,
-  `fk_utente` int(11) NOT NULL
+  `id_scambio` int NOT NULL,
+  `data_scambio` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `stato_scambio` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fk_utente` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dump dei dati per la tabella `scambio`
+--
+
+INSERT INTO `scambio` (`id_scambio`, `data_scambio`, `stato_scambio`, `fk_utente`) VALUES
+(1, '2025-08-31 10:39:19', 'completato', 2),
+(2, '2025-08-30 01:20:31', 'completato', 2),
+(3, '2025-08-31 10:39:24', 'completato', 2),
+(4, '2025-08-30 01:20:17', 'completato', 2);
 
 -- --------------------------------------------------------
 
@@ -763,11 +792,21 @@ CREATE TABLE `scambio` (
 --
 
 CREATE TABLE `scambio_oggetto` (
-  `fk_scambio` int(11) NOT NULL,
-  `fk_oggetto` int(11) NOT NULL,
+  `fk_scambio` int NOT NULL,
+  `fk_oggetto` int NOT NULL,
   `da_utente` tinyint(1) NOT NULL,
-  `quantita_scambio` int(11) NOT NULL DEFAULT 1
+  `quantita_scambio` int NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dump dei dati per la tabella `scambio_oggetto`
+--
+
+INSERT INTO `scambio_oggetto` (`fk_scambio`, `fk_oggetto`, `da_utente`, `quantita_scambio`) VALUES
+(1, 2, 1, 1),
+(2, 1, 1, 1),
+(3, 1, 1, 1),
+(4, 1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -776,9 +815,9 @@ CREATE TABLE `scambio_oggetto` (
 --
 
 CREATE TABLE `titolo` (
-  `id_titolo` int(11) NOT NULL,
-  `nome_titolo` varchar(100) NOT NULL,
-  `descrizione_titolo` text NOT NULL
+  `id_titolo` int NOT NULL,
+  `nome_titolo` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descrizione_titolo` text COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -788,8 +827,8 @@ CREATE TABLE `titolo` (
 --
 
 CREATE TABLE `titolo_utente` (
-  `fk_titolo` int(11) NOT NULL,
-  `fk_utente` int(11) NOT NULL
+  `fk_titolo` int NOT NULL,
+  `fk_utente` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -799,12 +838,12 @@ CREATE TABLE `titolo_utente` (
 --
 
 CREATE TABLE `utente` (
-  `id_utente` int(11) NOT NULL,
-  `nome` varchar(100) NOT NULL,
-  `cognome` varchar(100) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `telefono` varchar(20) DEFAULT NULL,
-  `password` varchar(100) NOT NULL
+  `id_utente` int NOT NULL,
+  `nome` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cognome` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `telefono` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `password` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -814,7 +853,8 @@ CREATE TABLE `utente` (
 INSERT INTO `utente` (`id_utente`, `nome`, `cognome`, `email`, `telefono`, `password`) VALUES
 (1, 'Davide', 'Blasioli', 'db@gmail.com', NULL, '$2y$10$GcEqvT2f6DNgRx39AKAfxOZhHVhPsHfu827tVcun2E7DT38XL4H4K'),
 (2, 'Francesco', 'Vampa', 'fv@boxomnia.it', NULL, '$2y$10$NXPIRLr5x50X6Do73ySyNuX/JkeMiGkfM2r24MPkovCvCV64WfRWi'),
-(6, 'Admin', 'Box Omnia', 'admin@boxomnia.it', NULL, '$2y$10$GcEqvT2f6DNgRx39AKAfxOZhHVhPsHfu827tVcun2E7DT38XL4H4K');
+(6, 'Admin', 'Box Omnia', 'admin@boxomnia.it', NULL, '$2y$10$GcEqvT2f6DNgRx39AKAfxOZhHVhPsHfu827tVcun2E7DT38XL4H4K'),
+(7, 'Francesco', 'Vampa', 'fv@gmail.com', NULL, '$2y$10$jnyMvJzqLNgYpDiTsjS30uKgnlxjevXomBIgSzv88BdmkTMacuk2e');
 
 -- --------------------------------------------------------
 
@@ -823,17 +863,17 @@ INSERT INTO `utente` (`id_utente`, `nome`, `cognome`, `email`, `telefono`, `pass
 -- (Vedi sotto per la vista effettiva)
 --
 CREATE TABLE `vista_ordini_completi` (
-`id_ordine` int(11)
+`id_ordine` int
 ,`data_ordine` datetime
 ,`tracking` varchar(100)
 ,`stato_ordine` tinyint(1)
 ,`stato_nome` varchar(15)
-,`id_utente` int(11)
+,`id_utente` int
 ,`cliente_nome` varchar(201)
 ,`cliente_email` varchar(100)
 ,`cliente_telefono` varchar(20)
 ,`totale_ordine` decimal(10,2)
-,`quantita_articoli` bigint(20)
+,`quantita_articoli` bigint
 ,`stato_carrello` enum('attivo','checkout','completato','abbandonato')
 ,`indirizzo_completo` varchar(351)
 ,`nazione` varchar(100)
@@ -846,15 +886,29 @@ CREATE TABLE `vista_ordini_completi` (
 -- (Vedi sotto per la vista effettiva)
 --
 CREATE TABLE `vista_statistiche_dashboard` (
-`utenti_totali` bigint(21)
-,`ordini_oggi` bigint(21)
-,`ordini_in_elaborazione` bigint(21)
+`utenti_totali` bigint
+,`ordini_oggi` bigint
+,`ordini_in_elaborazione` bigint
 ,`fatturato_mese` decimal(32,2)
-,`carrelli_attivi` bigint(21)
+,`carrelli_attivi` bigint
 ,`valore_carrelli_attivi` decimal(32,2)
-,`mystery_box_disponibili` bigint(21)
-,`oggetti_disponibili` bigint(21)
+,`mystery_box_disponibili` bigint
+,`oggetti_disponibili` bigint
 );
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `wishlist`
+--
+
+CREATE TABLE `wishlist` (
+  `id_wishlist` int NOT NULL,
+  `fk_utente` int NOT NULL,
+  `fk_oggetto` int DEFAULT NULL,
+  `fk_box` int DEFAULT NULL,
+  `data_aggiunta` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -863,7 +917,7 @@ CREATE TABLE `vista_statistiche_dashboard` (
 --
 DROP TABLE IF EXISTS `vista_ordini_completi`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_ordini_completi`  AS SELECT `o`.`id_ordine` AS `id_ordine`, `o`.`data_ordine` AS `data_ordine`, `o`.`tracking` AS `tracking`, `o`.`stato_ordine` AS `stato_ordine`, CASE WHEN `o`.`stato_ordine` = 0 THEN 'In elaborazione' WHEN `o`.`stato_ordine` = 1 THEN 'Spedito' WHEN `o`.`stato_ordine` = 2 THEN 'Consegnato' WHEN `o`.`stato_ordine` = 3 THEN 'Annullato' WHEN `o`.`stato_ordine` = 4 THEN 'Rimborsato' ELSE 'Sconosciuto' END AS `stato_nome`, `u`.`id_utente` AS `id_utente`, concat(`u`.`nome`,' ',`u`.`cognome`) AS `cliente_nome`, `u`.`email` AS `cliente_email`, `u`.`telefono` AS `cliente_telefono`, `c`.`totale` AS `totale_ordine`, `c`.`quantita` AS `quantita_articoli`, `c`.`stato` AS `stato_carrello`, concat('Via ',`i`.`via`,' ',`i`.`civico`,', ',`i`.`cap`,' ',`i`.`citta`,' (',`i`.`provincia`,')') AS `indirizzo_completo`, `i`.`nazione` AS `nazione` FROM (((`ordine` `o` join `utente` `u` on(`o`.`fk_utente` = `u`.`id_utente`)) left join `carrello` `c` on(`o`.`fk_carrello` = `c`.`id_carrello`)) join `indirizzo_spedizione` `i` on(`o`.`fk_indirizzo` = `i`.`id_indirizzo`)) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_ordini_completi`  AS SELECT `o`.`id_ordine` AS `id_ordine`, `o`.`data_ordine` AS `data_ordine`, `o`.`tracking` AS `tracking`, `o`.`stato_ordine` AS `stato_ordine`, (case when (`o`.`stato_ordine` = 0) then 'In elaborazione' when (`o`.`stato_ordine` = 1) then 'Spedito' when (`o`.`stato_ordine` = 2) then 'Consegnato' when (`o`.`stato_ordine` = 3) then 'Annullato' when (`o`.`stato_ordine` = 4) then 'Rimborsato' else 'Sconosciuto' end) AS `stato_nome`, `u`.`id_utente` AS `id_utente`, concat(`u`.`nome`,' ',`u`.`cognome`) AS `cliente_nome`, `u`.`email` AS `cliente_email`, `u`.`telefono` AS `cliente_telefono`, `c`.`totale` AS `totale_ordine`, `c`.`quantita` AS `quantita_articoli`, `c`.`stato` AS `stato_carrello`, concat('Via ',`i`.`via`,' ',`i`.`civico`,', ',`i`.`cap`,' ',`i`.`citta`,' (',`i`.`provincia`,')') AS `indirizzo_completo`, `i`.`nazione` AS `nazione` FROM (((`ordine` `o` join `utente` `u` on((`o`.`fk_utente` = `u`.`id_utente`))) left join `carrello` `c` on((`o`.`fk_carrello` = `c`.`id_carrello`))) join `indirizzo_spedizione` `i` on((`o`.`fk_indirizzo` = `i`.`id_indirizzo`))) ;
 
 -- --------------------------------------------------------
 
@@ -872,7 +926,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `vista_statistiche_dashboard`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_statistiche_dashboard`  AS SELECT (select count(0) from `utente`) AS `utenti_totali`, (select count(0) from `ordine` where cast(`ordine`.`data_ordine` as date) = curdate()) AS `ordini_oggi`, (select count(0) from `ordine` where `ordine`.`stato_ordine` = 0) AS `ordini_in_elaborazione`, (select ifnull(sum(`c`.`totale`),0) from (`ordine` `o` left join `carrello` `c` on(`o`.`fk_carrello` = `c`.`id_carrello`)) where date_format(`o`.`data_ordine`,'%Y-%m') = date_format(current_timestamp(),'%Y-%m')) AS `fatturato_mese`, (select count(0) from `carrello` where `carrello`.`stato` = 'attivo') AS `carrelli_attivi`, (select ifnull(sum(`carrello`.`totale`),0) from `carrello` where `carrello`.`stato` = 'attivo') AS `valore_carrelli_attivi`, (select count(0) from `mystery_box` where `mystery_box`.`quantita_box` > 0) AS `mystery_box_disponibili`, (select count(0) from `oggetto` where `oggetto`.`quant_oggetto` > 0 or `oggetto`.`quant_oggetto` is null) AS `oggetti_disponibili` ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_statistiche_dashboard`  AS SELECT (select count(0) from `utente`) AS `utenti_totali`, (select count(0) from `ordine` where (cast(`ordine`.`data_ordine` as date) = curdate())) AS `ordini_oggi`, (select count(0) from `ordine` where (`ordine`.`stato_ordine` = 0)) AS `ordini_in_elaborazione`, (select ifnull(sum(`c`.`totale`),0) from (`ordine` `o` left join `carrello` `c` on((`o`.`fk_carrello` = `c`.`id_carrello`))) where (date_format(`o`.`data_ordine`,'%Y-%m') = date_format(now(),'%Y-%m'))) AS `fatturato_mese`, (select count(0) from `carrello` where (`carrello`.`stato` = 'attivo')) AS `carrelli_attivi`, (select ifnull(sum(`carrello`.`totale`),0) from `carrello` where (`carrello`.`stato` = 'attivo')) AS `valore_carrelli_attivi`, (select count(0) from `mystery_box` where (`mystery_box`.`quantita_box` > 0)) AS `mystery_box_disponibili`, (select count(0) from `oggetto` where ((`oggetto`.`quant_oggetto` > 0) or (`oggetto`.`quant_oggetto` is null))) AS `oggetti_disponibili` ;
 
 --
 -- Indici per le tabelle scaricate
@@ -1066,6 +1120,16 @@ ALTER TABLE `utente`
   ADD PRIMARY KEY (`id_utente`);
 
 --
+-- Indici per le tabelle `wishlist`
+--
+ALTER TABLE `wishlist`
+  ADD PRIMARY KEY (`id_wishlist`),
+  ADD UNIQUE KEY `unique_user_item` (`fk_utente`,`fk_oggetto`,`fk_box`),
+  ADD KEY `fk_utente` (`fk_utente`),
+  ADD KEY `fk_oggetto` (`fk_oggetto`),
+  ADD KEY `fk_box` (`fk_box`);
+
+--
 -- AUTO_INCREMENT per le tabelle scaricate
 --
 
@@ -1073,103 +1137,109 @@ ALTER TABLE `utente`
 -- AUTO_INCREMENT per la tabella `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `id_admin` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_admin` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT per la tabella `carrello`
 --
 ALTER TABLE `carrello`
-  MODIFY `id_carrello` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id_carrello` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT per la tabella `carrello_salvato`
 --
 ALTER TABLE `carrello_salvato`
-  MODIFY `id_salvato` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_salvato` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT per la tabella `categoria_oggetto`
 --
 ALTER TABLE `categoria_oggetto`
-  MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id_categoria` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT per la tabella `classifica`
 --
 ALTER TABLE `classifica`
-  MODIFY `id_classifica` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_classifica` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT per la tabella `fattura`
 --
 ALTER TABLE `fattura`
-  MODIFY `id_fattura` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_fattura` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT per la tabella `immagine`
 --
 ALTER TABLE `immagine`
-  MODIFY `id_immagine` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=146;
+  MODIFY `id_immagine` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=146;
 
 --
 -- AUTO_INCREMENT per la tabella `indirizzo_spedizione`
 --
 ALTER TABLE `indirizzo_spedizione`
-  MODIFY `id_indirizzo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_indirizzo` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT per la tabella `mystery_box`
 --
 ALTER TABLE `mystery_box`
-  MODIFY `id_box` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_box` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT per la tabella `oggetto`
 --
 ALTER TABLE `oggetto`
-  MODIFY `id_oggetto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=106;
+  MODIFY `id_oggetto` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=106;
 
 --
 -- AUTO_INCREMENT per la tabella `ordine`
 --
 ALTER TABLE `ordine`
-  MODIFY `id_ordine` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_ordine` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT per la tabella `ordine_log`
 --
 ALTER TABLE `ordine_log`
-  MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_log` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT per la tabella `punti_utente`
 --
 ALTER TABLE `punti_utente`
-  MODIFY `id_punti` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_punti` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT per la tabella `rarita`
 --
 ALTER TABLE `rarita`
-  MODIFY `id_rarita` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_rarita` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT per la tabella `scambio`
 --
 ALTER TABLE `scambio`
-  MODIFY `id_scambio` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_scambio` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT per la tabella `titolo`
 --
 ALTER TABLE `titolo`
-  MODIFY `id_titolo` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_titolo` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT per la tabella `utente`
 --
 ALTER TABLE `utente`
-  MODIFY `id_utente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_utente` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT per la tabella `wishlist`
+--
+ALTER TABLE `wishlist`
+  MODIFY `id_wishlist` int NOT NULL AUTO_INCREMENT;
 
 --
 -- Limiti per le tabelle scaricate
@@ -1317,6 +1387,14 @@ ALTER TABLE `scambio_oggetto`
 ALTER TABLE `titolo_utente`
   ADD CONSTRAINT `fk_titolo_titolo_utente` FOREIGN KEY (`fk_titolo`) REFERENCES `titolo` (`id_titolo`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_utente_titolo_utente` FOREIGN KEY (`fk_utente`) REFERENCES `utente` (`id_utente`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Limiti per la tabella `wishlist`
+--
+ALTER TABLE `wishlist`
+  ADD CONSTRAINT `wishlist_ibfk_1` FOREIGN KEY (`fk_utente`) REFERENCES `utente` (`id_utente`) ON DELETE CASCADE,
+  ADD CONSTRAINT `wishlist_ibfk_2` FOREIGN KEY (`fk_oggetto`) REFERENCES `oggetto` (`id_oggetto`) ON DELETE CASCADE,
+  ADD CONSTRAINT `wishlist_ibfk_3` FOREIGN KEY (`fk_box`) REFERENCES `mystery_box` (`id_box`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
