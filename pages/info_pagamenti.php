@@ -31,7 +31,7 @@ include __DIR__ . '/header.php';
         <!-- PayPal -->
         <div class="payment-card paypal">
             <div class="payment-header">
-                <div class="payment-icon">🅿️</div>
+                <div class="payment-icon"> <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg"> </div>
                 <div class="payment-name">PayPal</div>
             </div>
             <div class="payment-description">
