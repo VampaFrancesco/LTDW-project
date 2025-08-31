@@ -13,23 +13,25 @@ try {
     $pdo = new PDO('mysql:host=localhost;dbname=boxomnia', 'admin', 'admin');
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Recupero delle novità Mystery Box con immagini
+    // Recupero delle novità Mystery Box con immagini (solo quelle non scadute)
     $stmt_novita_box = $pdo->prepare("
-        SELECT mb.*, nb.sconto_novita, nb.desc_novita, img.nome_img
+        SELECT mb.*, nb.sconto_novita, nb.desc_novita, nb.fine_novita, img.nome_img
         FROM novita_box AS nb
         JOIN mystery_box AS mb ON nb.fk_mystery_box = mb.id_box
         LEFT JOIN immagine AS img ON img.fk_mystery_box = mb.id_box
+        WHERE nb.fine_novita IS NULL OR nb.fine_novita > NOW()
         ORDER BY nb.data_novita DESC
     ");
     $stmt_novita_box->execute();
     $novita_box = $stmt_novita_box->fetchAll(PDO::FETCH_ASSOC);
 
-    // Recupero delle novità Oggetti con immagini
+    // Recupero delle novità Oggetti con immagini (solo quelle non scadute)
     $stmt_novita_oggetto = $pdo->prepare("
-        SELECT o.*, no.novita_sconto, no.novita_desc, img.nome_img
+        SELECT o.*, no.novita_sconto, no.novita_desc, no.novita_fine, img.nome_img
         FROM novita_oggetto AS no
         JOIN oggetto AS o ON no.fk_oggetto = o.id_oggetto
         LEFT JOIN immagine AS img ON img.fk_oggetto = o.id_oggetto
+        WHERE no.novita_fine IS NULL OR no.novita_fine > NOW()
         ORDER BY no.novita_data DESC
     ");
     $stmt_novita_oggetto->execute();
@@ -110,6 +112,13 @@ $carouselImages = getCarouselImages();
                             $disponibile = ($box['quantita_box'] > 0);
                             $prezzo_scontato = $box['prezzo_box'] - ($box['prezzo_box'] * ($box['sconto_novita'] / 100));
                             $immagine_path = !empty($box['nome_img']) ? '/LTDW-project/images/' . $box['nome_img'] : '/LTDW-project/images/default.png';
+                            
+                            // Formattiamo la data di fine novità
+                            $fine_novita_text = 'In corso';
+                            if (!empty($box['fine_novita']) && $box['fine_novita'] !== null) {
+                                $fine_novita_date = new DateTime($box['fine_novita']);
+                                $fine_novita_text = 'Fino al ' . $fine_novita_date->format('d/m/Y');
+                            }
                         ?>
                             <div class="item">
                                 <div class="product-card <?= !$disponibile ? 'out-of-stock' : ''; ?>">
@@ -117,12 +126,15 @@ $carouselImages = getCarouselImages();
                                         <div class="badge-overlay">Esaurito</div>
                                     <?php endif; ?>
                                     <?php if ($box['sconto_novita'] > 0): ?>
-                                        <span class="discount-badge">-<?= htmlspecialchars($box['sconto_novita']); ?>%</span>
+                                        <span class="discount-badge-left">-<?= htmlspecialchars($box['sconto_novita']); ?>%</span>
                                     <?php endif; ?>
                                     <img src="<?= htmlspecialchars($immagine_path); ?>"
                                          alt="<?= htmlspecialchars($box['nome_box'] ?? 'Prodotto'); ?>" class="product-img">
                                     <div class="product-info">
                                         <h3 class="product-name"><?= htmlspecialchars($box['nome_box']); ?></h3>
+                                        <div class="promotion-end">
+                                            <span class="promotion-text"><?= htmlspecialchars($fine_novita_text); ?></span>
+                                        </div>
                                         <div class="price-container">
                                             <?php if ($box['sconto_novita'] > 0): ?>
                                                 <span class="old-price">€ <?= number_format($box['prezzo_box'], 2, ',', '.'); ?></span>
@@ -154,6 +166,9 @@ $carouselImages = getCarouselImages();
                     <i class="bi bi-chevron-right"></i>
                 </button>
             </div>
+            <div class="promotion-warning">
+                <p><strong>Attenzione:</strong> è possibile visionare e approfittare degli sconti solamente nelle novità essendo promozioni a tempo limitate</p>
+            </div>
         </section>
 
         <hr>
@@ -170,6 +185,13 @@ $carouselImages = getCarouselImages();
                             $disponibile = ($oggetto['quant_oggetto'] > 0);
                             $prezzo_scontato = $oggetto['prezzo_oggetto'] - ($oggetto['prezzo_oggetto'] * ($oggetto['novita_sconto'] / 100));
                             $immagine_path = !empty($oggetto['nome_img']) ? '/LTDW-project/images/' . $oggetto['nome_img'] : '/LTDW-project/images/default.png';
+                            
+                            // Formattiamo la data di fine novità
+                            $fine_novita_text = 'In corso';
+                            if (!empty($oggetto['novita_fine']) && $oggetto['novita_fine'] !== null) {
+                                $fine_novita_date = new DateTime($oggetto['novita_fine']);
+                                $fine_novita_text = 'Fino al ' . $fine_novita_date->format('d/m/Y');
+                            }
                         ?>
                             <div class="item">
                                 <div class="product-card <?= !$disponibile ? 'out-of-stock' : ''; ?>">
@@ -177,12 +199,15 @@ $carouselImages = getCarouselImages();
                                         <div class="badge-overlay">Esaurito</div>
                                     <?php endif; ?>
                                     <?php if ($oggetto['novita_sconto'] > 0): ?>
-                                        <span class="discount-badge">-<?= htmlspecialchars($oggetto['novita_sconto']); ?>%</span>
+                                        <span class="discount-badge-left">-<?= htmlspecialchars($oggetto['novita_sconto']); ?>%</span>
                                     <?php endif; ?>
                                     <img src="<?= htmlspecialchars($immagine_path); ?>"
                                          alt="<?= htmlspecialchars($oggetto['nome_oggetto'] ?? 'Oggetto'); ?>" class="product-img">
                                     <div class="product-info">
                                         <h3 class="product-name"><?= htmlspecialchars($oggetto['nome_oggetto']); ?></h3>
+                                        <div class="promotion-end">
+                                            <span class="promotion-text"><?= htmlspecialchars($fine_novita_text); ?></span>
+                                        </div>
                                         <div class="price-container">
                                             <?php if ($oggetto['novita_sconto'] > 0): ?>
                                                 <span class="old-price">€ <?= number_format($oggetto['prezzo_oggetto'], 2, ',', '.'); ?></span>
@@ -213,6 +238,9 @@ $carouselImages = getCarouselImages();
                 <button class="carousel-nav next" onclick="slideProducts('oggettiSlider', 1)" id="oggettiNext">
                     <i class="bi bi-chevron-right"></i>
                 </button>
+            </div>
+            <div class="promotion-warning">
+                <p><strong>Attenzione:</strong> è possibile visionare e approfittare degli sconti solamente nelle novità essendo promozioni a tempo limitate</p>
             </div>
         </section>
 
