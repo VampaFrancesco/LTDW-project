@@ -1,8 +1,6 @@
 <?php
 require_once __DIR__ . '/../include/session_manager.php';
 require_once __DIR__ . '/../include/config.inc.php';
-$config = require_once __DIR__ . '/../include/config.inc.php';
-$db_config = $config['dbms']['localhost'];
 
 
 class ScambioManager {
@@ -433,12 +431,17 @@ class ScambioManager {
     }
 }
 
-// Configurazione del database dal config
+
 
 // Factory per creare istanza ScambioManager
 class ScambioManagerFactory {
     public static function create() {
-        $config = require __DIR__ . '/../include/config.inc.php';
+        global $config; // Usa la variabile globale $config
+
+        if (!isset($config)) {
+            require_once __DIR__ . '/../include/config.inc.php';
+        }
+
         $db_config = $config['dbms']['localhost'];
 
         try {
@@ -457,4 +460,3 @@ class ScambioManagerFactory {
     }
 }
 
-?>
