@@ -161,13 +161,13 @@ foreach ($available_cards as $card_id => $card) {
 
             <div class="card-category-section mb-5" id="yu-gi-oh-collection">
                 <h2 class="category-title mb-4">Collezione Yu-Gi-Oh!</h2>
-                <div class="row card-grid">
+                <div class="card-grid">
                     <?php foreach ($ygo_cards_data as $card): ?>
                         <?php 
                         $rarity_class = strtolower(str_replace(' ', '-', $card['rarity']));
                         $border_color = $card['rarity_color'] ?? '#ccc';
                         ?>
-                        <div class="col-lg-3 col-md-4 col-sm-6 mb-4 card-item <?php echo $rarity_class; ?>"
+                        <div class="card-item <?php echo $rarity_class; ?>"
                              data-game="yu-gi-oh"
                              data-rarity="<?php echo $rarity_class; ?>"
                              data-card-id="<?php echo htmlspecialchars($card['id_oggetto']); ?>">
@@ -222,13 +222,13 @@ foreach ($available_cards as $card_id => $card) {
 
             <div class="card-category-section" id="pokemon-collection">
                 <h2 class="category-title mb-4">Collezione Pokémon</h2>
-                <div class="row card-grid">
+                <div class="card-grid">
                     <?php foreach ($pk_cards_data as $card): ?>
                         <?php 
                         $rarity_class = strtolower(str_replace(' ', '-', $card['rarity']));
                         $border_color = $card['rarity_color'] ?? '#ccc';
                         ?>
-                        <div class="col-lg-3 col-md-4 col-sm-6 mb-4 card-item <?php echo $rarity_class; ?>"
+                        <div class="card-item <?php echo $rarity_class; ?>"
                              data-game="pokemon"
                              data-rarity="<?php echo $rarity_class; ?>"
                              data-card-id="<?php echo htmlspecialchars($card['id_oggetto']); ?>">
