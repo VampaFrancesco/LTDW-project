@@ -1,5 +1,4 @@
-
-    /* MODERN CSS WITH FIXES FOR NAVBAR, DROPDOWN, TEXT VISIBILITY */
+/* MODERN CSS WITH FIXES FOR NAVBAR, DROPDOWN, TEXT VISIBILITY */
 :root {
     --primary-color: #3f51b5;
     --secondary-color: #f50057;
@@ -55,12 +54,29 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0;
 }
 
-h1 { font-size: 2.5rem; }
-h2 { font-size: 2rem; }
-h3 { font-size: 1.5rem; }
-h4 { font-size: 1.25rem; }
-h5 { font-size: 1.1rem; }
-h6 { font-size: 1rem; }
+h1 {
+    font-size: 2.5rem;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+h4 {
+    font-size: 1.25rem;
+}
+
+h5 {
+    font-size: 1.1rem;
+}
+
+h6 {
+    font-size: 1rem;
+}
 
 p {
     margin: 20px;
@@ -367,62 +383,62 @@ img {
 }
 
 /* POKEBALL ICON */
-    .pokeball {
-        width: 35px;
-        height: 35px;
-        background-color: white;
-        border: 2px solid black;
-        border-radius: 50%;
-        position: relative;
-        overflow: hidden;
-        cursor: pointer;
-        display: inline-block;
-        transition: transform 0.2s ease-in-out;
-    }
+.pokeball {
+    width: 35px;
+    height: 35px;
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    display: inline-block;
+    transition: transform 0.2s ease-in-out;
+}
 
-    .pokeball:hover {
-        transform: scale(1.1) rotate(360deg);
-        box-shadow: var(--shadow-heavy);
-    }
+.pokeball:hover {
+    transform: scale(1.1) rotate(360deg);
+    box-shadow: var(--shadow-heavy);
+}
 
-    .pokeball-top {
-        height: 50%;
-        background-color: red;
-        border-bottom: 2px solid black;
-    }
+.pokeball-top {
+    height: 50%;
+    background-color: red;
+    border-bottom: 2px solid black;
+}
 
-    .pokeball-middle {
-        height: 2px;
-        background-color: black;
-        position: absolute;
-        width: 100%;
-        top: 50%;
-        transform: translateY(-50%);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+.pokeball-middle {
+    height: 2px;
+    background-color: black;
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-    .pokeball-button {
-        width: 12px;
-        height: 12px;
-        background-color: white;
-        border: 2px solid black;
-        border-radius: 50%;
-        position: relative;
-    }
+.pokeball-button {
+    width: 12px;
+    height: 12px;
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 50%;
+    position: relative;
+}
 
-    .pokeball-button::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 6px;
-        height: 6px;
-        background-color: black;
-        border-radius: 50%;
-    }
+.pokeball-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    background-color: black;
+    border-radius: 50%;
+}
 
 /* YUGIOH CARD ICON */
 .yugioh-card-icon {
@@ -457,7 +473,6 @@ img {
     transform: scale(1.1);
     box-shadow: 0 6px 10px rgba(0, 0, 0, 0.35);
 }
-
 
 
 /* CARDS AND BOXES */
@@ -779,7 +794,7 @@ img {
     text-shadow: 0 0 10px rgba(245, 0, 87, 0.3);
 }
 
-        /* COLLEZIONE */
+/* COLLEZIONE */
 .collection-page .fashion_taital {
     margin-top: 30px;
     font-size: 38px;
@@ -922,13 +937,15 @@ img {
 /* Griglia delle carte - MODIFICATO per 4 carte per riga */
 .card-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 4fr));
     gap: 20px;
     margin-top: 30px;
+    padding: 0 10px;
 }
 
 .card-item {
     display: block;
+    width: 100%;
     animation: fadeIn 0.5s ease-out;
     transition: opacity 0.5s ease-out, transform 0.5s ease-out;
 }
@@ -1310,7 +1327,7 @@ img {
 /* Responsive Design per Collezione - AGGIORNATO */
 @media (max-width: 1200px) {
     .card-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 
@@ -1319,7 +1336,7 @@ img {
         flex-direction: column;
         gap: 15px;
     }
-    
+
     .category-nav-filter-container {
         justify-content: center;
     }
@@ -1330,8 +1347,9 @@ img {
 }
 
 @media (max-width: 768px) {
-    .collection-page .fashion_taital {
-        font-size: 32px;
+    .card-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 15px;
     }
 
     .card-category-section .category-title {
@@ -1360,8 +1378,9 @@ img {
 
 @media (max-width: 576px) {
     .card-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 10px;
+        padding: 0 5px;
     }
 
     .card-box {
@@ -1716,7 +1735,8 @@ img {
     height: 100%;
     opacity: 0;
     transition: opacity 1.5s ease-in-out;
-    img{
+
+    img {
         width: 100%;
         height: 100%;
         object-fit: cover;
@@ -1935,8 +1955,12 @@ img {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* UTILITIES */
@@ -2186,12 +2210,12 @@ img {
 .promotion-warning {
     margin-top: 30px;
     padding: 20px;
-    background: rgba(255, 255, 255, 0.15);  /* Bianco con solo 15% di opacità */
-    border: 2px solid rgba(200, 200, 200, 0.2);  /* Bordo molto leggero */
+    background: rgba(255, 255, 255, 0.15); /* Bianco con solo 15% di opacità */
+    border: 2px solid rgba(200, 200, 200, 0.2); /* Bordo molto leggero */
     border-radius: 12px;
     text-align: center;
     backdrop-filter: blur(10px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);  /* Ombra molto leggera */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Ombra molto leggera */
 }
 
 .promotion-warning p {
@@ -2237,16 +2261,16 @@ img {
     .product-card {
         height: 480px;
     }
-    
+
     .promotion-warning {
         margin: 20px 10px;
         padding: 15px;
     }
-    
+
     .promotion-warning p {
         font-size: 1rem;
     }
-    
+
     .discount-badge-left {
         top: 8px;
         left: 8px;
@@ -2259,16 +2283,16 @@ img {
     .product-card {
         height: 450px;
     }
-    
+
     .promotion-end {
         margin-bottom: 10px;
         padding: 6px 10px;
     }
-    
+
     .promotion-text {
         font-size: 0.8rem;
     }
-    
+
     .promotion-warning p {
         font-size: 0.9rem;
     }
@@ -3120,6 +3144,7 @@ img {
         grid-template-columns: 1fr;
     }
 }
+
 @keyframes slideIn {
     from {
         transform: translateX(100%);
