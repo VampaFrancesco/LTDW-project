@@ -102,14 +102,7 @@ if ($flash_message) {
                                             <i class="bi bi-person-gear"></i> Profilo
                                         </a>
                                     </li>
-                                <?php endif; ?>
-
-                                <!-- Menu comune per tutti -->
-                                <li>
-                                    <a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/collezione.php">
-                                        <i class="bi bi-collection"></i> La mia Collezione
-                                    </a>
-                                </li>                              
+                                <?php endif; ?>                           
 
 
                                 <?php if (!$isAdmin): ?>

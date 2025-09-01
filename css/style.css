@@ -3166,3 +3166,11 @@ img {
         opacity: 0;
     }
 }
+
+.text-footer{
+    color: white;
+}
+
+.text-footer-email{
+    color: lightblue;
+}

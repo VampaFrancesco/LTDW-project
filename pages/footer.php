@@ -10,7 +10,7 @@
                     </label>
                     <button type="submit" class="btn btn-primary mb-2">Iscriviti</button>
                 </form>
-                <p class="small mt-3">Box Omnia è il punto di riferimento ufficiale per tutti i veri Collezionisti di carte! Scopri un mondo di Carte Originali, Giochi, Accessori esclusivi e tanto altro.</p>
+                <p class="small mt-3 text-footer">Box Omnia è il punto di riferimento ufficiale per tutti i veri Collezionisti di carte! Scopri un mondo di Carte Originali, Giochi, Accessori esclusivi e tanto altro.</p>
             </div>
             <div class="col-md-3 mb-4">
                 <h6>Informazioni</h6>
@@ -29,8 +29,8 @@
             </div>
         </div>
         <div class="text-center py-3 border-top">
-            <p class="mb-1">Orari servizio clienti: Lun - Ven 08:30 - 16:30 | <a href="mailto:info@boxomnia.it" class="text-light">info@boxomnia.it</a></p>
-            <p class="mb-0">© <?php echo date('Y'); ?> Box Omnia. Tutti i diritti riservati.</p>
+            <p class="text-footer">Orari servizio clienti: Lun - Ven 08:30 - 16:30 | <a href="mailto:info@boxomnia.it" class="text-footer-email">info@boxomnia.it</a></p>
+            <p class="text-footer">© <?php echo date('Y'); ?> Box Omnia. Tutti i diritti riservati.</p>
         </div>
     </div>
 </footer>
