@@ -136,10 +136,20 @@ $conn->close();
                         data-rarity="<?php echo htmlspecialchars($funko['rarity_name']); ?>">
                         <div class="box-main <?php echo $funko['available'] ? '' : 'unavailable'; ?>">
                             <a href="#" class="item-link" data-bs-toggle="modal" data-bs-target="#funkoModal_<?php echo $funko['id']; ?>">
-                                <div class="mystery-box-image-container">
+                                <div class="mystery-box-image-container position-relative">
+                                    <!-- Bottone Wishlist -->
+                                    <button class="wishlist-btn position-absolute top-0 end-0 m-2"
+                                            data-item-id="<?php echo $funko['id']; ?>"
+                                            data-item-type="oggetto"
+                                            onclick="toggleWishlist(this)"
+                                            title="Aggiungi alla wishlist"
+                                            style="z-index: 10;">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+
                                     <img src="<?php echo htmlspecialchars($funko['image_url']); ?>"
-                                        alt="<?php echo htmlspecialchars($funko['name']); ?>"
-                                        class="img-fluid mystery-box-img">
+                                         alt="<?php echo htmlspecialchars($funko['name']); ?>"
+                                         class="img-fluid mystery-box-img">
                                     <?php if (!$funko['available']): ?>
                                         <div class="unavailable-overlay">
                                             <p>ESAURITO</p>
@@ -204,7 +214,7 @@ $conn->close();
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         console.log('DOM loaded, inizializzazione filtri...');
-        
+
         const funkoPopGrid = document.getElementById('funkoPopGrid');
         const allItems = document.querySelectorAll('.funko-pop-item');
         const searchInput = document.getElementById('searchFunkoPop');
@@ -227,13 +237,13 @@ $conn->close();
 
         function filterAndSortItems(items, grid, searchTerm, priceRangeValue) {
             console.log('Applicazione filtri:', { searchTerm, priceRangeValue, itemsCount: items.length });
-            
+
             let sortedItems = Array.from(items);
 
             // Filtra per termine di ricerca
             if (searchTerm && searchTerm !== '') {
                 const lowerCaseSearchTerm = searchTerm.toLowerCase();
-                sortedItems = sortedItems.filter(item => 
+                sortedItems = sortedItems.filter(item =>
                     item.dataset.name.toLowerCase().includes(lowerCaseSearchTerm)
                 );
             }
@@ -270,7 +280,7 @@ $conn->close();
                 item.style.display = 'none';
                 item.style.opacity = '0';
             });
-            
+
             if (sortedItems.length > 0) {
                 // Riordina gli elementi nel DOM per l'ordinamento
                 if (priceRangeValue === 'asc' || priceRangeValue === 'desc') {
@@ -278,13 +288,13 @@ $conn->close();
                     sortedItems.forEach(item => {
                         item.remove();
                     });
-                    
+
                     // Reinseriscili nell'ordine corretto
                     sortedItems.forEach(item => {
                         grid.appendChild(item);
                     });
                 }
-                
+
                 // Mostra gli elementi filtrati con uno stile esplicito
                 sortedItems.forEach(item => {
                     item.style.display = 'block';
@@ -318,7 +328,7 @@ $conn->close();
                 }
             });
         }
-        
+
         // Event listener per la barra di ricerca - filtraggio in tempo reale
         if (searchInput) {
             searchInput.addEventListener('input', function() {

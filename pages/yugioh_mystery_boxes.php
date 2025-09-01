@@ -150,10 +150,18 @@ $conn->close();
                         data-rarity="<?php echo htmlspecialchars($box['rarity_name']); ?>">
                         <div class="box-main <?php echo $box['available'] ? '' : 'unavailable'; ?>">
                             <a href="#" class="item-link" data-bs-toggle="modal" data-bs-target="#boxModal_<?php echo $box['id']; ?>">
-                                <div class="mystery-box-image-container">
+                                <div class="mystery-box-image-container position-relative">
+                                    <?php if (SessionManager::isLoggedIn()): ?>
+                                        <button class="wishlist-btn"
+                                                data-item-id="<?php echo $box['id']; ?>"
+                                                data-item-type="box"
+                                                title="Aggiungi alla wishlist">
+                                            <i class="bi bi-heart"></i>
+                                        </button>
+                                    <?php endif; ?>
                                     <img src="<?php echo htmlspecialchars($box['image_url']); ?>"
-                                        alt="<?php echo htmlspecialchars($box['name']); ?>"
-                                        class="img-fluid mystery-box-img">
+                                         alt="<?php echo htmlspecialchars($box['name']); ?>"
+                                         class="img-fluid mystery-box-img">
                                     <?php if (!$box['available']): ?>
                                         <div class="unavailable-overlay">
                                             <p>ESAURITO</p>

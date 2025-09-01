@@ -141,10 +141,21 @@ $conn->close();
                                         data-availability="<?php echo htmlspecialchars($accessory['availability']); ?>"
                                         data-image-url="<?php echo htmlspecialchars($accessory['image_url']); ?>">
                                         <div class="card-img-container">
-                                            <img src="<?php echo htmlspecialchars($accessory['image_url']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($accessory['name']); ?>">
+                                            <div class="card-img-container">
+                                                <?php if (SessionManager::isLoggedIn()): ?>
+                                                    <button class="wishlist-btn"
+                                                            data-item-id="<?php echo $accessory['id_oggetto']; ?>"
+                                                            data-item-type="oggetto"
+                                                            title="Aggiungi alla wishlist">
+                                                        <i class="bi bi-heart"></i>
+                                                    </button>
+                                                <?php endif; ?>
+                                                <img src="<?php echo htmlspecialchars($accessory['image_url']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($accessory['name']); ?>">
+                                            </div>
                                         </div>
                                         <div class="card-body">
                                             <h5 class="card-title"><?php echo htmlspecialchars($accessory['name']); ?></h5>
+
                                             <p class="card-text text-muted"><?php echo htmlspecialchars($accessory['description']); ?></p>
                                         </div>
                                         <div class="card-footer text-center">

@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../include/config.inc.php';
 require_once __DIR__ . '/../include/session_manager.php';
 
+
 // IMPORTANTE: Fai tutti i controlli PRIMA di qualsiasi output HTML
 SessionManager::startSecureSession();
 // Recupera il messaggio flash PRIMA dell'output HTML
@@ -23,7 +24,10 @@ if ($flash_message) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="icon" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/images/favicon.ico" type="image/gif"/>
-
+    <script>
+        window.BASE_URL = '<?php echo BASE_URL; ?>';
+        window.isLoggedIn = <?php echo SessionManager::isLoggedIn() ? 'true' : 'false'; ?>;
+    </script>
 
 </head>
 <body>
@@ -147,7 +151,7 @@ if ($flash_message) {
                     </a>
 
                     <?php if (SessionManager::isLoggedIn()): ?>
-                        <a href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/notifications.php" class="mx-2" title="Notifiche">
+                        <a href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/notifiche.php" class="mx-2" title="Notifiche">
                             <i class="bi bi-bell-fill"></i>
                             <?php
                             // Mostra numero notifiche se presente

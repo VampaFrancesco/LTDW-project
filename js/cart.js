@@ -57,9 +57,10 @@ class CartManager {
         }
 
         try {
-            const response = await fetch(`${this.baseUrl}/action/cart_ajax.php`, {
+            formData.append('action', 'add');
+            const response = await fetch(`LTDW-project/action/cart_ajax.php`, {
                 method: 'POST',
-                body: this.appendAction(formData, 'add')
+                body: formData
             });
 
             const data = await response.json();
@@ -109,9 +110,10 @@ class CartManager {
         button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
         try {
-            const response = await fetch(`${this.baseUrl}/action/cart_ajax.php`, {
+            formData.append('action', 'add');
+            const response = await fetch(`/action/cart_ajax.php`, {
                 method: 'POST',
-                body: this.appendAction(formData, 'add')
+                body: formData
             });
 
             const data = await response.json();
@@ -274,9 +276,9 @@ class CartManager {
     async loadCartStatus() {
         try {
             const formData = new FormData();
-            formData.append('action', 'get');
+            formData.append('action', 'add');
 
-            const response = await fetch(`${this.baseUrl}/action/cart_ajax.php`, {
+            const response = await fetch(`/LTDW-project//action/cart_ajax.php`, {
                 method: 'POST',
                 body: formData
             });

@@ -172,7 +172,7 @@ include __DIR__.'/header.php';
                                 <?php echo htmlspecialchars($indirizzi[0]['nazione']); ?>
                             </p>
                         <?php endif; ?>
-                        <a href="<?php echo BASE_URL; ?>/pages/gestione_indirizzi.php" class="btn btn-sm btn-outline-primary mt-2">
+                        <a href="<?php echo BASE_URL; ?>/pages/aggiungi_indirizzo.php" class="btn btn-sm btn-outline-primary mt-2">
                             <i class="bi bi-plus-circle"></i> Gestisci indirizzi
                         </a>
                     </div>
