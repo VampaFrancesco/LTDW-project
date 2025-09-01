@@ -1,462 +1,271 @@
 <?php
-require_once __DIR__ . '/../include/session_manager.php';
-require_once __DIR__ . '/../include/config.inc.php';
+/**
+ * ScambioManager rigenerato con supporto alle carte cartacee.
+ * - Usa include/config.inc.php (ritorna $config) per connettersi al DB.
+ * - Aggiunge tabella scambio_cartaceo (se non esiste).
+ * - Estende creaProposta per accettare $carte_cartacee.
+ */
 
+require_once __DIR__ . '/session_manager.php';
+
+class ScambioManagerFactory {
+    public static function create(): ScambioManager {
+        $config = require __DIR__ . '/config.inc.php';
+        if (!isset($config['dbms']['localhost'])) {
+            throw new Exception('Configurazione DB non trovata.');
+        }
+        $db = $config['dbms']['localhost'];
+        $dsn = "mysql:host={$db['host']};dbname={$db['dbname']};charset=utf8mb4";
+        $options = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ];
+        $pdo = new PDO($dsn, $db['user'], $db['passwd'], $options);
+        return new ScambioManager($pdo);
+    }
+}
 
 class ScambioManager {
-    private $pdo;
+    private PDO $pdo;
 
-    public function __construct($database_connection) {
-        $this->pdo = $database_connection;
+    public function __construct(PDO $pdo) {
+        $this->pdo = $pdo;
+        $this->ensureSchema();
+    }
+
+    private function ensureSchema(): void {
+        // Crea la tabella per le carte cartacee se non esiste
+        $this->pdo->exec(<<<SQL
+            CREATE TABLE IF NOT EXISTS scambio_cartaceo (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                fk_scambio INT NOT NULL,
+                nome_carta VARCHAR(255) NOT NULL,
+                quantita INT NOT NULL DEFAULT 1,
+                stato ENUM('scarso','buono','eccellente') NOT NULL DEFAULT 'buono',
+                CONSTRAINT fk_scambio_cartaceo_scambio
+                    FOREIGN KEY (fk_scambio) REFERENCES scambio(id_scambio)
+                    ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        SQL);
     }
 
     /**
-     * Crea una nuova proposta di scambio
+     * Crea una proposta di scambio.
+     * @param int $utente_proponente
+     * @param array $carte_offerte      Array di oggetti digitali: [ ["id_oggetto"=>int, "quantita"=>int], ... ]
+     * @param array $carte_richieste    Array di oggetti digitali: [ ["id_oggetto"=>int, "quantita"=>int], ... ]
+     * @param int|null $utente_destinatario
+     * @param array $carte_cartacee     Array di carte cartacee: [ ["nome"=>string, "quantita"=>int, "stato"=>'scarso|buono|eccellente'], ... ]
+     * @return int id_scambio
      */
-    public function creaProposta($utente_proponente, $carte_offerte, $carte_richieste, $utente_destinatario = null) {
+    public function creaProposta(int $utente_proponente, array $carte_offerte = [], array $carte_richieste = [], ?int $utente_destinatario = null, array $carte_cartacee = []): int {
+        $this->pdo->beginTransaction();
         try {
-            $this->pdo->beginTransaction();
+            // Inserisci scambio
+            $stmt = $this->pdo->prepare("INSERT INTO scambio (stato_scambio, fk_utente) VALUES (?, ?)");
+            $stmt->execute(['proposto', $utente_proponente]);
+            $id_scambio = (int)$this->pdo->lastInsertId();
 
-            // Verifica che l'utente abbia le carte che vuole offrire
-            if (!$this->verificaPossessoOggetti($utente_proponente, $carte_offerte)) {
-                throw new Exception("Non possiedi tutte le carte che vuoi offrire");
+            // Inserisci offerte digitali
+            if (!empty($carte_offerte)) {
+                foreach ($carte_offerte as $c) {
+                    $id_oggetto = (int)($c['id_oggetto'] ?? 0);
+                    $qta = max(1, (int)($c['quantita'] ?? 1));
+                    $this->aggiungiRigaScambioOggetto($id_scambio, $id_oggetto, $qta, true);
+                }
             }
 
-            // Crea il record dello scambio
-            $stmt = $this->pdo->prepare("
-                INSERT INTO scambio (fk_utente, stato_scambio) 
-                VALUES (?, 'proposto')
-            ");
-            $stmt->execute([$utente_proponente]);
-            $id_scambio = $this->pdo->lastInsertId();
-
-            // Inserisce gli oggetti offerti dall'utente proponente
-            foreach ($carte_offerte as $carta) {
-                $stmt = $this->pdo->prepare("
-                    INSERT INTO scambio_oggetto (fk_scambio, fk_oggetto, da_utente, quantita_scambio) 
-                    VALUES (?, ?, 1, ?)
-                ");
-                $stmt->execute([$id_scambio, $carta['fk_oggetto'], $carta['quantita']]);
+            // Inserisci richieste digitali
+            if (!empty($carte_richieste)) {
+                foreach ($carte_richieste as $c) {
+                    $id_oggetto = (int)($c['id_oggetto'] ?? 0);
+                    $qta = max(1, (int)($c['quantita'] ?? 1));
+                    $this->aggiungiRigaScambioOggetto($id_scambio, $id_oggetto, $qta, false);
+                }
             }
 
-            // Inserisce gli oggetti richiesti
-            foreach ($carte_richieste as $carta) {
-                $stmt = $this->pdo->prepare("
-                    INSERT INTO scambio_oggetto (fk_scambio, fk_oggetto, da_utente, quantita_scambio) 
-                    VALUES (?, ?, 0, ?)
-                ");
-                $stmt->execute([$id_scambio, $carta['fk_oggetto'], $carta['quantita']]);
+            // Inserisci carte cartacee offerte
+            if (!empty($carte_cartacee)) {
+                $stmtC = $this->pdo->prepare("INSERT INTO scambio_cartaceo (fk_scambio, nome_carta, quantita, stato) VALUES (?,?,?,?)");
+                foreach ($carte_cartacee as $cc) {
+                    $nome = trim((string)($cc['nome'] ?? ''));
+                    if ($nome === '') { continue; }
+                    $qta = max(1, (int)($cc['quantita'] ?? 1));
+                    $stato = in_array(($cc['stato'] ?? 'buono'), ['scarso','buono','eccellente'], true) ? $cc['stato'] : 'buono';
+                    $stmtC->execute([$id_scambio, $nome, $qta, $stato]);
+                }
             }
 
             $this->pdo->commit();
             return $id_scambio;
-
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $this->pdo->rollBack();
             throw $e;
         }
     }
 
-    /**
-     * Accetta uno scambio proposto
-     */
-    public function accettaScambio($id_scambio, $utente_accettante) {
+    /** Inserisce una riga in scambio_oggetto (tabella già esistente nel progetto). */
+    private function aggiungiRigaScambioOggetto(int $id_scambio, int $id_oggetto, int $quantita, bool $da_proponente): void {
+        // da_proponente=true => offerta; false => richiesta
+        $stmt = $this->pdo->prepare("INSERT INTO scambio_oggetto (fk_scambio, fk_oggetto, quantita_scambio, da_proponente) VALUES (?,?,?,?)");
+        $stmt->execute([$id_scambio, $id_oggetto, $quantita, $da_proponente ? 1 : 0]);
+    }
+
+    public function accettaScambio(int $id_scambio, int $utente_accettante): void {
+        // Esegue controlli basilari e completa lo scambio (solo componenti digitali).
+        $scambio = $this->getScambio($id_scambio);
+        if (!$scambio || $scambio['stato_scambio'] !== 'proposto') {
+            throw new Exception('Scambio non valido o non più disponibile');
+        }
+        if ((int)$scambio['fk_utente'] === $utente_accettante) {
+            throw new Exception('Non puoi accettare uno scambio creato da te');
+        }
+
+        $richieste = $this->getCarteRichieste($id_scambio);
+        if (!$this->verificaPossessoOggetti($utente_accettante, $richieste)) {
+            throw new Exception('Non possiedi tutte le carte richieste');
+        }
+
+        $this->pdo->beginTransaction();
         try {
-            $this->pdo->beginTransaction();
+            // Trasferisci oggetti digitali
+            $offerte = $this->getCarteOfferte($id_scambio);
+            $this->eseguiTrasferimenti($scambio['fk_utente'], $utente_accettante, $offerte);
+            $this->eseguiTrasferimenti($utente_accettante, $scambio['fk_utente'], $richieste);
 
-            // Verifica che lo scambio esista e sia in stato "proposto"
-            $scambio = $this->getScambio($id_scambio);
-            if (!$scambio || $scambio['stato_scambio'] !== 'proposto') {
-                throw new Exception("Scambio non valido o già processato");
-            }
-
-            // Non puoi accettare il tuo stesso scambio
-            if ($scambio['fk_utente'] == $utente_accettante) {
-                throw new Exception("Non puoi accettare il tuo stesso scambio");
-            }
-
-            // Verifica che l'utente accettante abbia le carte richieste
-            $carte_richieste = $this->getCarteRichieste($id_scambio);
-            if (!$this->verificaPossessoOggetti($utente_accettante, $carte_richieste)) {
-                throw new Exception("Non possiedi tutte le carte richieste per questo scambio");
-            }
-
-            // Esegue lo scambio
-            $this->eseguiScambio($id_scambio, $utente_accettante);
-
-            // Aggiorna lo stato del scambio
-            $stmt = $this->pdo->prepare("
-                UPDATE scambio 
-                SET stato_scambio = 'completato', data_scambio = NOW() 
-                WHERE id_scambio = ?
-            ");
-            $stmt->execute([$id_scambio]);
+            // Aggiorna stato
+            $stmt = $this->pdo->prepare("UPDATE scambio SET stato_scambio = ? WHERE id_scambio = ?");
+            $stmt->execute(['concluso', $id_scambio]);
 
             $this->pdo->commit();
-            return true;
-
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $this->pdo->rollBack();
             throw $e;
         }
     }
 
-    /**
-     * Rifiuta uno scambio
-     */
-    public function rifiutaScambio($id_scambio, $utente) {
-        try {
-            $scambio = $this->getScambio($id_scambio);
-            if (!$scambio || $scambio['stato_scambio'] !== 'proposto') {
-                throw new Exception("Scambio non valido o già processato");
-            }
-
-            // Solo il proponente può cancellare il suo scambio
-            if ($scambio['fk_utente'] != $utente) {
-                throw new Exception("Non puoi rifiutare questo scambio");
-            }
-
-            $stmt = $this->pdo->prepare("
-                UPDATE scambio 
-                SET stato_scambio = 'rifiutato' 
-                WHERE id_scambio = ?
-            ");
-            $stmt->execute([$id_scambio]);
-
-            return true;
-
-        } catch (Exception $e) {
-            throw $e;
-        }
-    }
-
-    /**
-     * Esegue effettivamente lo scambio degli oggetti tra utenti
-     */
-    private function eseguiScambio($id_scambio, $utente_accettante) {
+    public function rifiutaScambio(int $id_scambio, int $utente): void {
         $scambio = $this->getScambio($id_scambio);
-        $utente_proponente = $scambio['fk_utente'];
-
-        // Ottieni le carte offerte e richieste
-        $carte_offerte = $this->getCarteOfferte($id_scambio);
-        $carte_richieste = $this->getCarteRichieste($id_scambio);
-
-        // Trasferisce le carte offerte dal proponente all'accettante
-        foreach ($carte_offerte as $carta) {
-            $this->trasferisciOggetto(
-                $utente_proponente,
-                $utente_accettante,
-                $carta['fk_oggetto'],
-                $carta['quantita_scambio']
-            );
-        }
-
-        // Trasferisce le carte richieste dall'accettante al proponente
-        foreach ($carte_richieste as $carta) {
-            $this->trasferisciOggetto(
-                $utente_accettante,
-                $utente_proponente,
-                $carta['fk_oggetto'],
-                $carta['quantita_scambio']
-            );
-        }
+        if (!$scambio) { throw new Exception('Scambio inesistente'); }
+        if ((int)$scambio['fk_utente'] !== $utente) { /* opzionale: permetti annullo solo al proponente */ }
+        $stmt = $this->pdo->prepare("UPDATE scambio SET stato_scambio = ? WHERE id_scambio = ?");
+        $stmt->execute(['annullato', $id_scambio]);
     }
 
-    /**
-     * Trasferisce un oggetto da un utente all'altro
-     */
-    private function trasferisciOggetto($da_utente, $a_utente, $id_oggetto, $quantita) {
-        // Rimuovi dall'utente che cede
-        $stmt = $this->pdo->prepare("
-            UPDATE oggetto_utente 
-            SET quantita_ogg = quantita_ogg - ? 
-            WHERE fk_utente = ? AND fk_oggetto = ?
-        ");
-        $stmt->execute([$quantita, $da_utente, $id_oggetto]);
-
-        // Rimuovi il record se la quantità diventa 0
-        $stmt = $this->pdo->prepare("
-            DELETE FROM oggetto_utente 
-            WHERE fk_utente = ? AND fk_oggetto = ? AND quantita_ogg <= 0
-        ");
-        $stmt->execute([$da_utente, $id_oggetto]);
-
-        // Aggiungi all'utente che riceve
-        $stmt = $this->pdo->prepare("
-            INSERT INTO oggetto_utente (fk_utente, fk_oggetto, quantita_ogg) 
-            VALUES (?, ?, ?) 
-            ON DUPLICATE KEY UPDATE quantita_ogg = quantita_ogg + ?
-        ");
-        $stmt->execute([$a_utente, $id_oggetto, $quantita, $quantita]);
-    }
-
-    /**
-     * Verifica che un utente possieda gli oggetti specificati
-     */
-    public function verificaPossessoOggetti($id_utente, $oggetti) {
-        foreach ($oggetti as $oggetto) {
-            // Usa la chiave corretta in base al formato dei dati
-            $id_oggetto = isset($oggetto['fk_oggetto']) ? $oggetto['fk_oggetto'] : $oggetto['id_oggetto'];
-            $quantita_richiesta = isset($oggetto['quantita']) ? $oggetto['quantita'] : $oggetto['quantita_scambio'];
-
-            $stmt = $this->pdo->prepare("
-                SELECT quantita_ogg 
-                FROM oggetto_utente 
-                WHERE fk_utente = ? AND fk_oggetto = ?
-            ");
-            $stmt->execute([$id_utente, $id_oggetto]);
-            $possesso = $stmt->fetch();
-
-            if (!$possesso || $possesso['quantita_ogg'] < $quantita_richiesta) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Ottiene i dettagli di uno scambio
-     */
-    public function getScambio($id_scambio) {
-        $stmt = $this->pdo->prepare("
-            SELECT s.*, u.nome, u.cognome, u.email 
-            FROM scambio s 
-            JOIN utente u ON s.fk_utente = u.id_utente 
-            WHERE s.id_scambio = ?
-        ");
+    public function getScambio(int $id_scambio): ?array {
+        $stmt = $this->pdo->prepare("SELECT * FROM scambio WHERE id_scambio = ?");
         $stmt->execute([$id_scambio]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $row = $stmt->fetch();
+        return $row ?: null;
     }
 
-    /**
-     * Ottiene le carte offerte in uno scambio
-     */
-    public function getCarteOfferte($id_scambio) {
-        $stmt = $this->pdo->prepare("
-            SELECT so.*, o.nome_oggetto, o.desc_oggetto, r.nome_rarita, r.colore, co.nome_categoria
-            FROM scambio_oggetto so
-            JOIN oggetto o ON so.fk_oggetto = o.id_oggetto
-            JOIN categoria_oggetto co ON o.fk_categoria_oggetto = co.id_categoria
-            LEFT JOIN rarita r ON o.fk_rarita = r.id_rarita
-            WHERE so.fk_scambio = ? AND so.da_utente = 1
-        ");
+    public function getCarteOfferte(int $id_scambio): array {
+        $sql = "SELECT so.*, o.nome_oggetto FROM scambio_oggetto so JOIN oggetto o ON o.id_oggetto = so.fk_oggetto WHERE so.fk_scambio = ? AND so.da_proponente = 1";
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$id_scambio]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll();
     }
 
-    /**
-     * Ottiene le carte richieste in uno scambio
-     */
-    public function getCarteRichieste($id_scambio) {
-        $stmt = $this->pdo->prepare("
-            SELECT so.*, o.nome_oggetto, o.desc_oggetto, r.nome_rarita, r.colore, co.nome_categoria
-            FROM scambio_oggetto so
-            JOIN oggetto o ON so.fk_oggetto = o.id_oggetto
-            JOIN categoria_oggetto co ON o.fk_categoria_oggetto = co.id_categoria
-            LEFT JOIN rarita r ON o.fk_rarita = r.id_rarita
-            WHERE so.fk_scambio = ? AND so.da_utente = 0
-        ");
+    public function getCarteRichieste(int $id_scambio): array {
+        $sql = "SELECT so.*, o.nome_oggetto FROM scambio_oggetto so JOIN oggetto o ON o.id_oggetto = so.fk_oggetto WHERE so.fk_scambio = ? AND so.da_proponente = 0";
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$id_scambio]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll();
     }
 
-    /**
-     * Ottiene tutti gli scambi disponibili
-     */
-    public function getScambiDisponibili($utente_id = null) {
-        $where_clause = "WHERE s.stato_scambio = 'proposto'";
+    public function getCarteCartacee(int $id_scambio): array {
+        $stmt = $this->pdo->prepare("SELECT * FROM scambio_cartaceo WHERE fk_scambio = ?");
+        $stmt->execute([$id_scambio]);
+        return $stmt->fetchAll();
+    }
+
+    public function getDettagliCompleti(int $id_scambio): array {
+        return [
+            'carte_offerte_dettagli'  => $this->getCarteOfferte($id_scambio),
+            'carte_richieste_dettagli'=> $this->getCarteRichieste($id_scambio),
+            'carte_cartacee'          => $this->getCarteCartacee($id_scambio),
+            'valore_offerto'          => 0.0,
+            'valore_richiesto'        => 0.0,
+        ];
+    }
+
+    public function getScambiDisponibili(?int $escludi_utente_id = null): array {
         $params = [];
-
-        if ($utente_id) {
-            $where_clause .= " AND s.fk_utente != ?";
-            $params[] = $utente_id;
+        $sql = "SELECT s.*, u.nome, u.cognome,
+                       SUM(CASE WHEN so.da_proponente=1 THEN so.quantita_scambio ELSE 0 END) AS carte_offerte,
+                       SUM(CASE WHEN so.da_proponente=0 THEN so.quantita_scambio ELSE 0 END) AS carte_richieste
+                FROM scambio s
+                LEFT JOIN scambio_oggetto so ON so.fk_scambio = s.id_scambio
+                LEFT JOIN utente u ON u.id_utente = s.fk_utente
+                WHERE s.stato_scambio = 'proposto'";
+        if ($escludi_utente_id) {
+            $sql .= " AND s.fk_utente <> ?";
+            $params[] = $escludi_utente_id;
         }
-
-        $stmt = $this->pdo->prepare("
-            SELECT s.*, u.nome, u.cognome,
-                   COUNT(CASE WHEN so.da_utente = 1 THEN 1 END) as carte_offerte,
-                   COUNT(CASE WHEN so.da_utente = 0 THEN 1 END) as carte_richieste
-            FROM scambio s 
-            JOIN utente u ON s.fk_utente = u.id_utente
-            LEFT JOIN scambio_oggetto so ON s.id_scambio = so.fk_scambio
-            $where_clause
-            GROUP BY s.id_scambio
-            ORDER BY s.data_scambio DESC
-        ");
+        $sql .= " GROUP BY s.id_scambio ORDER BY s.data_scambio DESC";
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll();
     }
 
-    /**
-     * Ottiene gli scambi di un utente specifico
-     */
-    public function getScambiUtente($utente_id, $stato = null) {
-        $where_clause = "WHERE s.fk_utente = ?";
-        $params = [$utente_id];
+    public function getScambiUtente(int $utente_id): array {
+        $sql = "SELECT s.*,
+                       SUM(CASE WHEN so.da_proponente=1 THEN so.quantita_scambio ELSE 0 END) AS carte_offerte,
+                       SUM(CASE WHEN so.da_proponente=0 THEN so.quantita_scambio ELSE 0 END) AS carte_richieste
+                FROM scambio s
+                LEFT JOIN scambio_oggetto so ON so.fk_scambio = s.id_scambio
+                WHERE s.fk_utente = ?
+                GROUP BY s.id_scambio
+                ORDER BY s.data_scambio DESC";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$utente_id]);
+        return $stmt->fetchAll();
+    }
 
-        if ($stato) {
-            $where_clause .= " AND s.stato_scambio = ?";
-            $params[] = $stato;
+    // ====== Utilità specifiche del tuo progetto (semplificate) ======
+    public function getCollezioneUtente(int $utente_id): array {
+        // Restituisce oggetti posseduti dall'utente
+        $sql = "SELECT ou.*, o.nome_oggetto
+                FROM oggetto_utente ou
+                JOIN oggetto o ON o.id_oggetto = ou.fk_oggetto
+                WHERE ou.fk_utente = ?";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$utente_id]);
+        return $stmt->fetchAll();
+    }
+
+    public function getCategorie(): array {
+        $stmt = $this->pdo->query("SELECT * FROM categoria ORDER BY nome_categoria");
+        return $stmt->fetchAll();
+    }
+
+    public function verificaPossessoOggetti(int $utente_id, array $righe_scambio): bool {
+        if (empty($righe_scambio)) return true;
+        $ok = true;
+        foreach ($righe_scambio as $r) {
+            $id_oggetto = (int)$r['fk_oggetto'];
+            $qta = (int)$r['quantita_scambio'];
+            $stmt = $this->pdo->prepare("SELECT quantita FROM oggetto_utente WHERE fk_utente=? AND fk_oggetto=?");
+            $stmt->execute([$utente_id, $id_oggetto]);
+            $row = $stmt->fetch();
+            if (!$row || (int)$row['quantita'] < $qta) { $ok = false; break; }
         }
-
-        $stmt = $this->pdo->prepare("
-            SELECT s.*, u.nome, u.cognome,
-                   COUNT(CASE WHEN so.da_utente = 1 THEN 1 END) as carte_offerte,
-                   COUNT(CASE WHEN so.da_utente = 0 THEN 1 END) as carte_richieste
-            FROM scambio s 
-            JOIN utente u ON s.fk_utente = u.id_utente
-            LEFT JOIN scambio_oggetto so ON s.id_scambio = so.fk_scambio
-            $where_clause
-            GROUP BY s.id_scambio
-            ORDER BY s.data_scambio DESC
-        ");
-        $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $ok;
     }
 
-    /**
-     * Ottiene la collezione di un utente per la selezione delle carte
-     */
-    public function getCollezioneUtente($id_utente, $categoria_id = null) {
-        $where_clause = "";
-        $params = [$id_utente];
-
-        if ($categoria_id) {
-            $where_clause = " AND o.fk_categoria_oggetto = ?";
-            $params[] = $categoria_id;
+    private function eseguiTrasferimenti(int $da_utente, int $a_utente, array $righe_scambio): void {
+        foreach ($righe_scambio as $r) {
+            $this->trasferisciOggetto($da_utente, $a_utente, (int)$r['fk_oggetto'], (int)$r['quantita_scambio']);
         }
-
-        $stmt = $this->pdo->prepare("
-            SELECT ou.*, o.nome_oggetto, o.desc_oggetto, o.prezzo_oggetto,
-                   r.nome_rarita, r.colore, co.nome_categoria,
-                   oc.valore_stimato, oc.numero_carta,
-                   img.nome_img
-            FROM oggetto_utente ou
-            JOIN oggetto o ON ou.fk_oggetto = o.id_oggetto
-            JOIN categoria_oggetto co ON o.fk_categoria_oggetto = co.id_categoria
-            LEFT JOIN rarita r ON o.fk_rarita = r.id_rarita
-            LEFT JOIN oggetto_collezione oc ON o.id_oggetto = oc.fk_oggetto
-            LEFT JOIN immagine img ON o.id_oggetto = img.fk_oggetto
-            WHERE ou.fk_utente = ? AND ou.quantita_ogg > 0 $where_clause
-            ORDER BY r.ordine DESC, o.nome_oggetto
-        ");
-        $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Ottiene tutte le categorie disponibili
-     */
-    public function getCategorie() {
-        $stmt = $this->pdo->prepare("
-            SELECT * FROM categoria_oggetto 
-            ORDER BY nome_categoria
-        ");
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * Calcola il valore stimato di una lista di carte
-     */
-    public function calcolaValoreStimato($carte) {
-        $valore_totale = 0;
-
-        foreach ($carte as $carta) {
-            $id_oggetto = isset($carta['fk_oggetto']) ? $carta['fk_oggetto'] : $carta['id_oggetto'];
-            $quantita = isset($carta['quantita']) ? $carta['quantita'] : $carta['quantita_scambio'];
-
-            $stmt = $this->pdo->prepare("
-                SELECT valore_stimato 
-                FROM oggetto_collezione 
-                WHERE fk_oggetto = ?
-            ");
-            $stmt->execute([$id_oggetto]);
-            $valore = $stmt->fetch();
-
-            if ($valore) {
-                $valore_totale += $valore['valore_stimato'] * $quantita;
-            }
-        }
-
-        return $valore_totale;
-    }
-
-    /**
-     * Ricerca oggetti per nome (utile per la selezione delle carte richieste)
-     */
-    public function cercaOggetti($termine_ricerca, $categoria_id = null) {
-        $where_clause = "WHERE o.nome_oggetto LIKE ?";
-        $params = ['%' . $termine_ricerca . '%'];
-
-        if ($categoria_id) {
-            $where_clause .= " AND o.fk_categoria_oggetto = ?";
-            $params[] = $categoria_id;
-        }
-
-        $stmt = $this->pdo->prepare("
-            SELECT o.*, r.nome_rarita, r.colore, co.nome_categoria,
-                   oc.valore_stimato, img.nome_img
-            FROM oggetto o
-            JOIN categoria_oggetto co ON o.fk_categoria_oggetto = co.id_categoria
-            LEFT JOIN rarita r ON o.fk_rarita = r.id_rarita
-            LEFT JOIN oggetto_collezione oc ON o.id_oggetto = oc.fk_oggetto
-            LEFT JOIN immagine img ON o.id_oggetto = img.fk_oggetto
-            $where_clause
-            ORDER BY r.ordine DESC, o.nome_oggetto
-            LIMIT 20
-        ");
-        $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * Ottiene dettagli completi dello scambio con carte
-     */
-    public function getDettagliCompleti($id_scambio) {
-        $scambio = $this->getScambio($id_scambio);
-        if (!$scambio) {
-            return null;
-        }
-
-        $carte_offerte = $this->getCarteOfferte($id_scambio);
-        $carte_richieste = $this->getCarteRichieste($id_scambio);
-
-        $scambio['carte_offerte_dettagli'] = $carte_offerte;
-        $scambio['carte_richieste_dettagli'] = $carte_richieste;
-        $scambio['valore_offerto'] = $this->calcolaValoreStimato($carte_offerte);
-        $scambio['valore_richiesto'] = $this->calcolaValoreStimato($carte_richieste);
-
-        return $scambio;
+    private function trasferisciOggetto(int $da_utente, int $a_utente, int $id_oggetto, int $quantita): void {
+        // Scala dal mittente
+        $stmt = $this->pdo->prepare("UPDATE oggetto_utente SET quantita = quantita - ? WHERE fk_utente = ? AND fk_oggetto = ?");
+        $stmt->execute([$quantita, $da_utente, $id_oggetto]);
+        // Aggiungi al destinatario (upsert semplice)
+        $stmt = $this->pdo->prepare("INSERT INTO oggetto_utente (fk_utente, fk_oggetto, quantita) VALUES (?,?,?)
+                                     ON DUPLICATE KEY UPDATE quantita = quantita + VALUES(quantita)");
+        $stmt->execute([$a_utente, $id_oggetto, $quantita]);
     }
 }
-
-
-
-// Factory per creare istanza ScambioManager
-class ScambioManagerFactory {
-    public static function create() {
-        global $config; // Usa la variabile globale $config
-
-        if (!isset($config)) {
-            require_once __DIR__ . '/../include/config.inc.php';
-        }
-
-        $db_config = $config['dbms']['localhost'];
-
-        try {
-            $pdo = new PDO(
-                "mysql:host={$db_config['host']};dbname={$db_config['dbname']};charset=utf8mb4",
-                $db_config['user'],
-                $db_config['passwd']
-            );
-            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            return new ScambioManager($pdo);
-
-        } catch (PDOException $e) {
-            throw new Exception("Errore di connessione al database: " . $e->getMessage());
-        }
-    }
-}
-

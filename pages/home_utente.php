@@ -254,7 +254,7 @@ $carouselImages = getCarouselImages();
                     <h3>Classifica</h3>
                     <p>Sfida gli altri collezionisti e scala la classifica per diventare il numero uno!</p>
                 </a>
-                <a href="<?= BASE_URL; ?>/pages/scambi.php" class="community-card">
+                <a href="<?= BASE_URL; ?>/pages/scambio.php" class="community-card">
                     <i class="bi bi-exchange-alt community-icon"></i>
                     <h3>Scambi di Carte</h3>
                     <p>Scambia le tue carte doppie e completa la tua collezione con altri appassionati.</p>
