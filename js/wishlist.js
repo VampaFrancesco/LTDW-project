@@ -298,7 +298,7 @@ function showNotification(message, type) {
     setTimeout(() => {
         notification.style.animation = 'slideOutRight 0.3s ease';
         setTimeout(() => notification.remove(), 300);
-    }, 3000);
+    }, 300);
 }
 
 // Gestione rimozione dalla pagina wishlist
@@ -344,33 +344,38 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Gestione aggiunta al carrello dalla wishlist
+    // Gestione aggiunta al carrello dalla wishlist - VERSIONE CORRETTA
     document.querySelectorAll('.btn-add-to-cart').forEach(button => {
         button.addEventListener('click', function() {
             const itemId = this.dataset.itemId;
             const itemType = this.dataset.itemType;
 
+            // Ottieni dati dal DOM della card wishlist
+            const card = this.closest('.wishlist-item-card');
+            const nome = card.querySelector('h3').textContent.trim();
+            const prezzoElement = card.querySelector('.price');
+            const prezzo = prezzoElement.textContent.replace('€', '').replace(',', '.').trim();
+
+            // Prepara FormData con tutti i parametri richiesti
             const formData = new FormData();
             formData.append('id_prodotto', itemId);
-            formData.append('item_type', itemType);
+            formData.append('nome_prodotto', nome);
+            formData.append('prezzo', prezzo);
             formData.append('tipo', itemType === 'box' ? 'mystery_box' : 'oggetto');
             formData.append('quantita', '1');
 
-// Ottieni nome e prezzo dal DOM della card
-            const card = this.closest('.wishlist-item-card');
-            const nome = card.querySelector('h3').textContent.trim();
-            const prezzo = card.querySelector('.price').textContent.replace('€', '').replace(',', '.').trim();
+            // Disabilita bottone durante la richiesta
+            this.disabled = true;
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="bi bi-hourglass-split"></i> Aggiunta...';
 
-            formData.append('nome_prodotto', nome);
-            formData.append('prezzo', prezzo);
-
+            // ✅ CORREZIONE: Usa BASE_URL JavaScript invece di PHP
             fetch(`${BASE_URL}/action/add_to_cart.php`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
                     'X-Requested-With': 'XMLHttpRequest'
                 },
-                body: `action=add&item_id=${itemId}&item_type=${itemType}&quantity=1`
+                body: formData
             })
                 .then(response => response.json())
                 .then(data => {
@@ -378,25 +383,60 @@ document.addEventListener('DOMContentLoaded', function() {
                         showNotification('Prodotto aggiunto al carrello!', 'success');
                         updateCartCounter(data.cart_count);
                     } else {
-                        alert(data.message || 'Errore nell\'aggiunta al carrello');
+                        showNotification(data.message || 'Errore nell\'aggiunta al carrello', 'error');
                     }
                 })
                 .catch(error => {
                     console.error('Errore:', error);
-                    alert('Si è verificato un errore');
+                    showNotification('Si è verificato un errore', 'error');
+                })
+                .finally(() => {
+                    // Ripristina bottone
+                    this.disabled = false;
+                    this.innerHTML = originalText;
                 });
         });
     });
-});
 
-function updateCartCounter(count) {
-    const cartBadge = document.querySelector('.bi-cart-fill').nextElementSibling;
-    if (cartBadge && cartBadge.classList.contains('badge')) {
-        cartBadge.textContent = count;
-    } else if (count > 0) {
-        const newBadge = document.createElement('span');
-        newBadge.className = 'badge bg-danger';
-        newBadge.textContent = count;
-        document.querySelector('.bi-cart-fill').parentElement.appendChild(newBadge);
+    function showNotification(message, type) {
+        // Rimuovi notifiche esistenti
+        document.querySelectorAll('.wishlist-notification').forEach(n => n.remove());
+
+        const notification = document.createElement('div');
+        notification.className = `wishlist-notification alert alert-${type === 'success' ? 'success' : 'danger'}`;
+        notification.innerHTML = `
+        <i class="bi bi-${type === 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill'}"></i>
+        <strong>${type === 'success' ? 'Perfetto!' : 'Errore!'}</strong> ${message}
+    `;
+        notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+        min-width: 300px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        animation: slideInRight 0.3s ease-out;
+    `;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease-out';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
     }
-}
+
+    function updateCartCounter(count) {
+        const cartBadge = document.querySelector('.cart-count, .badge');
+        if (cartBadge && count > 0) {
+            cartBadge.textContent = count;
+            cartBadge.style.display = 'inline-block';
+            // Animazione pulse
+            cartBadge.classList.add('animate__animated', 'animate__pulse');
+            setTimeout(() => {
+                cartBadge.classList.remove('animate__animated', 'animate__pulse');
+            }, 1000);
+        }
+    }
+});

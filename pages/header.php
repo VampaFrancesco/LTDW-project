@@ -19,21 +19,24 @@ if ($flash_message) {
     <title>Box Omnia</title>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/css/style.css">
-    <link rel="stylesheet" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/css/bootstrap.min.css">
+    <link rel="stylesheet" href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/css/style.css">
+    <link rel="stylesheet" href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link rel="icon" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/images/favicon.ico" type="image/gif"/>
+    <link rel="icon" href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/images/favicon.ico" type="image/gif"/>
+
     <script>
-        window.BASE_URL = '<?php echo BASE_URL; ?>';
+        window.BASE_URL = '<?php echo defined('BASE_URL') ? BASE_URL : ''; ?>';
         window.isLoggedIn = <?php echo SessionManager::isLoggedIn() ? 'true' : 'false'; ?>;
     </script>
+
 
 </head>
 <body>
 <!-- Gestione messaggi flash -->
 <?php if ($flash_message): ?>
-    <div class="alert alert-<?php echo htmlspecialchars($flash_message['type']); ?> alert-dismissible fade show" role="alert">
+    <div class="alert alert-<?php echo htmlspecialchars($flash_message['type']); ?> alert-dismissible fade show"
+         role="alert">
         <?php echo htmlspecialchars($flash_message['content']); ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
@@ -41,17 +44,19 @@ if ($flash_message) {
 
 <?php if (empty($hideNav)): ?>
     <header>
-        <div class="header-top py-2 background-header" >
+        <div class="header-top py-2 background-header">
             <div class="container d-flex align-items-center">
 
                 <!-- 1) Logo a sinistra -->
-                <a href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/index.php" class="logo-link mr-3">
-                    <img id="logo_header" src="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/images/boxomnia.png" alt="logo">
+                <a href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/pages/index.php" class="logo-link mr-3">
+                    <img id="logo_header" src="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/images/boxomnia.png"
+                         alt="logo">
                 </a>
 
                 <!-- 2) Search bar -->
                 <div class="flex-fill px-3">
-                    <form class="form-inline w-100" method="get" action="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/action/search.php">
+                    <form class="form-inline w-100" method="get"
+                          action="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/action/search.php">
                         <input class="form-control mr-2 flex-grow-1" type="search" name="q" placeholder="Cerca..."
                                aria-label="Cerca">
                         <button class="btn btn-outline-secondary" type="submit">
@@ -81,42 +86,50 @@ if ($flash_message) {
                                 <?php if ($isAdmin): ?>
                                     <!-- Menu ADMIN: Dashboard invece di Profilo -->
                                     <li>
-                                        <a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/dashboard/dashboard.php">
+                                        <a class="dropdown-item"
+                                           href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/pages/dashboard/dashboard.php">
                                             <i class="bi bi-speedometer2"></i> Dashboard Admin
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/home_utente.php">
+                                        <a class="dropdown-item"
+                                           href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/pages/home_utente.php">
                                             <i class="bi bi-house"></i> Area Utente
                                         </a>
                                     </li>
                                 <?php else: ?>
                                     <!-- Menu UTENTE NORMALE: Profilo invece di Dashboard -->
                                     <li>
-                                        <a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/home_utente.php">
+                                        <a class="dropdown-item"
+                                           href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/pages/home_utente.php">
                                             <i class="bi bi-house"></i> <?php echo SessionManager::isLoggedIn() ? 'Home Page' : 'Dashboard'; ?>
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/profilo.php">
+                                        <a class="dropdown-item"
+                                           href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/pages/profilo.php">
                                             <i class="bi bi-person-gear"></i> Profilo
                                         </a>
                                     </li>
-                                <?php endif; ?>                           
+                                <?php endif; ?>
 
 
                                 <?php if (!$isAdmin): ?>
                                     <!-- Ordini solo per utenti normali -->
                                     <li>
-                                        <a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/ordini.php">
+                                        <a class="dropdown-item"
+                                           href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/pages/ordini.php">
                                             <i class="bi bi-bag-check"></i> I miei Ordini
                                         </a>
                                     </li>
                                 <?php endif; ?>
 
-                                <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <a class="dropdown-item" href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/auth/logout.php">
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/pages/auth/logout.php">
                                         <i class="bi bi-box-arrow-right"></i> Logout
                                     </a>
                                 </li>
@@ -124,15 +137,18 @@ if ($flash_message) {
                         </div>
                     <?php else: ?>
                         <!-- Utente non loggato -->
-                        <a href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/auth/login.php" class="mx-2">ACCEDI</a>
-                        <a href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/auth/register.php" class="mx-2">REGISTRATI</a>
+                        <a href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/pages/auth/login.php" class="mx-2">ACCEDI</a>
+                        <a href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/pages/auth/register.php"
+                           class="mx-2">REGISTRATI</a>
                     <?php endif; ?>
 
                     <!-- Altri link sempre visibili -->
-                    <a href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/wishlist.php" class="mx-2" title="Lista Desideri">
+                    <a href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/pages/wishlist.php" class="mx-2"
+                       title="Lista Desideri">
                         <i class="bi bi-heart-fill"></i>
                     </a>
-                    <a href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/cart.php" class="mx-2" title="Carrello">
+                    <a href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/pages/cart.php" class="mx-2"
+                       title="Carrello">
                         <i class="bi bi-cart-fill"></i>
                         <?php
                         // Mostra numero items nel carrello se presente
@@ -144,7 +160,8 @@ if ($flash_message) {
                     </a>
 
                     <?php if (SessionManager::isLoggedIn()): ?>
-                        <a href="<?php echo (defined('BASE_URL') ? BASE_URL : ''); ?>/pages/notifiche.php" class="mx-2" title="Notifiche">
+                        <a href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/pages/notifiche.php" class="mx-2"
+                           title="Notifiche">
                             <i class="bi bi-bell-fill"></i>
                             <?php
                             // Mostra numero notifiche se presente
@@ -166,11 +183,11 @@ if ($flash_message) {
 <!-- Script per il dropdown (Bootstrap 5) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         // Auto-hide alerts dopo 5 secondi
         const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(function(alert) {
-            setTimeout(function() {
+        alerts.forEach(function (alert) {
+            setTimeout(function () {
                 const bsAlert = new bootstrap.Alert(alert);
                 bsAlert.close();
             }, 5000);

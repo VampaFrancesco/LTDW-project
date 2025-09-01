@@ -210,8 +210,8 @@ class ScambioManager {
 
     public function getScambiUtente(int $utente_id): array {
         $sql = "SELECT s.*,
-                       SUM(CASE WHEN so.da_proponente=1 THEN so.quantita_scambio ELSE 0 END) AS carte_offerte,
-                       SUM(CASE WHEN so.da_proponente=0 THEN so.quantita_scambio ELSE 0 END) AS carte_richieste
+                       SUM(CASE WHEN so.da_utente=1 THEN so.quantita_scambio ELSE 0 END) AS carte_offerte,
+                       SUM(CASE WHEN so.da_utente=0 THEN so.quantita_scambio ELSE 0 END) AS carte_richieste
                 FROM scambio s
                 LEFT JOIN scambio_oggetto so ON so.fk_scambio = s.id_scambio
                 WHERE s.fk_utente = ?
@@ -235,7 +235,7 @@ class ScambioManager {
     }
 
     public function getCategorie(): array {
-        $stmt = $this->pdo->query("SELECT * FROM categoria ORDER BY nome_categoria");
+        $stmt = $this->pdo->query("SELECT * FROM categoria_oggetto ORDER BY nome_categoria");
         return $stmt->fetchAll();
     }
 
@@ -245,7 +245,7 @@ class ScambioManager {
         foreach ($righe_scambio as $r) {
             $id_oggetto = (int)$r['fk_oggetto'];
             $qta = (int)$r['quantita_scambio'];
-            $stmt = $this->pdo->prepare("SELECT quantita FROM oggetto_utente WHERE fk_utente=? AND fk_oggetto=?");
+            $stmt = $this->pdo->prepare("SELECT quantita_ogg FROM oggetto_utente WHERE fk_utente=? AND fk_oggetto=?");
             $stmt->execute([$utente_id, $id_oggetto]);
             $row = $stmt->fetch();
             if (!$row || (int)$row['quantita'] < $qta) { $ok = false; break; }
