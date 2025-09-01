@@ -283,8 +283,6 @@ include __DIR__ . '/header.php';
             const orderDetailsContent = document.getElementById('orderDetailsContent').innerHTML;
 
             const printContent = `
-                <!DOCTYPE html>
-                <html>
                 <head>
                     <title>Dettagli Ordine - BoxOmnia</title>
                     <link rel="stylesheet" href="../assets/css/print_styles.css">
@@ -308,7 +306,6 @@ include __DIR__ . '/header.php';
                         </div>
                     </div>
                 </body>
-                </html>
             `;
 
             const printWindow = window.open('', '_blank');
