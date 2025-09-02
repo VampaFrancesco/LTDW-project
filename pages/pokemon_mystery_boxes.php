@@ -209,6 +209,7 @@ $conn->close();
                                         <input type="hidden" name="nome_prodotto" value="<?php echo htmlspecialchars($box['name']); ?>">
                                         <input type="hidden" name="prezzo" value="<?php echo $box['price']; ?>">
                                         <input type="hidden" name="tipo" value="mystery_box">
+                                        <input type="hidden" name="redirect_url" value="<?php echo BASE_URL; ?>/pages/pokemon_mystery_boxes.php">
                                         <div class="input-group mb-3">
                                             <label for="quantityBox_<?php echo $box['id']; ?>" class="input-group-text">Quantità</label>
                                             <input type="number" name="quantita" id="quantityBox_<?php echo $box['id']; ?>" class="form-control" value="1" min="1" max="<?php echo $box['stock']; ?>">

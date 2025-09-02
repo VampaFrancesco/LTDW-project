@@ -195,6 +195,7 @@ $conn->close();
                                         <input type="hidden" name="nome_prodotto" value="<?php echo htmlspecialchars($funko['name']); ?>">
                                         <input type="hidden" name="prezzo" value="<?php echo $funko['price']; ?>">
                                         <input type="hidden" name="tipo" value="funko_pop">
+                                        <input type="hidden" name="redirect_url" value="<?php echo BASE_URL; ?>/pages/pokemon_funko_pops.php">
                                         <div class="input-group mb-3">
                                             <label for="quantityFunko_<?php echo $funko['id']; ?>" class="input-group-text">Quantità</label>
                                             <input type="number" name="quantita" id="quantityFunko_<?php echo $funko['id']; ?>" class="form-control" value="1" min="1" max="<?php echo $funko['stock']; ?>">

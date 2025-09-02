@@ -44,11 +44,11 @@ include __DIR__.'/header.php';
         <?php if (empty($array_prodotti)): ?>
             <!-- Carrello vuoto -->
             <div class="alert alert-info text-center py-5">
-                <i class="fas fa-shopping-cart fa-3x mb-3 text-muted"></i>
+                <i class="bi bi-shopping-cart fa-3x mb-3 text-muted"></i>
                 <h3>Il tuo carrello è vuoto</h3>
                 <p class="mb-4">Aggiungi alcuni prodotti per iniziare il tuo shopping!</p>
                 <a href="<?php echo BASE_URL; ?>/pages/home_utente.php" class="btn btn-primary btn-lg">
-                    <i class="fas fa-shopping-bag"></i> Vai allo Shop
+                    <i class="bi bi-shopping-bag"></i> Vai allo Shop
                 </a>
             </div>
 
@@ -60,7 +60,7 @@ include __DIR__.'/header.php';
                     <div class="card shadow-sm">
                         <div class="card-header bg-light">
                             <h5 class="mb-0">
-                                <i class="fas fa-shopping-cart"></i>
+                                <i class="bi bi-shopping-cart"></i>
                                 Prodotti nel carrello (<?php echo count($array_prodotti); ?>)
                             </h5>
                         </div>
@@ -102,7 +102,7 @@ include __DIR__.'/header.php';
                                             <div class="input-group input-group-sm">
                                                 <button class="btn btn-outline-secondary" type="button"
                                                         onclick="updateQuantity('<?php echo htmlspecialchars($item['cart_key']); ?>', -1)">
-                                                    <i class="fas fa-minus"></i>
+                                                    <i class="bi bi-minus"></i>
                                                 </button>
                                                 <input type="number"
                                                        id="qty-<?php echo htmlspecialchars($item['cart_key']); ?>"
@@ -114,7 +114,7 @@ include __DIR__.'/header.php';
                                                        onchange="validateAndUpdateQuantity('<?php echo htmlspecialchars($item['cart_key']); ?>')">
                                                 <button class="btn btn-outline-secondary" type="button"
                                                         onclick="updateQuantity('<?php echo htmlspecialchars($item['cart_key']); ?>', 1)">
-                                                    <i class="fas fa-plus"></i>
+                                                    <i class="bi bi-plus"></i>
                                                 </button>
                                             </div>
                                         </div>
@@ -129,7 +129,7 @@ include __DIR__.'/header.php';
                                             <button class="btn btn-sm btn-outline-danger"
                                                     onclick="removeFromCart('<?php echo htmlspecialchars($item['cart_key']); ?>')"
                                                     title="Rimuovi prodotto">
-                                                <i class="fas fa-trash"></i>
+                                                <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -144,7 +144,7 @@ include __DIR__.'/header.php';
                     <div class="card shadow-sm sticky-top" style="top: 20px;">
                         <div class="card-header bg-light">
                             <h5 class="mb-0">
-                                <i class="fas fa-calculator"></i> Riepilogo Ordine
+                                <i class="bi bi-calculator"></i> Riepilogo Ordine
                             </h5>
                         </div>
                         <div class="card-body">
@@ -166,7 +166,7 @@ include __DIR__.'/header.php';
 
                             <?php if ($subtotal < 50 && $subtotal > 0): ?>
                                 <div class="alert alert-info py-2 small" id="free-shipping-info">
-                                    <i class="fas fa-info-circle"></i>
+                                    <i class="bi bi-info-circle"></i>
                                     Spendi altri €<span id="amount-for-free-shipping"><?php echo number_format(50 - $subtotal, 2, ',', '.'); ?></span>
                                     per la spedizione gratuita!
                                 </div>
@@ -182,11 +182,11 @@ include __DIR__.'/header.php';
                             <div class="d-grid gap-2">
                                 <a href="<?php echo BASE_URL; ?>/action/checkout_action.php"
                                    class="btn btn-success btn-lg">
-                                    <i class="fas fa-credit-card"></i> Procedi al Checkout
+                                    <i class="bi bi-credit-card"></i> Procedi al Checkout
                                 </a>
                                 <a href="<?php echo BASE_URL; ?>/pages/home_utente.php"
                                    class="btn btn-outline-secondary">
-                                    <i class="fas fa-arrow-left"></i> Continua Shopping
+                                    <i class="bi bi-arrow-left"></i> Continua Shopping
                                 </a>
                             </div>
                         </div>
