@@ -14,7 +14,7 @@ include __DIR__ . '/header.php';
         <!-- Carte di Credito/Debito -->
         <div class="payment-card credit-card">
             <div class="payment-header">
-                <div class="payment-icon"><img src="/images/debitcardlogo.png"></div>
+                <div class="payment-icon"><img src="<?php echo BASE_URL; ?>/images/debitcardlogo.png"></div>
                 <div class="payment-name">Carte di Credito/Debito</div>
             </div>
             <div class="payment-description">
