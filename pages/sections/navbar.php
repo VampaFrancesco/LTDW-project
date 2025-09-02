@@ -8,7 +8,7 @@ require_once __DIR__.'/../../include/config.inc.php';
     <ul class="nav-list">
         <li class="nav-item">
             <a href="<?php echo BASE_URL; ?>/pages/accessori.php">
-                <i class="bi bi-shop"></i><span>Accessori</span>
+<img src="<?php echo BASE_URL; ?>/images/shield.png"><span>Accessori</span>
             </a>
         </li>
         <li class="nav-item dropdown">

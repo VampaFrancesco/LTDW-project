@@ -50,7 +50,7 @@ include __DIR__ . '/header.php';
             </div>
             <div class="col-lg-4 text-lg-end">
                 <button class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#filterPanel">
-                    <i class="fas fa-filter"></i> Filtri avanzati
+                    <i class="bi bi-filter"></i> Filtri avanzati
                 </button>
             </div>
         </div>
@@ -114,11 +114,11 @@ include __DIR__ . '/header.php';
 
                         <div class="mt-3">
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-search"></i> Applica filtri
+                                <i class="bi bi-search"></i> Applica filtri
                             </button>
                             <a href="<?php echo BASE_URL; ?>/action/search.php?q=<?php echo urlencode($query); ?>"
                                class="btn btn-outline-secondary">
-                                <i class="fas fa-times"></i> Reset
+                                <i class="bi bi-times"></i> Reset
                             </a>
                         </div>
                     </form>
@@ -129,7 +129,7 @@ include __DIR__ . '/header.php';
         <!-- Risultati -->
         <?php if (empty($results)): ?>
             <div class="alert alert-info">
-                <h5><i class="fas fa-info-circle"></i> Nessun risultato trovato</h5>
+                <h5><i class="bi bi-info-circle"></i> Nessun risultato trovato</h5>
                 <p>Prova a:</p>
                 <ul>
                     <li>Controllare l'ortografia</li>
@@ -137,7 +137,7 @@ include __DIR__ . '/header.php';
                     <li>Rimuovere alcuni filtri</li>
                 </ul>
                 <a href="<?php echo BASE_URL; ?>/pages/shop.php" class="btn btn-primary mt-3">
-                    <i class="fas fa-shopping-bag"></i> Vai allo Shop
+                    <i class="bi bi-shopping-bag"></i> Vai allo Shop
                 </a>
             </div>
         <?php else: ?>
@@ -193,7 +193,7 @@ include __DIR__ . '/header.php';
                                 <!-- Categoria -->
                                 <?php if (!empty($product['categoria'])): ?>
                                     <small class="text-muted mb-2">
-                                        <i class="fas fa-tag"></i> <?php echo htmlspecialchars($product['categoria']); ?>
+                                        <i class="bi bi-tag"></i> <?php echo htmlspecialchars($product['categoria']); ?>
                                     </small>
                                 <?php endif; ?>
 
@@ -227,7 +227,7 @@ include __DIR__ . '/header.php';
                                             <input type="hidden" name="tipo" value="<?php echo $product['tipo']; ?>">
                                             <input type="hidden" name="quantita" value="1">
                                             <button type="submit" class="btn btn-primary btn-sm w-100">
-                                                <i class="fas fa-cart-plus"></i> Aggiungi al Carrello
+                                                <i class="bi bi-cart-plus"></i> Aggiungi al Carrello
                                             </button>
                                         </form>
                                     <?php else: ?>
