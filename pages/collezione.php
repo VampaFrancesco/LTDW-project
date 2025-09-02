@@ -37,9 +37,6 @@ if ($conn->connect_error) {
 // Abilita la reportistica degli errori MySQLi (utile per il debug) 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT); 
 
-// CODICE AGGIORNATO: Non più necessario recuperare i nomi per la datalist
-// Rimosso il codice per $card_names
-
 // 1. Recupera le rarità e i loro colori 
 $rarities_db = []; 
 $rarity_colors = []; 
@@ -130,8 +127,9 @@ foreach ($available_cards as $card_id => $card) {
 <main class="background-custom">
     <div>
         <div class="container">
+            <!-- NUOVO LAYOUT: Header unificato con titolo e navigazione -->
             <div class="collection-header">
-                <h1 class="fashion_taverage mb-5">La mia Collezione</h1>
+                <h1 class="fashion_taverage">La mia Collezione</h1>
                 <div class="category-nav-filter-container">
                     <a href="#yu-gi-oh-collection" class="btn btn-filter-nav">Yu-Gi-Oh!</a>
                     <a href="#pokemon-collection" class="btn btn-filter-nav">Pokémon</a>
@@ -145,7 +143,8 @@ foreach ($available_cards as $card_id => $card) {
                 </div>
             <?php endif; ?>
 
-            <div class="rarity-filter-section mb-5">
+            <!-- FILTRI RARITÀ: ora più integrati nel design -->
+            <div class="rarity-filter-section">
                 <h3 class="filter-title">Filtra per Rarità:</h3>
                 <div class="filter-buttons-container">
                     <button class="btn btn-filter active" data-rarity="all">Tutte</button>
@@ -289,13 +288,13 @@ foreach ($available_cards as $card_id => $card) {
                             <div class="col-md-12 mb-3">
                                 <label for="cardName" class="form-label">Nome Carta</label>
                                 <input type="text" class="form-control" id="cardName" name="card_name" placeholder="Scrivi il nome della carta..." required>
-                                <small class="form-text text-muted">Inserisci il nome esatto della carta che vuoi aggiungere alla collezione.</small>
+                                <small class="form-text text-muted">Inserisci il nome esatto della carta che vuoi aggiungere</small>
                             </div>
                         </div>
                         <div class="mb-4">
                             <label for="cardQuantity" class="form-label">Quantità</label>
                             <input type="number" class="form-control" id="cardQuantity" name="card_quantity" value="1" min="0" required>
-                            <small class="form-text text-muted">Inserisci la quantità di questa carta che possiedi.</small>
+                            <small class="form-text text-muted">Inserisci la quantità della carta che possiedi</small>
                         </div>
                         <button type="submit" class="btn btn-add-card">Aggiungi Carta alla Collezione</button>
                     </form>
