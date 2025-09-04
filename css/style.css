@@ -3144,27 +3144,330 @@ img {
     border-left-color: #dc3545;
 }
 
-/* Sezione contatti */
-.contact-section {
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    border: 2px solid #cbd5e1;
-    border-radius: 15px;
-    padding: 30px;
-    margin-top: 30px;
+/* CONTACT */
+/* Contenitore principale */
+.contact-page {
+    min-height: 100vh;
+    position: relative;
+    padding-bottom: 80px;
+}
+
+.contact-page .container {
+    position: relative;
+    z-index: 2;
+    padding: 60px 20px;
+}
+
+/* Titolo principale */
+.contact-page .fashion_taital.h1-contact {
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--text-color);
     text-align: center;
+    margin-bottom: 30px;
+    position: relative;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: titleGlow 3s ease-in-out infinite;
 }
 
-.contact-title {
-    color: #333;
-    margin-bottom: 15px;
-    font-size: 24px;
-    font-weight: bold;
+.contact-page .fashion_taital.h1-contact::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -10px;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    border-radius: 2px;
 }
 
-.contact-text {
-    color: #666;
-    margin-bottom: 20px;
+/* Testo lead */
+.contact-page .lead {
+    font-size: 20px;
+    line-height: 1.6;
+    color: var(--text-color);
+    margin-bottom: 50px;
+    padding: 30px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-light);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.contact-page .lead::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color), var(--secondary-color));
+}
+
+.contact-page .lead strong {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+/* Contenitore del contenuto principale */
+.contact-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    margin-top: 50px;
+    align-items: flex-start;
+}
+
+/* Sezione info contatti */
+.contact-info-section {
+    flex: 1 1 300px;
+    min-width: 300px;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.contact-info-section h2 {
+    font-size: 28px;
+    font-weight: 600;
+    color: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+    margin: 0 0 20px 0;
+    position: relative;
+    padding-left: 20px;
+}
+
+.contact-info-section h2::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 30px;
+    background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+    border-radius: 3px;
+}
+
+.contact-info-section p {
     font-size: 16px;
+    line-height: 1.7;
+    color: var(--text-color);
+    margin-bottom: 15px;
+    padding: 20px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 4px 16px rgba(63, 81, 181, 0.05);
+    transition: all var(--transition-speed) ease;
+    position: relative;
+}
+
+.contact-info-section p:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-light);
+    border-color: rgba(63, 81, 181, 0.2);
+}
+
+.contact-info-section p strong {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Sezione form contatti */
+.contact-form-section {
+    flex: 2 1 400px;
+    min-width: 300px;
+    animation: fadeInUp 0.8s ease-out 0.2s;
+}
+
+.contact-form-section form {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    padding: 30px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-light);
+    transition: all var(--transition-speed) ease;
+}
+
+.contact-form-section form:hover {
+    box-shadow: var(--shadow-heavy);
+}
+
+.contact-form-section .form-group {
+    margin-bottom: 25px;
+}
+
+.contact-form-section label {
+    display: block;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+}
+
+.contact-form-section .form-control {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    color: var(--text-color);
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.contact-form-section .form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.2);
+}
+
+.contact-form-section textarea.form-control {
+    resize: vertical;
+}
+
+/* Stile per il pulsante */
+.contact-form-section .btn-add-to-cart {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.contact-form-section .btn-add-to-cart:hover {
+    box-shadow: 0 5px 20px rgba(63, 81, 181, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Decorazioni aggiuntive (come nella pagina About) */
+.contact-page::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(63, 81, 181, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(245, 0, 87, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(0, 188, 212, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Responsive Design per la pagina contatti */
+@media (max-width: 1024px) {
+    .contact-content {
+        gap: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .contact-page .container {
+        padding: 40px 15px;
+    }
+    
+    .contact-page .fashion_taital.h1-contact {
+        font-size: 36px;
+        margin-bottom: 25px;
+    }
+    
+    .contact-page .lead {
+        font-size: 18px;
+        padding: 25px 20px;
+        margin-bottom: 40px;
+    }
+    
+    .contact-content {
+        flex-direction: column;
+        gap: 25px;
+        margin-top: 30px;
+    }
+    
+    .contact-info-section,
+    .contact-form-section {
+        min-width: auto;
+        flex: 1 1 auto;
+    }
+    
+    .contact-info-section h2 {
+        font-size: 24px;
+        margin: 25px 0 15px 0;
+    }
+    
+    .contact-info-section p {
+        font-size: 15px;
+        padding: 18px;
+        margin-bottom: 20px;
+    }
+    
+    .contact-form-section form {
+        padding: 25px;
+    }
+    
+    .contact-form-section label,
+    .contact-form-section .form-control {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .contact-page .fashion_taital.h1-contact {
+        font-size: 28px;
+    }
+    
+    .contact-page .lead {
+        font-size: 16px;
+        padding: 20px 15px;
+    }
+    
+    .contact-content {
+        gap: 20px;
+    }
+    
+    .contact-info-section h2 {
+        font-size: 22px;
+        padding-left: 15px;
+    }
+    
+    .contact-info-section h2::before {
+        width: 4px;
+        height: 25px;
+    }
+    
+    .contact-info-section p {
+        font-size: 14px;
+        padding: 15px;
+        line-height: 1.6;
+    }
+    
+    .contact-form-section form {
+        padding: 20px;
+    }
+    
+    .contact-form-section .btn-add-to-cart {
+        font-size: 16px;
+        padding: 12px;
+    }
 }
 
 /* Pulsanti FAQ */

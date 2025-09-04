@@ -3,46 +3,44 @@ include __DIR__ . '/header.php';
 ?>
 
 <main class="background-custom">
-    <div class="container section">
+    <div class="container section contact-page">
         
-        <h1 class="fashion_taital">Contattaci</h1>
+        <h1 class="fashion_taital h1-contact">Contattaci</h1>
         
-        <p class="lead" style="text-align: center; max-width: 800px; margin: 0 auto;">
-            Hai domande, suggerimenti o richieste particolari?  
+        <p class="lead">
+            Hai domande, suggerimenti o richieste particolari?
             Compila il form qui sotto oppure utilizza i nostri recapiti: saremo felici di risponderti!
         </p>
 
-        <div style="display: flex; flex-wrap: wrap; gap: 40px; margin-top: 40px;">
+        <div class="contact-content">
             
-            <!-- Info contatti -->
-            <div style="flex: 1 1 300px; min-width: 300px;">
+            <div class="contact-info-section">
                 <h2>I nostri recapiti</h2>
-                <p><strong>Email:</strong> <a href="mailto:info@mysterybox.it">info@mysterybox.it</a></p>
-                <p><strong>Telefono:</strong> <a href="tel:+390000000000">+39 000 000 000</a></p>
+                <p><strong>Email:</strong> info@boxomnia.it</p>
+                <p><strong>Telefono:</strong> +39 000 000 000</p>
                 <p><strong>Indirizzo:</strong> Via delle Sorprese, 123 - Roma</p>
-                <p><strong>Orari:</strong> Lun - Ven: 9:00 - 18:00</p>
+                <p><strong>Orari:</strong> Lun - Ven: 8:30 - 16:30</p>
             </div>
 
-            <!-- Form contatti -->
-            <div style="flex: 2 1 400px; min-width: 300px;">
-                <form action="send_contact.php" method="POST" style="background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+            <div class="contact-form-section">
+                <form action="send_contact.php" method="POST">
                     
-                    <div class="form-group" style="margin-bottom: 20px;">
+                    <div class="form-group">
                         <label for="name">Nome e Cognome</label>
                         <input type="text" id="name" name="name" class="form-control" required>
                     </div>
 
-                    <div class="form-group" style="margin-bottom: 20px;">
+                    <div class="form-group">
                         <label for="email">Email</label>
                         <input type="email" id="email" name="email" class="form-control" required>
                     </div>
 
-                    <div class="form-group" style="margin-bottom: 20px;">
+                    <div class="form-group">
                         <label for="message">Messaggio</label>
                         <textarea id="message" name="message" class="form-control" rows="5" required></textarea>
                     </div>
 
-                    <button type="submit" class="btn-add-to-cart" style="width: 100%;">Invia</button>
+                    <button type="submit" class="btn-add-to-cart">Invia</button>
                 </form>
             </div>
 
