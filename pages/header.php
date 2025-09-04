@@ -67,7 +67,7 @@ if ($flash_message) {
 
                 <!-- 3) Top-links a destra -->
                 <div class="top-links d-flex align-items-center ml-3">
-                    <i class="bi bi-person-fill"></i>
+                    <img src="<?php echo BASE_URL; ?>/images/svg/account.svg" alt="account">
 
                     <?php if (SessionManager::isLoggedIn()): ?>
                         <!-- Utente loggato -->
@@ -145,11 +145,11 @@ if ($flash_message) {
                     <!-- Altri link sempre visibili -->
                     <a href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/pages/wishlist.php" class="mx-2"
                        title="Lista Desideri">
-                        <i class="bi bi-heart-fill"></i>
+                        <img src="<?php echo BASE_URL; ?>/images/svg/cuore.svg" alt="wishlist">
                     </a>
                     <a href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/pages/cart.php" class="mx-2"
                        title="Carrello">
-                        <i class="bi bi-cart-fill"></i>
+                        <img src="<?php echo BASE_URL; ?>/images/svg/carrello.svg" alt="carrello">
                         <?php
                         // Mostra numero items nel carrello se presente
                         $cart_items = SessionManager::get('cart_items_count', 0);
