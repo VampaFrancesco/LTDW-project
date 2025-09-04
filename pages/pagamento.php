@@ -1,43 +1,29 @@
 <?php
-/**
- * pages/pagamento.php - VERSIONE MIGLIORATA COMPLETA
- * Gestisce la pagina di pagamento con controlli di sicurezza avanzati
- */
-
+// pages/pagamento.php - VERSIONE CORRETTA
 require_once __DIR__.'/../include/session_manager.php';
 require_once __DIR__.'/../include/config.inc.php';
 
-// Richiedi autenticazione
 SessionManager::requireLogin();
+$user_id = SessionManager::get('user_id');
 
-// Recupera i dati del checkout dalla sessione
+// Recupera dati checkout
 $checkout_data = SessionManager::get('checkout_data');
 
-// Se non ci sono dati di checkout, torna al carrello
 if (!$checkout_data || !isset($checkout_data['items'])) {
-    SessionManager::setFlashMessage('Per procedere al pagamento devi prima selezionare dei prodotti dal carrello.', 'info');
+    SessionManager::setFlashMessage('Sessione checkout scaduta.', 'warning');
     header('Location: ' . BASE_URL . '/pages/cart.php');
     exit();
 }
 
-// Verifica che i dati non siano troppo vecchi (max 60 minuti)
-if (isset($checkout_data['timestamp']) && time() - $checkout_data['timestamp'] > 3600) {
+// Verifica scadenza (60 minuti)
+if (time() - $checkout_data['timestamp'] > 3600) {
     SessionManager::remove('checkout_data');
-    SessionManager::setFlashMessage('La sessione di checkout è scaduta. I prezzi potrebbero essere cambiati, ricontrolla il carrello.', 'warning');
+    SessionManager::setFlashMessage('Sessione scaduta, riprova.', 'warning');
     header('Location: ' . BASE_URL . '/pages/cart.php');
     exit();
 }
 
-// Verifica che l'utente corrente sia lo stesso che ha creato il checkout
-$user_id = SessionManager::get('user_id');
-if (isset($checkout_data['user_id']) && $checkout_data['user_id'] != $user_id) {
-    SessionManager::remove('checkout_data');
-    SessionManager::setFlashMessage('Sessione non valida. Riprova dal carrello.', 'danger');
-    header('Location: ' . BASE_URL . '/pages/cart.php');
-    exit();
-}
-
-// ✅ CONNESSIONE DATABASE CON GESTIONE ERRORI MIGLIORATA
+// Database
 $db_config = $config['dbms']['localhost'];
 $conn = new mysqli(
         $db_config['host'],
@@ -46,417 +32,471 @@ $conn = new mysqli(
         $db_config['dbname']
 );
 
-if ($conn->connect_error) {
-    SessionManager::setFlashMessage('Errore di connessione al database. Riprova più tardi.', 'danger');
-    header('Location: ' . BASE_URL . '/pages/cart.php');
-    exit();
-}
-
-// ✅ RECUPERA INDIRIZZI CON GESTIONE SICURA DEI NULL
+// Recupera indirizzi
 $stmt = $conn->prepare("
     SELECT id_indirizzo, via, civico, cap, citta, provincia, nazione 
     FROM indirizzo_spedizione 
-    WHERE fk_utente = ?
+    WHERE fk_utente = ? 
     ORDER BY id_indirizzo DESC
 ");
-
-if (!$stmt) {
-    SessionManager::setFlashMessage('Errore nel recupero degli indirizzi. Riprova più tardi.', 'danger');
-    header('Location: ' . BASE_URL . '/pages/cart.php');
-    exit();
-}
-
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $indirizzi_result = $stmt->get_result();
 
 $indirizzi = [];
 while ($row = $indirizzi_result->fetch_assoc()) {
-    // ✅ SANIFICAZIONE DEI DATI PER EVITARE NULL
-    $indirizzi[] = [
-            'id_indirizzo' => $row['id_indirizzo'],
-            'via' => $row['via'] ?? '',
-            'civico' => $row['civico'] ?? '',
-            'cap' => $row['cap'] ?? '',
-            'citta' => $row['citta'] ?? '',
-            'provincia' => $row['provincia'] ?? '',
-            'nazione' => $row['nazione'] ?? 'Italia'
-    ];
+    $indirizzi[] = $row;
 }
+
 $stmt->close();
 $conn->close();
 
-// Se non ci sono indirizzi, reindirizza a gestione indirizzi
-if (empty($indirizzi)) {
-    SessionManager::setFlashMessage('Devi aggiungere un indirizzo di spedizione prima di completare l\'ordine.', 'warning');
-    SessionManager::set('redirect_after_address', BASE_URL . '/pages/pagamento.php');
-    header('Location: ' . BASE_URL . '/pages/aggiungi_indirizzo.php');
-    exit();
-}
+// Calcolo spedizione
+$spedizione = $checkout_data['totale'] >= 50 ? 0 : 5.00;
+$totale_finale = $checkout_data['totale'] + $spedizione;
 
-include __DIR__.'/header.php';
+include __DIR__ . '/header.php';
 ?>
 
-<main class="container my-5">
-    <div class="row">
-        <!-- Colonna sinistra: Form di pagamento -->
-        <div class="col-lg-8">
-            <h2 class="mb-4">Checkout</h2>
+    <style>
+        /* ===== CSS PAGAMENTO.PHP - OTTIMIZZATO ===== */
 
-            <!-- Step indicator -->
-            <div class="step-indicator mb-4">
-                <div class="d-flex justify-content-between">
-                    <div class="step active">
-                        <div class="step-number">1</div>
-                        <div class="step-label">Carrello</div>
+        /* Container principale */
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .container.py-4 {
+            padding: 2rem 0.75rem !important;
+        }
+
+        /* Titolo pagina */
+        h2 {
+            color: #333;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-align: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Sezioni principali */
+        h4 {
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+
+        h4::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            margin-right: 0.75rem;
+            border-radius: 2px;
+        }
+
+        /* Form styling */
+        #payment-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Opzioni indirizzi */
+        .form-check.border {
+            border: 2px solid #e9ecef !important;
+            border-radius: 12px !important;
+            padding: 1.5rem !important;
+            margin-bottom: 1rem !important;
+            background: linear-gradient(135deg, #fafbfc 0%, #f8f9fa 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-check.border::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+            opacity: 0.05;
+            z-index: 1;
+        }
+
+        .form-check.border:hover {
+            border-color: #667eea !important;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+        }
+
+        .form-check.border:hover::before {
+            width: 100%;
+        }
+
+        .form-check.border:has(input:checked) {
+            border-color: #28a745 !important;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            box-shadow: 0 5px 20px rgba(40, 167, 69, 0.2);
+        }
+
+        .form-check-input {
+            transform: scale(1.3) !important;
+            accent-color: #28a745;
+            position: relative;
+            z-index: 2;
+        }
+
+        .form-check-label {
+            cursor: pointer;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+        }
+
+        .form-check-label strong {
+            color: #495057;
+            font-size: 1.05rem;
+        }
+
+        .form-check-label i {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+            color: #667eea;
+        }
+
+        /* Card riepilogo ordine */
+        .card.mb-4 {
+            border: none !important;
+            border-radius: 15px !important;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08) !important;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+            border-bottom: 1px solid #dee2e6 !important;
+            padding: 1.5rem !important;
+        }
+
+        .card-header h5 {
+            margin: 0 !important;
+            color: #495057;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-header h5::before {
+            content: '🛒';
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+
+        .card-body {
+            padding: 2rem !important;
+        }
+
+        .card-body .d-flex {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .card-body .d-flex:last-child {
+            border-bottom: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #28a745;
+            background: linear-gradient(135deg, #f8fff9 0%, #f1f8f2 100%);
+            margin: 1rem -2rem 0 -2rem;
+            padding: 1.5rem 2rem;
+            border-radius: 0 0 15px 15px;
+        }
+
+        .card-body hr {
+            margin: 1rem 0;
+            border-color: #dee2e6;
+            opacity: 0.5;
+        }
+
+        /* Note ordine */
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.75rem;
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef !important;
+            border-radius: 12px !important;
+            padding: 1rem !important;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            border-color: #667eea !important;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+        }
+
+        /* Pulsanti */
+        .d-flex.justify-content-between:last-child {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid #f0f0f0;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border-radius: 25px !important;
+            padding: 0.75rem 2rem !important;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-secondary {
+            background: transparent !important;
+            color: #6c757d !important;
+            border: 2px solid #dee2e6 !important;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9fa !important;
+            color: #495057 !important;
+            border-color: #adb5bd !important;
+            transform: translateY(-2px);
+        }
+
+        .btn-success.btn-lg {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+            border: none !important;
+            padding: 1rem 3rem !important;
+            font-size: 1.1rem !important;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-success.btn-lg:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4) !important;
+        }
+
+        .btn-success.btn-lg:disabled {
+            background: #6c757d !important;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container.py-4 {
+                padding: 1rem 0.5rem !important;
+            }
+
+            #payment-form {
+                padding: 1.5rem;
+                margin: 0 -0.5rem;
+            }
+
+            .d-flex.justify-content-between:last-child {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+                padding: 1rem;
+            }
+
+            .form-check.border {
+                padding: 1rem !important;
+            }
+        }
+
+        /* Stati focus per accessibilità */
+        .form-check.border:focus-within {
+            outline: 3px solid rgba(102, 126, 234, 0.3);
+            outline-offset: 2px;
+        }
+
+        .btn:focus {
+            outline: 3px solid rgba(102, 126, 234, 0.3) !important;
+            outline-offset: 2px;
+        }
+
+        /* Animazioni staggered per elementi */
+        .mb-4:nth-child(1) { animation-delay: 0.1s; }
+        .mb-4:nth-child(2) { animation-delay: 0.2s; }
+        .mb-4:nth-child(3) { animation-delay: 0.3s; }
+        .mb-4:nth-child(4) { animation-delay: 0.4s; }
+
+        .mb-4 {
+            animation: slideInUp 0.6s ease-out both;
+        }
+
+        /* Loading state per il pulsante */
+        .btn-success.btn-lg.loading {
+            position: relative;
+        }
+
+        .btn-success.btn-lg.loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            margin: auto;
+            border: 2px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+    <div class="container py-4">
+        <h2><i class="bi bi-credit-card"></i> Pagamento</h2>
+
+        <!-- ✅ FORM CORRETTO CHE INVIA A process_payment_action.php -->
+        <form method="POST" action="<?php echo BASE_URL; ?>/action/process_payment_action.php" id="payment-form">
+
+            <!-- Selezione Indirizzo -->
+            <div class="mb-4">
+                <h4>Indirizzo di Spedizione</h4>
+                <?php foreach ($indirizzi as $indirizzo): ?>
+                    <div class="form-check border p-3 mb-2">
+                        <input class="form-check-input" type="radio" name="indirizzo_id"
+                               value="<?php echo $indirizzo['id_indirizzo']; ?>" required>
+                        <label class="form-check-label">
+                            <strong><?php echo htmlspecialchars($indirizzo['via'] . ' ' . $indirizzo['civico']); ?></strong><br>
+                            <?php echo htmlspecialchars($indirizzo['cap'] . ' ' . $indirizzo['citta'] . ' (' . $indirizzo['provincia'] . ')'); ?>
+                        </label>
                     </div>
-                    <div class="step active">
-                        <div class="step-number">2</div>
-                        <div class="step-label">Spedizione</div>
-                    </div>
-                    <div class="step active">
-                        <div class="step-number">3</div>
-                        <div class="step-label">Pagamento</div>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">4</div>
-                        <div class="step-label">Conferma</div>
-                    </div>
-                </div>
+                <?php endforeach; ?>
             </div>
 
-            <!-- Info sessione -->
-            <div class="alert alert-info mb-4">
-                <i class="bi bi-clock"></i>
-                <strong>Tempo rimanente:</strong>
-                <span id="timeRemaining">59:59</span> -
-                Completa l'ordine entro questo tempo per mantenere i prezzi correnti.
-            </div>
-
-            <!-- ✅ MESSAGGI FLASH -->
-            <?php
-            $flash_message = SessionManager::getFlashMessage();
-            if ($flash_message):
-                ?>
-                <div class="alert alert-<?php echo htmlspecialchars($flash_message['type'] ?? 'info'); ?> alert-dismissible fade show">
-                    <?php echo htmlspecialchars($flash_message['content'] ?? ''); ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            <?php endif; ?>
-
-            <form action="<?php echo BASE_URL; ?>/action/process_payment_action.php" method="POST" id="paymentForm">
-
-                <!-- Sezione Indirizzo di Spedizione -->
-                <div class="card mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Indirizzo di Spedizione</h5>
-                    </div>
-                    <div class="card-body">
-                        <?php if (count($indirizzi) > 1): ?>
-                            <div class="mb-3">
-                                <label for="indirizzo_spedizione" class="form-label">Seleziona indirizzo:</label>
-                                <select class="form-select" id="indirizzo_spedizione" name="indirizzo_id" required>
-                                    <?php foreach ($indirizzi as $indirizzo): ?>
-                                        <option value="<?php echo htmlspecialchars($indirizzo['id_indirizzo']); ?>">
-                                            <?php echo htmlspecialchars($indirizzo['via'] . ' ' . $indirizzo['civico'] . ', ' .
-                                                    $indirizzo['cap'] . ' ' . $indirizzo['citta'] . ' (' . $indirizzo['provincia'] . ')'); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                        <?php else: ?>
-                            <input type="hidden" name="indirizzo_id" value="<?php echo htmlspecialchars($indirizzi[0]['id_indirizzo']); ?>">
-                            <p class="mb-0">
-                                <strong><?php echo htmlspecialchars($indirizzi[0]['via'] . ' ' . $indirizzi[0]['civico']); ?></strong><br>
-                                <?php echo htmlspecialchars($indirizzi[0]['cap'] . ' ' . $indirizzi[0]['citta'] . ' (' . $indirizzi[0]['provincia'] . ')'); ?><br>
-                                <?php echo htmlspecialchars($indirizzi[0]['nazione']); ?>
-                            </p>
-                        <?php endif; ?>
-                        <a href="<?php echo BASE_URL; ?>/pages/aggiungi_indirizzo.php" class="btn btn-sm btn-outline-primary mt-2">
-                            <i class="bi bi-plus-circle"></i> Gestisci indirizzi
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Sezione Metodo di Pagamento (Fittizio) -->
-                <div class="card mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="bi bi-credit-card"></i> Metodo di Pagamento</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="alert alert-info mb-3">
-                            <i class="bi bi-info-circle"></i>
-                            <strong>Ambiente di test:</strong> Questo è un sistema di pagamento fittizio. Nessun pagamento reale verrà elaborato.
-                        </div>
-
-                        <!-- Opzioni di pagamento -->
-                        <div class="payment-options">
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="radio" name="payment_method" id="carta_credito" value="carta_credito" checked>
-                                <label class="form-check-label" for="carta_credito">
-                                    <i class="bi bi-credit-card"></i> Carta di Credito/Debito
-                                </label>
-                            </div>
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="radio" name="payment_method" id="paypal" value="paypal">
-                                <label class="form-check-label" for="paypal">
-                                    <i class="bi bi-paypal"></i> PayPal
-                                </label>
-                            </div>
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="radio" name="payment_method" id="bonifico" value="bonifico">
-                                <label class="form-check-label" for="bonifico">
-                                    <i class="bi bi-bank"></i> Bonifico Bancario
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Form carta di credito (fittizio) -->
-                        <div id="creditCardForm" class="mt-4">
-                            <div class="row">
-                                <div class="col-md-8 mb-3">
-                                    <label for="card_number" class="form-label">Numero Carta</label>
-                                    <input type="text" class="form-control" id="card_number" name="card_number"
-                                           placeholder="1234 5678 9012 3456" maxlength="19">
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="card_cvv" class="form-label">CVV</label>
-                                    <input type="text" class="form-control" id="card_cvv" name="card_cvv"
-                                           placeholder="123" maxlength="4">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="card_name" class="form-label">Nome sulla Carta</label>
-                                    <input type="text" class="form-control" id="card_name" name="card_name"
-                                           placeholder="Mario Rossi">
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label for="card_month" class="form-label">Mese</label>
-                                    <select class="form-select" id="card_month" name="card_month">
-                                        <option value="">MM</option>
-                                        <?php for($i = 1; $i <= 12; $i++): ?>
-                                            <option value="<?php echo str_pad($i, 2, '0', STR_PAD_LEFT); ?>">
-                                                <?php echo str_pad($i, 2, '0', STR_PAD_LEFT); ?>
-                                            </option>
-                                        <?php endfor; ?>
-                                    </select>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label for="card_year" class="form-label">Anno</label>
-                                    <select class="form-select" id="card_year" name="card_year">
-                                        <option value="">YYYY</option>
-                                        <?php
-                                        $current_year = date('Y');
-                                        for($i = $current_year; $i <= $current_year + 10; $i++):
-                                            ?>
-                                            <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
-                                        <?php endfor; ?>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Form PayPal (nascosto inizialmente) -->
-                        <div id="paypalForm" class="mt-4" style="display: none;">
-                            <div class="alert alert-info">
-                                <i class="bi bi-paypal"></i>
-                                Verrai reindirizzato su PayPal per completare il pagamento.
-                            </div>
-                        </div>
-
-                        <!-- Form Bonifico (nascosto inizialmente) -->
-                        <div id="bonificoForm" class="mt-4" style="display: none;">
-                            <div class="alert alert-warning">
-                                <h6><i class="bi bi-bank"></i> Istruzioni per il Bonifico</h6>
-                                <p class="mb-1"><strong>IBAN:</strong> IT60 X054 2811 1010 0000 0123456</p>
-                                <p class="mb-1"><strong>Intestatario:</strong> Box Omnia S.r.l.</p>
-                                <p class="mb-0"><strong>Causale:</strong> Ordine #[numero_ordine]</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Note aggiuntive -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h6 class="mb-0"><i class="bi bi-chat-text"></i> Note Aggiuntive (Opzionale)</h6>
-                    </div>
-                    <div class="card-body">
-                            <textarea class="form-control" name="note_ordine" rows="3"
-                                      placeholder="Inserisci eventuali note per il tuo ordine..."></textarea>
-                    </div>
-                </div>
-
-                <!-- Termini e Condizioni -->
-                <div class="form-check mb-4">
-                    <input class="form-check-input" type="checkbox" id="accept_terms" name="accept_terms" required>
-                    <label class="form-check-label" for="accept_terms">
-                        Accetto i <a href="#" target="_blank">Termini e Condizioni</a> e
-                        l'<a href="#" target="_blank">Informativa sulla Privacy</a>
+            <!-- Metodo di Pagamento -->
+            <div class="mb-4">
+                <h4>Metodo di Pagamento</h4>
+                <div class="form-check border p-3 mb-2">
+                    <input class="form-check-input" type="radio" name="payment_method"
+                           value="carta_credito" checked required>
+                    <label class="form-check-label">
+                        <i class="bi bi-credit-card"></i> Carta di Credito
                     </label>
                 </div>
-
-                <!-- Pulsante Conferma -->
-                <button type="submit" class="btn btn-success btn-lg w-100" id="confirmPaymentBtn">
-                    <i class="bi bi-lock-fill"></i>
-                    <span id="btnText">Conferma e Paga €<?php echo number_format($checkout_data['totale'], 2); ?></span>
-                    <span id="btnSpinner" class="d-none">
-                            <span class="spinner-border spinner-border-sm" role="status"></span>
-                            Elaborazione...
-                        </span>
-                </button>
-
-            </form>
-        </div>
-
-        <!-- Colonna destra: Riepilogo Ordine -->
-        <div class="col-lg-4">
-            <div class="card">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0"><i class="bi bi-cart3"></i> Riepilogo Ordine</h5>
+                <div class="form-check border p-3 mb-2">
+                    <input class="form-check-input" type="radio" name="payment_method"
+                           value="paypal" required>
+                    <label class="form-check-label">
+                        <i class="bi bi-paypal"></i> PayPal
+                    </label>
                 </div>
+            </div>
+
+            <!-- Riepilogo Ordine -->
+            <div class="card mb-4">
+                <div class="card-header"><h5>Riepilogo Ordine</h5></div>
                 <div class="card-body">
-                    <!-- Items del carrello -->
-                    <?php
-                    $subtotale = 0;
-                    foreach ($checkout_data['items'] as $item):
-                        $subtotale += $item['totale'];
-                        ?>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div class="flex-grow-1">
-                                <h6 class="mb-0"><?php echo htmlspecialchars($item['nome_prodotto']); ?></h6>
-                                <small class="text-muted">Qtà: <?php echo $item['quantita']; ?></small>
-                            </div>
-                            <span class="fw-bold">€<?php echo number_format($item['totale'], 2); ?></span>
+                    <?php foreach ($checkout_data['items'] as $item): ?>
+                        <div class="d-flex justify-content-between">
+                            <span><?php echo htmlspecialchars($item['nome_prodotto']); ?> (x<?php echo $item['quantita']; ?>)</span>
+                            <span>€<?php echo number_format($item['totale'], 2); ?></span>
                         </div>
                     <?php endforeach; ?>
-
                     <hr>
-
-                    <!-- Calcoli -->
-                    <div class="d-flex justify-content-between mb-2">
+                    <div class="d-flex justify-content-between">
                         <span>Subtotale:</span>
-                        <span>€<?php echo number_format($subtotale, 2); ?></span>
+                        <span>€<?php echo number_format($checkout_data['totale'], 2); ?></span>
                     </div>
-
-                    <?php
-                    $spese_spedizione = $subtotale >= 50 ? 0 : 5.00;
-                    $totale_finale = $subtotale + $spese_spedizione;
-                    ?>
-
-                    <div class="d-flex justify-content-between mb-2">
+                    <div class="d-flex justify-content-between">
                         <span>Spedizione:</span>
-                        <span class="<?php echo $spese_spedizione == 0 ? 'text-success' : ''; ?>">
-                                <?php echo $spese_spedizione == 0 ? 'GRATIS' : '€' . number_format($spese_spedizione, 2); ?>
-                            </span>
+                        <span><?php echo $spedizione == 0 ? 'GRATUITA' : '€' . number_format($spedizione, 2); ?></span>
                     </div>
-
                     <hr>
-
-                    <div class="d-flex justify-content-between mb-3">
-                        <strong>Totale:</strong>
-                        <strong class="text-primary">€<?php echo number_format($totale_finale, 2); ?></strong>
-                    </div>
-
-                    <!-- Sicurezza -->
-                    <div class="text-center mt-3">
-                        <small class="text-muted">
-                            <i class="bi bi-shield-check"></i> Pagamento sicuro e protetto
-                        </small>
-                    </div>
-
-                    <!-- Link al carrello -->
-                    <div class="text-center mt-2">
-                        <a href="<?php echo BASE_URL; ?>/pages/cart.php" class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-arrow-left"></i> Torna al carrello
-                        </a>
+                    <div class="d-flex justify-content-between fw-bold">
+                        <span>TOTALE:</span>
+                        <span>€<?php echo number_format($totale_finale, 2); ?></span>
                     </div>
                 </div>
             </div>
 
-            <!-- Info aggiuntive -->
-            <div class="mt-3">
-                <div class="alert alert-info">
-                    <h6><i class="bi bi-truck"></i> Spedizione Gratuita</h6>
-                    <small>Su tutti gli ordini sopra i €50</small>
-                </div>
-                <div class="alert alert-info">
-                    <h6><i class="bi bi-arrow-return-left"></i> Reso Facile</h6>
-                    <small>30 giorni per il reso</small>
-                </div>
+            <!-- Note Ordine -->
+            <div class="mb-4">
+                <label for="note_ordine" class="form-label">Note aggiuntive (opzionale)</label>
+                <textarea class="form-control" name="note_ordine" id="note_ordine" rows="3"></textarea>
             </div>
-        </div>
+
+            <!-- Pulsanti -->
+            <div class="d-flex justify-content-between">
+                <a href="<?php echo BASE_URL; ?>/pages/cart.php" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Torna al Carrello
+                </a>
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="bi bi-check-circle"></i> Conferma e Paga €<?php echo number_format($totale_finale, 2); ?>
+                </button>
+            </div>
+        </form>
     </div>
-</main>
 
     <script>
-        // ✅ GESTIONE FORM E VALIDAZIONE
-        document.getElementById('paymentForm').addEventListener('submit', function(e) {
-            const acceptTerms = document.getElementById('accept_terms');
+        // Validazione form
+        document.getElementById('payment-form').addEventListener('submit', function(e) {
+            const addressSelected = document.querySelector('input[name="indirizzo_id"]:checked');
+            const paymentSelected = document.querySelector('input[name="payment_method"]:checked');
 
-            if (!acceptTerms.checked) {
+            if (!addressSelected) {
                 e.preventDefault();
-                alert('Devi accettare i Termini e Condizioni per continuare.');
-                acceptTerms.focus();
+                alert('Seleziona un indirizzo di spedizione');
                 return false;
             }
 
-            // Mostra spinner
-            const btn = document.getElementById('confirmPaymentBtn');
-            const btnText = document.getElementById('btnText');
-            const btnSpinner = document.getElementById('btnSpinner');
-
-            btn.disabled = true;
-            btnText.classList.add('d-none');
-            btnSpinner.classList.remove('d-none');
-
-            return true;
-        });
-
-        // ✅ GESTIONE OPZIONI PAGAMENTO
-        document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                // Nasconde tutti i form
-                document.getElementById('creditCardForm').style.display = 'none';
-                document.getElementById('paypalForm').style.display = 'none';
-                document.getElementById('bonificoForm').style.display = 'none';
-
-                // Mostra il form corrispondente
-                if (this.value === 'carta_credito') {
-                    document.getElementById('creditCardForm').style.display = 'block';
-                } else if (this.value === 'paypal') {
-                    document.getElementById('paypalForm').style.display = 'block';
-                } else if (this.value === 'bonifico') {
-                    document.getElementById('bonificoForm').style.display = 'block';
-                }
-            });
-        });
-
-        // ✅ TIMER SESSIONE
-        let sessionStart = <?php echo $checkout_data['timestamp']; ?>;
-        let sessionTimeout = 3600; // 60 minuti
-
-        function updateTimer() {
-            let elapsed = Math.floor(Date.now() / 1000) - sessionStart;
-            let remaining = sessionTimeout - elapsed;
-
-            if (remaining <= 0) {
-                alert('La sessione di checkout è scaduta. Verrai reindirizzato al carrello.');
-                window.location.href = '<?php echo BASE_URL; ?>/pages/cart.php';
-                return;
+            if (!paymentSelected) {
+                e.preventDefault();
+                alert('Seleziona un metodo di pagamento');
+                return false;
             }
 
-            let minutes = Math.floor(remaining / 60);
-            let seconds = remaining % 60;
-
-            document.getElementById('timeRemaining').textContent =
-                String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
-        }
-
-        // Aggiorna timer ogni secondo
-        setInterval(updateTimer, 1000);
-        updateTimer(); // Prima chiamata immediata
+            // Disabilita pulsante per evitare doppi click
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Elaborazione...';
+        });
     </script>
 
 <?php include __DIR__ . '/footer.php'; ?>

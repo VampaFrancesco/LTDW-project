@@ -180,10 +180,13 @@ include __DIR__.'/header.php';
                             </div>
 
                             <div class="d-grid gap-2">
-                                <a href="<?php echo BASE_URL; ?>/action/checkout_action.php"
-                                   class="btn btn-success btn-lg">
-                                    <i class="bi bi-credit-card"></i> Procedi al Checkout
-                                </a>
+                                <form method="POST" action="<?php echo BASE_URL; ?>/action/checkout_action.php" style="display: inline;">
+                                    <button type="submit" class="btn btn-success btn-lg">
+                                        <i class="bi bi-credit-card"></i>
+                                        Procedi al Checkout
+                                    </button>
+                                </form>
+
                                 <a href="<?php echo BASE_URL; ?>/pages/home_utente.php"
                                    class="btn btn-outline-secondary">
                                     <i class="bi bi-arrow-left"></i> Continua Shopping
