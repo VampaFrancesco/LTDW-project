@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:8889
--- Creato il: Set 02, 2025 alle 08:06
+-- Creato il: Set 04, 2025 alle 15:46
 -- Versione del server: 8.0.40
 -- Versione PHP: 8.3.14
 
@@ -127,7 +127,28 @@ INSERT INTO `carrello` (`id_carrello`, `totale`, `fk_utente`, `data_creazione`, 
 (27, 15.00, 7, '2025-09-02 00:55:55', '2025-09-02 00:58:31', 1, 'completato', NULL, 89),
 (28, 16.00, 7, '2025-09-02 00:56:00', '2025-09-02 00:58:31', 1, 'completato', NULL, 32),
 (29, 4.00, 7, '2025-09-02 00:59:03', '2025-09-02 00:59:08', 1, 'completato', NULL, 8),
-(30, 4.00, 7, '2025-09-02 01:08:43', '2025-09-02 01:08:50', 1, 'completato', NULL, 8);
+(30, 4.00, 7, '2025-09-02 01:08:43', '2025-09-02 01:08:50', 1, 'completato', NULL, 8),
+(32, 9.50, 7, '2025-09-03 22:49:31', '2025-09-03 22:53:23', 1, 'completato', NULL, 18),
+(33, 15.00, 7, '2025-09-03 22:49:39', '2025-09-03 22:53:23', 1, 'completato', NULL, 89),
+(34, 15.00, 7, '2025-09-03 22:53:38', '2025-09-03 22:53:46', 1, 'completato', NULL, 29),
+(35, 15.50, 7, '2025-09-03 22:53:40', '2025-09-03 22:53:46', 1, 'completato', NULL, 30),
+(36, 15.00, 7, '2025-09-03 22:57:38', '2025-09-03 22:59:56', 1, 'completato', NULL, 29),
+(37, 15.50, 7, '2025-09-03 22:57:40', '2025-09-03 22:59:56', 1, 'completato', NULL, 28),
+(38, 15.00, 7, '2025-09-03 23:24:09', '2025-09-04 16:53:12', 1, 'completato', NULL, 89),
+(39, 15.00, 7, '2025-09-03 23:24:10', '2025-09-04 16:53:12', 1, 'completato', NULL, 90),
+(40, 15.50, 7, '2025-09-04 16:24:19', '2025-09-04 16:53:12', 1, 'completato', NULL, 28),
+(41, 15.50, 7, '2025-09-04 16:24:21', '2025-09-04 16:53:12', 1, 'completato', NULL, 30),
+(42, 3.00, 7, '2025-09-04 16:27:32', '2025-09-04 16:53:12', 1, 'completato', NULL, 23),
+(43, 15.00, 7, '2025-09-04 16:58:40', '2025-09-04 17:21:14', 1, 'completato', NULL, 89),
+(44, 16.00, 7, '2025-09-04 16:58:43', '2025-09-04 17:21:14', 1, 'completato', NULL, 88),
+(45, 15.00, 7, '2025-09-04 17:25:30', '2025-09-04 17:25:43', 1, 'completato', NULL, 29),
+(46, 15.00, 7, '2025-09-04 17:25:34', '2025-09-04 17:25:43', 1, 'completato', NULL, 90),
+(47, 15.00, 7, '2025-09-04 17:27:52', '2025-09-04 17:28:04', 1, 'completato', NULL, 89),
+(48, 15.50, 7, '2025-09-04 17:27:56', '2025-09-04 17:28:04', 1, 'completato', NULL, 28),
+(49, 4.50, 7, '2025-09-04 17:39:06', '2025-09-04 17:39:28', 1, 'completato', NULL, 10),
+(50, 15.00, 7, '2025-09-04 17:39:09', '2025-09-04 17:39:28', 1, 'completato', NULL, 29),
+(51, 15.00, 7, '2025-09-04 17:42:38', '2025-09-04 17:42:50', 1, 'completato', NULL, 89),
+(52, 15.50, 7, '2025-09-04 17:42:41', '2025-09-04 17:42:50', 1, 'completato', NULL, 28);
 
 --
 -- Trigger `carrello`
@@ -379,19 +400,32 @@ INSERT INTO `indirizzo_spedizione` (`id_indirizzo`, `via`, `civico`, `cap`, `cit
 --
 
 CREATE TABLE `info_ordine` (
+  `id_info_ordine` int NOT NULL,
   `fk_ordine` int NOT NULL,
-  `fk_box` int NOT NULL,
+  `fk_box` int DEFAULT NULL,
+  `fk_oggetto` int DEFAULT NULL,
   `quantita_ordine` int NOT NULL,
-  `totale_ordine` decimal(10,2) NOT NULL
+  `totale_ordine` decimal(10,2) NOT NULL,
+  `note_ordine` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dump dei dati per la tabella `info_ordine`
 --
 
-INSERT INTO `info_ordine` (`fk_ordine`, `fk_box`, `quantita_ordine`, `totale_ordine`) VALUES
-(2, 2, 1, 20.00),
-(3, 2, 2, 40.00);
+INSERT INTO `info_ordine` (`id_info_ordine`, `fk_ordine`, `fk_box`, `fk_oggetto`, `quantita_ordine`, `totale_ordine`, `note_ordine`) VALUES
+(1, 2, 2, NULL, 1, 20.00, NULL),
+(2, 3, 2, NULL, 2, 40.00, NULL),
+(4, 20, NULL, 89, 1, 15.00, NULL),
+(5, 20, NULL, 88, 1, 16.00, NULL),
+(6, 21, NULL, 29, 1, 15.00, NULL),
+(7, 21, NULL, 90, 1, 15.00, NULL),
+(8, 22, NULL, 89, 1, 15.00, NULL),
+(9, 22, NULL, 28, 1, 15.50, NULL),
+(10, 23, NULL, 10, 1, 4.50, NULL),
+(11, 23, NULL, 29, 1, 15.00, NULL),
+(12, 24, NULL, 89, 1, 15.00, NULL),
+(13, 24, NULL, 28, 1, 15.50, NULL);
 
 -- --------------------------------------------------------
 
@@ -700,7 +734,16 @@ INSERT INTO `ordine` (`id_ordine`, `data_ordine`, `tracking`, `stato_ordine`, `f
 (6, '2025-08-30 00:23:55', NULL, 0, 1, 1, 22),
 (7, '2025-09-02 00:58:31', NULL, 0, 7, 2, 27),
 (8, '2025-09-02 00:59:08', NULL, 0, 7, 2, 29),
-(9, '2025-09-02 01:08:50', '56ghg4wbw4yhj', 1, 7, 2, 30);
+(9, '2025-09-02 01:08:50', '56ghg4wbw4yhj', 2, 7, 2, 30),
+(13, '2025-09-03 22:53:23', NULL, 0, 7, 2, 32),
+(14, '2025-09-03 22:53:46', NULL, 0, 7, 2, 34),
+(15, '2025-09-03 22:59:56', NULL, 0, 7, 2, 36),
+(16, '2025-09-04 16:53:12', NULL, 0, 7, 2, 38),
+(20, '2025-09-04 17:21:14', NULL, 0, 7, 2, NULL),
+(21, '2025-09-04 17:25:43', NULL, 0, 7, 2, NULL),
+(22, '2025-09-04 17:28:04', NULL, 0, 7, 2, NULL),
+(23, '2025-09-04 17:39:28', NULL, 0, 7, 2, NULL),
+(24, '2025-09-04 17:42:50', NULL, 0, 7, 2, NULL);
 
 -- --------------------------------------------------------
 
@@ -733,7 +776,17 @@ INSERT INTO `ordine_log` (`id_log`, `fk_ordine`, `stato_precedente`, `stato_nuov
 (8, 7, NULL, 0, 'Ordine creato con 2 articoli per un totale di €31.00', NULL, '2025-09-02 00:58:31'),
 (9, 8, NULL, 0, 'Ordine creato con 1 articoli per un totale di €4.00', NULL, '2025-09-02 00:59:08'),
 (10, 9, NULL, 0, 'Ordine ORD-68b627828ca8e9.21534116 creato con 1 articoli (1 prodotti distinti) per €4.00', NULL, '2025-09-02 01:08:50'),
-(11, 9, 0, 1, '', NULL, '2025-09-02 01:11:42');
+(11, 9, 0, 1, '', NULL, '2025-09-02 01:11:42'),
+(12, 9, 1, 2, '', NULL, '2025-09-03 19:42:55'),
+(13, 13, NULL, 0, 'Ordine ORD-68b8aac32aa353.61421679 creato con 2 articoli (2 prodotti distinti) per €24.50', NULL, '2025-09-03 22:53:23'),
+(14, 14, NULL, 0, 'Ordine ORD-68b8aadaa0c3d1.10371649 creato con 2 articoli (2 prodotti distinti) per €30.50', NULL, '2025-09-03 22:53:46'),
+(15, 15, NULL, 0, 'Ordine ORD-68b8ac4c053470.32904934 creato con 2 articoli (2 prodotti distinti) per €30.50', NULL, '2025-09-03 22:59:56'),
+(16, 16, NULL, 0, 'Ordine ORD-68b9a7d8c77b63.70980885 creato con 5 articoli (5 prodotti distinti) per €64.00', NULL, '2025-09-04 16:53:12'),
+(17, 20, NULL, 0, 'Ordine ORD-68b9ae6adf5770.62679302 creato - 2 articoli (0 Mystery Box, 2 oggetti) - Totale: €36.00 - Pagamento: carta_credito', NULL, '2025-09-04 17:21:14'),
+(18, 21, NULL, 0, 'Ordine ORD-68b9af770ceb24.15758946 creato - 2 articoli (0 Mystery Box, 2 oggetti) - Totale: €35.00 - Pagamento: carta_credito', NULL, '2025-09-04 17:25:43'),
+(19, 22, NULL, 0, 'Ordine ORD-68b9b00407f340.79732152 creato - 2 articoli (0 Mystery Box, 2 oggetti) - Totale: €35.50 - Pagamento: carta_credito', NULL, '2025-09-04 17:28:04'),
+(20, 23, NULL, 0, 'Ordine ORD-68b9b2b0cb8d72.79879642 creato - 2 articoli (0 Mystery Box, 2 oggetti) - Totale: €24.50 - Pagamento: carta_credito', NULL, '2025-09-04 17:39:28'),
+(21, 24, NULL, 0, 'Ordine ORD-68b9b37ad5d615.06676003 creato - 2 articoli (0 Mystery Box, 2 oggetti) - Totale: €35.50 - Pagamento: carta_credito', NULL, '2025-09-04 17:42:50');
 
 -- --------------------------------------------------------
 
@@ -806,9 +859,9 @@ INSERT INTO `scambio` (`id_scambio`, `data_scambio`, `stato_scambio`, `fk_utente
 CREATE TABLE `scambio_cartaceo` (
   `id` int NOT NULL,
   `fk_scambio` int NOT NULL,
-  `nome_carta` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nome_carta` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `quantita` int NOT NULL DEFAULT '1',
-  `stato` enum('scarso','buono','eccellente') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'buono'
+  `stato` enum('scarso','buono','eccellente') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'buono'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -936,14 +989,6 @@ CREATE TABLE `wishlist` (
   `data_aggiunta` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 
---
--- Dump dei dati per la tabella `wishlist`
---
-
-INSERT INTO `wishlist` (`id_wishlist`, `fk_utente`, `fk_oggetto`, `fk_box`, `data_aggiunta`) VALUES
-(1, 7, 30, NULL, '2025-09-01 22:28:43'),
-(2, 7, 12, NULL, '2025-09-01 22:43:00');
-
 -- --------------------------------------------------------
 
 --
@@ -1046,8 +1091,12 @@ ALTER TABLE `indirizzo_spedizione`
 -- Indici per le tabelle `info_ordine`
 --
 ALTER TABLE `info_ordine`
-  ADD PRIMARY KEY (`fk_ordine`,`fk_box`),
-  ADD KEY `fk_box_info_ordine` (`fk_box`);
+  ADD PRIMARY KEY (`id_info_ordine`),
+  ADD KEY `fk_ordine_info_ordine` (`fk_ordine`),
+  ADD KEY `fk_box_info_ordine` (`fk_box`),
+  ADD KEY `fk_oggetto_info_ordine` (`fk_oggetto`),
+  ADD KEY `idx_ordine_box` (`fk_ordine`,`fk_box`),
+  ADD KEY `idx_ordine_oggetto` (`fk_ordine`,`fk_oggetto`);
 
 --
 -- Indici per le tabelle `mystery_box`
@@ -1184,7 +1233,7 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT per la tabella `carrello`
 --
 ALTER TABLE `carrello`
-  MODIFY `id_carrello` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id_carrello` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT per la tabella `carrello_salvato`
@@ -1223,6 +1272,12 @@ ALTER TABLE `indirizzo_spedizione`
   MODIFY `id_indirizzo` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT per la tabella `info_ordine`
+--
+ALTER TABLE `info_ordine`
+  MODIFY `id_info_ordine` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
 -- AUTO_INCREMENT per la tabella `mystery_box`
 --
 ALTER TABLE `mystery_box`
@@ -1238,13 +1293,13 @@ ALTER TABLE `oggetto`
 -- AUTO_INCREMENT per la tabella `ordine`
 --
 ALTER TABLE `ordine`
-  MODIFY `id_ordine` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_ordine` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT per la tabella `ordine_log`
 --
 ALTER TABLE `ordine_log`
-  MODIFY `id_log` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id_log` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT per la tabella `punti_utente`
@@ -1353,6 +1408,7 @@ ALTER TABLE `indirizzo_spedizione`
 --
 ALTER TABLE `info_ordine`
   ADD CONSTRAINT `fk_box_info_ordine` FOREIGN KEY (`fk_box`) REFERENCES `mystery_box` (`id_box`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_oggetto_info_ordine` FOREIGN KEY (`fk_oggetto`) REFERENCES `oggetto` (`id_oggetto`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_ordine_info_ordine` FOREIGN KEY (`fk_ordine`) REFERENCES `ordine` (`id_ordine`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
