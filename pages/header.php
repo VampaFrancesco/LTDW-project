@@ -158,20 +158,6 @@ if ($flash_message) {
                             <span class="badge bg-danger"><?php echo $cart_items; ?></span>
                         <?php endif; ?>
                     </a>
-
-                    <?php if (SessionManager::isLoggedIn()): ?>
-                        <a href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/pages/notifiche.php" class="mx-2"
-                           title="Notifiche">
-                            <i class="bi bi-bell-fill"></i>
-                            <?php
-                            // Mostra numero notifiche se presente
-                            $notifications = SessionManager::get('notifications_count', 0);
-                            if ($notifications > 0):
-                                ?>
-                                <span class="badge bg-warning"><?php echo $notifications; ?></span>
-                            <?php endif; ?>
-                        </a>
-                    <?php endif; ?>
                 </div>
 
             </div>
