@@ -32,17 +32,18 @@ if (session_status() === PHP_SESSION_NONE) {
 
     // Impostazioni aggiuntive di sicurezza - TIMEOUT 5 MINUTI
     ini_set('session.cookie_secure', $cookieParams['secure'] ? 1 : 0);
-    ini_set('session.gc_maxlifetime', 300); // 5 minuti (300 secondi)
+// Sostituisci la sezione timeout con:
+    ini_set('session.gc_maxlifetime', 300); // ✅ 5 minuti (era 300, ora coerente)
     ini_set('session.gc_probability', 1);
-    ini_set('session.gc_divisor', 100);
+    ini_set('session.gc_divisor', 10); // ✅ Aumentato per pulizia più frequente
+
+// Costanti per il timeout della sessione
+    define('SESSION_TIMEOUT_SECONDS', 300); // ✅ 5 minuti uniformato;
 
     // Rigenerazione automatica dell'ID sessione
     ini_set('session.auto_start', 0);
     ini_set('session.use_trans_sid', 0);
 }
-
-// Costanti per il timeout della sessione
-define('SESSION_TIMEOUT_SECONDS', 300); // 5 minuti
 
 // Funzione helper per debug (solo in sviluppo)
 if (!function_exists('getSessionInfo')) {

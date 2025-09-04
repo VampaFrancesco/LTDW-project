@@ -4,6 +4,11 @@ class SessionManager
 {
     private static $initialized = false;
 
+    // ✅ TIMEOUT UNIFORMATO A 5 MINUTI
+    const SESSION_TIMEOUT_SECONDS = 300; // 5 minuti
+    const SESSION_MAX_LIFETIME = 300;    // 5 minuti massimo
+    const SESSION_REGENERATION_INTERVAL = 120; // Rigenera ogni 2 minuti
+
     public static function startSecureSession(): void
     {
         if (self::$initialized) {
@@ -24,8 +29,8 @@ class SessionManager
                 $_SESSION['last_activity'] = time();
             }
 
-            // Rigenera ID ogni 5 minuti per sicurezza
-            if (time() - $_SESSION['last_regeneration'] > 300) {
+            // Rigenera ID ogni 2 minuti per sicurezza
+            if (time() - ($_SESSION['last_regeneration'] ?? 0) > self::SESSION_REGENERATION_INTERVAL) {
                 session_regenerate_id(true);
                 $_SESSION['last_regeneration'] = time();
             }
@@ -38,14 +43,16 @@ class SessionManager
     {
         self::startSecureSession();
 
-        // Controlla timeout inattività (5 minuti)
-        if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 300)) {
+        // ✅ CONTROLLA TIMEOUT INATTIVITÀ (5 MINUTI)
+        if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > self::SESSION_TIMEOUT_SECONDS)) {
+            error_log("Sessione scaduta per inattività: " . (time() - $_SESSION['last_activity']) . " secondi");
             self::destroy();
             return false;
         }
 
-        // Controlla durata massima sessione (30 minuti)
-        if (isset($_SESSION['created']) && (time() - $_SESSION['created'] > 1800)) {
+        // ✅ CONTROLLA DURATA MASSIMA SESSIONE (5 MINUTI)
+        if (isset($_SESSION['created']) && (time() - $_SESSION['created'] > self::SESSION_MAX_LIFETIME)) {
+            error_log("Sessione scaduta per durata massima: " . (time() - $_SESSION['created']) . " secondi");
             self::destroy();
             return false;
         }
@@ -190,6 +197,68 @@ class SessionManager
     }
 
     /**
+     * ✅ CREA SESSIONE CHECKOUT CON TIMESTAMP CORRETTO
+     */
+    public static function createCheckoutSession($items, $total, $user_id): bool
+    {
+        if (empty($items) || $total <= 0) {
+            return false;
+        }
+
+        $checkout_data = [
+            'items' => $items,
+            'totale' => $total,
+            'user_id' => $user_id,
+            'timestamp' => time(), // ✅ Timestamp attuale
+            'expires_at' => time() + self::SESSION_TIMEOUT_SECONDS // ✅ Scadenza esplicita
+        ];
+
+        self::set('checkout_data', $checkout_data);
+
+        error_log("Checkout session creata: timestamp=" . $checkout_data['timestamp'] . ", expires_at=" . $checkout_data['expires_at']);
+
+        return true;
+    }
+
+    /**
+     * ✅ VALIDA SESSIONE CHECKOUT
+     */
+    public static function validateCheckoutSession(): array|false
+    {
+        $checkout_data = self::get('checkout_data');
+
+        if (!$checkout_data || !is_array($checkout_data)) {
+            error_log("Checkout session mancante o non valida");
+            return false;
+        }
+
+        // Verifica scadenza
+        $current_time = time();
+        if (isset($checkout_data['expires_at']) && $current_time > $checkout_data['expires_at']) {
+            error_log("Checkout session scaduta: current_time={$current_time}, expires_at={$checkout_data['expires_at']}");
+            self::remove('checkout_data');
+            return false;
+        }
+
+        // Verifica user_id
+        $current_user = self::get('user_id');
+        if (isset($checkout_data['user_id']) && $checkout_data['user_id'] != $current_user) {
+            error_log("Checkout session user_id mismatch: stored={$checkout_data['user_id']}, current={$current_user}");
+            self::remove('checkout_data');
+            return false;
+        }
+
+        // Verifica items
+        if (!isset($checkout_data['items']) || !is_array($checkout_data['items']) || empty($checkout_data['items'])) {
+            error_log("Checkout session items non validi");
+            self::remove('checkout_data');
+            return false;
+        }
+
+        return $checkout_data;
+    }
+
+    /**
      * Aggiorna il contatore del carrello
      */
     public static function updateCartCount() {
@@ -285,5 +354,28 @@ class SessionManager
             header('Location: ' . $redirect_url);
             exit();
         }
+    }
+
+    /**
+     * ✅ DEBUG INFO PER TIMEOUT
+     */
+    public static function getSessionDebugInfo(): array
+    {
+        self::startSecureSession();
+
+        return [
+            'current_time' => time(),
+            'created' => $_SESSION['created'] ?? 'N/A',
+            'last_activity' => $_SESSION['last_activity'] ?? 'N/A',
+            'last_regeneration' => $_SESSION['last_regeneration'] ?? 'N/A',
+            'age_seconds' => isset($_SESSION['created']) ? (time() - $_SESSION['created']) : 'N/A',
+            'inactive_seconds' => isset($_SESSION['last_activity']) ? (time() - $_SESSION['last_activity']) : 'N/A',
+            'timeout_limit' => self::SESSION_TIMEOUT_SECONDS,
+            'max_lifetime' => self::SESSION_MAX_LIFETIME,
+            'is_valid' => self::validateSession(),
+            'checkout_data_exists' => (bool)self::get('checkout_data'),
+            'checkout_timestamp' => self::get('checkout_data')['timestamp'] ?? 'N/A',
+            'checkout_expires_at' => self::get('checkout_data')['expires_at'] ?? 'N/A'
+        ];
     }
 }

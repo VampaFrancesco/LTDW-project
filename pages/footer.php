@@ -36,13 +36,13 @@
 </footer>
 
 <!-- JS -->
-<script src="/LTDW-project/js/jquery.min.js" defer></script>
-<script src="/LTDW-project/js/popper.min.js" defer></script>
-<script src="/LTDW-project/js/bootstrap.bundle.min.js" defer></script>
-<script src="/LTDW-project/js/slider-setting.js" defer></script>
-<script src="/LTDW-project/js/custom.js" defer></script>
-<script src="/LTDW-project/js/register.js" defer></script>
-<script src="/LTDW-project/js/session_manager.js" defer></script>
-<script src="/LTDW-project/js/cart.js" defer></script>
-<script src="/LTDW-project/js/search.js" defer></script>
-<script src="/LTDW-project/js/wishlist.js" defer></script>
+<script src="<>/js/jquery.min.js" defer></script>
+<script src="<>/js/popper.min.js" defer></script>
+<script src="<>/js/bootstrap.bundle.min.js" defer></script>
+<script src="<?= BASE_URL ?>/js/slider-setting.js" defer></script>
+<script src="<?= BASE_URL ?>/js/custom.js" defer></script>
+<script src="<?= BASE_URL ?>/js/register.js" defer></script>
+<script src="<?= BASE_URL ?>/js/session_manager.js" defer></script>
+<script src="<?= BASE_URL ?>/js/cart.js" defer></script>
+<script src="<?= BASE_URL ?>/js/search.js" defer></script>
+<script src="<?= BASE_URL ?>/js/wishlist.js" defer></script>
