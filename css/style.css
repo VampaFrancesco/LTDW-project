@@ -4121,3 +4121,1103 @@ img {
 .about-page .fashion_taital.h2-about {
     animation: titleGlow 3s ease-in-out infinite;
 }
+
+/* SCAMBI */
+:root {
+    --scambi-primary-color: #3f51b5;
+    --scambi-secondary-color: #f50057;
+    --scambi-accent-color: #00bcd4;
+    --scambi-text-color: #333333;
+    --scambi-card-bg: #ffffff;
+    --scambi-border-radius: 15px;
+    --scambi-transition-speed: 0.4s;
+    --scambi-shadow-light: 0 8px 32px rgba(63, 81, 181, 0.1);
+    --scambi-shadow-heavy: 0 16px 48px rgba(0, 0, 0, 0.4);
+    --scambi-gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 35%, #f093fb 65%, #f5576c 100%);
+    --scambi-glass-bg: rgba(255, 255, 255, 0.95);
+    --scambi-glass-border: rgba(255, 255, 255, 0.3);
+}
+
+.scambi-collection-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.scambi-collection-header h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--scambi-primary-color), var(--scambi-secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: var(--scambi-shadow-light);
+    margin-bottom: 2rem;
+}
+
+/* Sezioni principali */
+.scambi-section-card {
+    background: var(--scambi-glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--scambi-glass-border);
+    border-radius: var(--scambi-border-radius);
+    box-shadow: var(--scambi-shadow-light);
+    margin-bottom: 2rem;
+    overflow: hidden;
+    transition: all var(--scambi-transition-speed) ease;
+}
+
+.scambi-section-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--scambi-shadow-heavy);
+}
+
+.scambi-section-header {
+    background: linear-gradient(135deg, var(--scambi-primary-color), var(--scambi-accent-color));
+    color: white;
+    padding: 1.5rem 2rem;
+    margin: -1px -1px 0 -1px;
+}
+
+.scambi-section-header h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.scambi-section-header i {
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+}
+
+/* Form di creazione scambio */
+.scambi-form {
+    padding: 2rem;
+}
+
+.scambi-subsection-title {
+    color: var(--scambi-primary-color);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--scambi-accent-color);
+}
+
+/* Tabs personalizzati */
+.scambi-custom-tabs {
+    border: none;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: var(--scambi-border-radius);
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.scambi-custom-tabs .nav-link {
+    background: transparent;
+    border: none;
+    color: var(--scambi-text-color);
+    font-weight: 500;
+    border-radius: calc(var(--scambi-border-radius) - 5px);
+    transition: all var(--scambi-transition-speed) ease;
+    margin-right: 0.5rem;
+}
+
+.scambi-custom-tabs .nav-link:hover {
+    background: rgba(255, 255, 255, 0.7);
+    transform: translateY(-2px);
+}
+
+.scambi-custom-tabs .nav-link.active {
+    background: var(--scambi-primary-color);
+    color: white;
+    box-shadow: var(--scambi-shadow-light);
+}
+
+/* Input di ricerca */
+.scambi-search-input {
+    border: 2px solid var(--scambi-accent-color);
+    border-radius: var(--scambi-border-radius);
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all var(--scambi-transition-speed) ease;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.scambi-search-input:focus {
+    border-color: var(--scambi-primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(63, 81, 181, 0.25);
+    outline: none;
+    background: white;
+}
+
+/* Griglia delle carte */
+.scambi-carte-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: var(--scambi-border-radius);
+    border: 1px solid var(--scambi-glass-border);
+}
+
+.scambi-carte-grid::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scambi-carte-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+.scambi-carte-grid::-webkit-scrollbar-thumb {
+    background: var(--scambi-primary-color);
+    border-radius: 4px;
+    transition: background var(--scambi-transition-speed) ease;
+}
+
+.scambi-carte-grid::-webkit-scrollbar-thumb:hover {
+    background: var(--scambi-accent-color);
+}
+
+/* Item delle carte */
+.scambi-carta-item {
+    background: var(--scambi-card-bg);
+    border: 2px solid transparent;
+    border-radius: var(--scambi-border-radius);
+    padding: 1rem;
+    transition: all var(--scambi-transition-speed) ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.scambi-carta-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left var(--scambi-transition-speed) ease;
+}
+
+.scambi-carta-item:hover {
+    transform: translateY(-5px);
+    border-color: var(--scambi-primary-color);
+    box-shadow: var(--scambi-shadow-light);
+}
+
+.scambi-carta-item:hover::before {
+    left: 100%;
+}
+
+.scambi-carta-nome {
+    font-weight: 600;
+    color: var(--scambi-primary-color);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    line-height: 1.3;
+    max-height: 2.6rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.scambi-carta-quantita {
+    font-size: 0.85rem;
+    color: var(--scambi-accent-color);
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+}
+
+.scambi-carta-input {
+    border: 2px solid var(--scambi-glass-border);
+    border-radius: calc(var(--scambi-border-radius) - 5px);
+    transition: all var(--scambi-transition-speed) ease;
+    text-align: center;
+    font-weight: 600;
+}
+
+.scambi-carta-input:focus {
+    border-color: var(--scambi-accent-color);
+    box-shadow: 0 0 0 0.1rem rgba(0, 188, 212, 0.25);
+    outline: none;
+}
+
+.scambi-carta-input + .input-group-text {
+    background: var(--scambi-accent-color);
+    color: white;
+    border: 2px solid var(--scambi-accent-color);
+    font-weight: 600;
+}
+
+/* Bottone personalizzato */
+.scambi-custom-btn {
+    background: linear-gradient(135deg, var(--scambi-primary-color), var(--scambi-secondary-color));
+    border: none;
+    border-radius: var(--scambi-border-radius);
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    transition: all var(--scambi-transition-speed) ease;
+    box-shadow: var(--scambi-shadow-light);
+    position: relative;
+    overflow: hidden;
+}
+
+.scambi-custom-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left var(--scambi-transition-speed) ease;
+}
+
+.scambi-custom-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--scambi-shadow-heavy);
+}
+
+.scambi-custom-btn:hover::before {
+    left: 100%;
+}
+
+.scambi-custom-btn:active {
+    transform: translateY(-1px);
+}
+
+/* Griglia degli scambi */
+.scambi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem;
+}
+
+/* Card degli scambi */
+.scambi-card {
+    background: var(--scambi-card-bg);
+    border-radius: var(--scambi-border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--scambi-shadow-light);
+    border: 2px solid transparent;
+    transition: all var(--scambi-transition-speed) ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.scambi-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(135deg, var(--scambi-primary-color), var(--scambi-accent-color));
+}
+
+.scambi-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--scambi-primary-color);
+    box-shadow: var(--scambi-shadow-heavy);
+}
+
+.scambi-header {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--scambi-glass-border);
+}
+
+.scambi-header h5 {
+    color: var(--scambi-primary-color);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.scambi-contatti {
+    font-size: 0.9rem;
+    color: var(--scambi-text-color);
+    opacity: 0.8;
+}
+
+.scambi-contatti div {
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+}
+
+.scambi-dettagli {
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.scambi-dettagli strong {
+    color: var(--scambi-primary-color);
+}
+
+/* Azioni degli scambi */
+.scambi-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.scambi-actions .btn {
+    border-radius: calc(var(--scambi-border-radius) - 5px);
+    font-weight: 500;
+    transition: all var(--scambi-transition-speed) ease;
+    flex: 1;
+    min-width: 100px;
+}
+
+.scambi-actions .btn:hover {
+    transform: translateY(-2px);
+}
+
+.scambi-actions .btn-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border: none;
+}
+
+.scambi-actions .btn-outline-primary {
+    border: 2px solid var(--scambi-primary-color);
+    color: var(--scambi-primary-color);
+    background: transparent;
+}
+
+.scambi-actions .btn-outline-primary:hover {
+    background: var(--scambi-primary-color);
+    color: white;
+}
+
+/* Miei scambi */
+.scambi-mio-scambio {
+    position: relative;
+}
+
+.scambi-stato-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.scambi-stato-in_corso {
+    background: linear-gradient(135deg, #ffc107, #ff8f00);
+    color: white;
+}
+
+.scambi-stato-in_attesa {
+    background: linear-gradient(135deg, #17a2b8, #007bff);
+    color: white;
+}
+
+.scambi-stato-concluso {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+}
+
+.scambi-data-scambio {
+    font-size: 0.85rem;
+    color: var(--scambi-text-color);
+    opacity: 0.7;
+    font-weight: 500;
+}
+
+/* Animazioni */
+@keyframes scambiFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.scambi-section-card {
+    animation: scambiFadeIn 0.8s ease-out;
+}
+
+.scambi-carta-item {
+    animation: scambiFadeIn 0.6s ease-out;
+}
+
+.scambi-card {
+    animation: scambiFadeIn 0.7s ease-out;
+}
+
+/* Loading states */
+.scambi-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.scambi-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid var(--scambi-primary-color);
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: scambiSpin 1s linear infinite;
+}
+
+@keyframes scambiSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Utilità */
+.scambi-hidden {
+    display: none !important;
+}
+
+.scambi-fade-in {
+    animation: scambiFadeIn 0.5s ease-out;
+}
+
+.scambi-fade-out {
+    animation: scambiFadeOut 0.5s ease-out forwards;
+}
+
+@keyframes scambiFadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+.scambi-carta-selezionata {
+    border-color: var(--scambi-secondary-color) !important;
+    box-shadow: 0 0 0 0.2rem rgba(245, 0, 87, 0.25);
+}
+
+.scambi-vertical-tabs {
+    flex-direction: column;
+}
+
+.scambi-vertical-tabs .nav-link {
+    margin-right: 0;
+    margin-bottom: 0.25rem;
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .scambi-collection-header h1 {
+        font-size: 2rem;
+    }
+    
+    .scambi-section-header {
+        padding: 1rem;
+    }
+    
+    .scambi-section-header h2 {
+        font-size: 1.4rem;
+    }
+    
+    .scambi-form {
+        padding: 1rem;
+    }
+    
+    .scambi-carte-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        max-height: 300px;
+    }
+    
+    .scambi-grid {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+    
+    .scambi-custom-tabs {
+        flex-direction: column;
+    }
+    
+    .scambi-custom-tabs .nav-link {
+        margin-right: 0;
+        margin-bottom: 0.25rem;
+        text-align: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .scambi-carta-item {
+        padding: 0.75rem;
+    }
+    
+    .scambi-card {
+        padding: 1rem;
+    }:root {
+    --primary-color: #3f51b5;
+    --secondary-color: #f50057;
+    --accent-color: #00bcd4;
+    --text-color: #333333;
+    --card-bg: #ffffff;
+    --border-radius: 15px;
+    --transition-speed: 0.4s;
+    --shadow-light: 0 8px 32px rgba(63, 81, 181, 0.1);
+    --shadow-heavy: 0 16px 48px rgba(0, 0, 0, 0.4);
+    --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 35%, #f093fb 65%, #f5576c 100%);
+    --glass-bg: rgba(255, 255, 255, 0.95);
+    --glass-border: rgba(255, 255, 255, 0.3);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--gradient-bg);
+    min-height: 100vh;
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.page-title {
+    font-size: 3rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: var(--shadow-light);
+    margin-bottom: 2rem;
+}
+
+/* Sezioni principali */
+.section-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    margin-bottom: 2rem;
+    overflow: hidden;
+    transition: all var(--transition-speed) ease;
+}
+
+.section-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-heavy);
+}
+
+.section-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    color: white;
+    padding: 1.5rem 2rem;
+    margin: -1px -1px 0 -1px;
+}
+
+.section-header h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.section-header i {
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+}
+
+/* Form di creazione scambio */
+.scambio-form {
+    padding: 2rem;
+}
+
+.subsection-title {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--accent-color);
+}
+
+/* Tabs personalizzati */
+.custom-tabs {
+    border: none;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: var(--border-radius);
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.custom-tabs .nav-link {
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font-weight: 500;
+    border-radius: calc(var(--border-radius) - 5px);
+    transition: all var(--transition-speed) ease;
+    margin-right: 0.5rem;
+}
+
+.custom-tabs .nav-link:hover {
+    background: rgba(255, 255, 255, 0.7);
+    transform: translateY(-2px);
+}
+
+.custom-tabs .nav-link.active {
+    background: var(--primary-color);
+    color: white;
+    box-shadow: var(--shadow-light);
+}
+
+/* Input di ricerca */
+.search-input {
+    border: 2px solid var(--accent-color);
+    border-radius: var(--border-radius);
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all var(--transition-speed) ease;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.search-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(63, 81, 181, 0.25);
+    outline: none;
+    background: white;
+}
+
+/* Griglia delle carte */
+.carte-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--glass-border);
+}
+
+.carte-grid::-webkit-scrollbar {
+    width: 8px;
+}
+
+.carte-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+.carte-grid::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+    transition: background var(--transition-speed) ease;
+}
+
+.carte-grid::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-color);
+}
+
+/* Item delle carte */
+.carta-item {
+    background: var(--card-bg);
+    border: 2px solid transparent;
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    transition: all var(--transition-speed) ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.carta-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left var(--transition-speed) ease;
+}
+
+.carta-item:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-light);
+}
+
+.carta-item:hover::before {
+    left: 100%;
+}
+
+.carta-nome {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    line-height: 1.3;
+    max-height: 2.6rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.carta-quantita {
+    font-size: 0.85rem;
+    color: var(--accent-color);
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+}
+
+.carta-input {
+    border: 2px solid var(--glass-border);
+    border-radius: calc(var(--border-radius) - 5px);
+    transition: all var(--transition-speed) ease;
+    text-align: center;
+    font-weight: 600;
+}
+
+.carta-input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.1rem rgba(0, 188, 212, 0.25);
+    outline: none;
+}
+
+.input-group-text {
+    background: var(--accent-color);
+    color: white;
+    border: 2px solid var(--accent-color);
+    font-weight: 600;
+}
+
+/* Bottone personalizzato */
+.custom-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    transition: all var(--transition-speed) ease;
+    box-shadow: var(--shadow-light);
+    position: relative;
+    overflow: hidden;
+}
+
+.custom-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left var(--transition-speed) ease;
+}
+
+.custom-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-heavy);
+}
+
+.custom-btn:hover::before {
+    left: 100%;
+}
+
+.custom-btn:active {
+    transform: translateY(-1px);
+}
+
+/* Griglia degli scambi */
+.scambi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem;
+}
+
+/* Card degli scambi */
+.scambio-card {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-light);
+    border: 2px solid transparent;
+    transition: all var(--transition-speed) ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.scambio-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+}
+
+.scambio-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-heavy);
+}
+
+.scambio-header {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.scambio-header h5 {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.contatti {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+.contatti div {
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+}
+
+.scambio-dettagli {
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.scambio-dettagli strong {
+    color: var(--primary-color);
+}
+
+/* Azioni degli scambi */
+.scambio-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.scambio-actions .btn {
+    border-radius: calc(var(--border-radius) - 5px);
+    font-weight: 500;
+    transition: all var(--transition-speed) ease;
+    flex: 1;
+    min-width: 100px;
+}
+
+.scambio-actions .btn:hover {
+    transform: translateY(-2px);
+}
+
+.scambio-actions .btn-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border: none;
+}
+
+.scambio-actions .btn-outline-primary {
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    background: transparent;
+}
+
+.scambio-actions .btn-outline-primary:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Miei scambi */
+.mio-scambio {
+    position: relative;
+}
+
+.stato-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.stato-in_corso {
+    background: linear-gradient(135deg, #ffc107, #ff8f00);
+    color: white;
+}
+
+.stato-in_attesa {
+    background: linear-gradient(135deg, #17a2b8, #007bff);
+    color: white;
+}
+
+.stato-concluso {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+}
+
+.data-scambio {
+    font-size: 0.85rem;
+    color: var(--text-color);
+    opacity: 0.7;
+    font-weight: 500;
+}
+
+/* Animazioni */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section-card {
+    animation: fadeIn 0.8s ease-out;
+}
+
+.carta-item {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.scambio-card {
+    animation: fadeIn 0.7s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .section-header {
+        padding: 1rem;
+    }
+    
+    .section-header h2 {
+        font-size: 1.4rem;
+    }
+    
+    .scambio-form {
+        padding: 1rem;
+    }
+    
+    .carte-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        max-height: 300px;
+    }
+    
+    .scambi-grid {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+    
+    .custom-tabs {
+        flex-direction: column;
+    }
+    
+    .custom-tabs .nav-link {
+        margin-right: 0;
+        margin-bottom: 0.25rem;
+        text-align: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .container-fluid {
+        padding: 1rem;
+    }
+    
+    .carta-item {
+        padding: 0.75rem;
+    }
+    
+    .scambio-card {
+        padding: 1rem;
+    }
+    
+    .scambio-actions {
+        flex-direction: column;
+    }
+    
+    .scambio-actions .btn {
+        flex: none;
+    }
+}
+
+/* Utilità */
+.hidden {
+    display: none !important;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Loading states */
+.loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid var(--primary-color);
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+}
