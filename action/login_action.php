@@ -1,10 +1,4 @@
 <?php
-// action/login_action.php - VERSIONE CORRETTA
-error_reporting(E_ALL);
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
-
-ob_start();
 
 try {
     require_once __DIR__ . '/../include/session_manager.php';

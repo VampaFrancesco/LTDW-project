@@ -209,6 +209,11 @@ $conn->close();
                             <i class="bi bi-shield-plus"></i> Crea Admin
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gestione_contenuti.php">
+                            <i class="bi bi-pencil-fill"></i> Gestisci contenuti
+                        </a>
+                    </li>
                 </ul>
             </div>
         </nav>

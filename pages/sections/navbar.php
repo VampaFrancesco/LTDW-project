@@ -1,6 +1,5 @@
 <?php
 // include/navbar.php
-require_once __DIR__ . '/../../include/session_config.php';
 require_once __DIR__ . '/../../include/session_manager.php';
 require_once __DIR__ . '/../../include/config.inc.php';
 ?>
@@ -45,7 +44,7 @@ require_once __DIR__ . '/../../include/config.inc.php';
                 </li>
             </ul>
         <li class="nav-item">
-            <a href="<?php echo BASE_URL; ?>/pages/index.php">
+            <a href="<?php echo BASE_URL; ?>/pages/home_utente.php">
                 <img src="<?php echo BASE_URL; ?>/images/svg/home.svg" alt="home"><span>Homepage</span>
             </a>
         </li>

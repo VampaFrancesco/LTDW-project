@@ -48,7 +48,7 @@ if ($flash_message) {
             <div class="container d-flex align-items-center">
 
                 <!-- 1) Logo a sinistra -->
-                <a href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/pages/index.php" class="logo-link mr-3">
+                <a href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/pages/home_utente.php" class="logo-link mr-3">
                     <img id="logo_header" src="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/images/boxomnia.png"
                          alt="logo">
                 </a>

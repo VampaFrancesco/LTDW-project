@@ -1,5 +1,6 @@
 <?php
 
+
 // Definizione della configurazione del database all'interno dell'array $config
 $config['dbms']['localhost']['user'] = "admin";
 $config['dbms']['localhost']['passwd'] = "admin";
