@@ -55,7 +55,7 @@ require_once __DIR__ . '/../../include/config.inc.php';
             </a>
         </li>
         <li class="nav-item">
-            <a href="<?php echo BASE_URL; ?>/pages/scambio.php">
+            <a href="<?php echo BASE_URL; ?>/pages/scambi.php">
                 <img src="<?php echo BASE_URL; ?>/images/svg/scambio.svg" alt="scambio"><span>Scambio</span>
             </a>
         </li>
