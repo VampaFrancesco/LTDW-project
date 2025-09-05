@@ -5221,3 +5221,540 @@ body {
     }
 }
 }
+
+/* =================================
+   CLASSIFICA STYLES
+   ================================= */
+
+/* Header Styles */
+.classifica-header {
+    margin-bottom: 3rem;
+}
+
+.trophy-gold {
+    color: #FFD700;
+    margin-right: 15px;
+}
+
+.medal-silver {
+    color: #C0C0C0;
+    margin-left: 15px;
+}
+
+.classifica-description {
+    background: var(--glass-bg);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+}
+
+/* Stats Cards */
+.stat-card {
+    background: var(--glass-bg);
+    padding: 25px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-light);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-heavy);
+}
+
+.stat-card .stat-icon {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    display: block;
+}
+
+.stat-card .stat-icon-gold {
+    font-size: 2.5rem;
+    color: #FFD700;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.stat-card .stat-icon-secondary {
+    font-size: 2.5rem;
+    color: var(--secondary-color);
+    margin-bottom: 10px;
+    display: block;
+}
+
+.stat-card h3 {
+    margin: 10px 0;
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+.stat-card p {
+    margin: 0;
+    color: #666;
+    font-weight: 500;
+}
+
+/* Classifica Container */
+.classifica-container {
+    background: var(--glass-bg);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-light);
+    overflow: hidden;
+}
+
+/* Podium Section */
+.podium-section {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.podium-title {
+    color: white;
+    margin-bottom: 30px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.podium-card {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 25px;
+    transition: all 0.3s ease;
+}
+
+.podium-card:hover {
+    transform: scale(1.05);
+}
+
+.podium-card-gold {
+    border: 2px solid #FFD700;
+}
+
+.podium-card-silver {
+    border: 2px solid #C0C0C0;
+}
+
+.podium-card-bronze {
+    border: 2px solid #CD7F32;
+}
+
+.podium-medal {
+    font-size: 4rem;
+    margin-bottom: 10px;
+}
+
+.podium-name {
+    color: white;
+    margin: 10px 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.podium-score {
+    color: #000;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    margin: 10px 0;
+    display: inline-block;
+}
+
+.podium-score-gold {
+    background: #FFD700;
+}
+
+.podium-score-silver {
+    background: #C0C0C0;
+}
+
+.podium-score-bronze {
+    background: #CD7F32;
+}
+
+.podium-objects {
+    color: rgba(255,255,255,0.8);
+    font-size: 0.9rem;
+}
+
+/* Table Styles */
+.classifica-table-container {
+    padding: 30px;
+}
+
+.classifica-table {
+    background: transparent;
+    margin-bottom: 0;
+}
+
+.classifica-header-row {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+}
+
+.classifica-th {
+    border: none;
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.classifica-row {
+    background: rgba(255,255,255,0.7);
+    transition: all 0.3s ease;
+}
+
+.classifica-row.top-three {
+    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(192,192,192,0.1));
+}
+
+.classifica-row:hover {
+    background: rgba(63,81,181,0.1);
+    transform: scale(1.01);
+    box-shadow: 0 4px 15px rgba(63, 81, 181, 0.2);
+}
+
+.classifica-td {
+    border: none;
+    padding: 20px;
+    vertical-align: middle;
+}
+
+/* Position Cell */
+.position-cell {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.position-medal {
+    font-size: 1.5rem;
+    margin-right: 5px;
+}
+
+.position-medal.gold {
+    color: #FFD700;
+}
+
+.position-medal.silver {
+    color: #C0C0C0;
+}
+
+.position-medal.bronze {
+    color: #CD7F32;
+}
+
+.position-number {
+    color: var(--text-color);
+    font-size: 1.2rem;
+}
+
+/* User Info */
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    margin-right: 15px;
+    font-size: 1.2rem;
+}
+
+.user-details {
+    flex: 1;
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 16px;
+    margin-bottom: 2px;
+}
+
+.user-email {
+    color: #666;
+    font-size: 13px;
+}
+
+/* Score Badge */
+.score-badge {
+    background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+    color: white;
+    padding: 8px 15px;
+    border-radius: 25px;
+    display: inline-block;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Objects Badge */
+.objects-badge {
+    background: var(--glass-bg);
+    padding: 8px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    font-weight: 600;
+    color: var(--primary-color);
+    border: 1px solid var(--glass-border);
+}
+
+/* Average Score */
+.average-score {
+    color: #666;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+/* Empty State */
+.empty-classifica {
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.empty-trophy {
+    font-size: 5rem;
+    color: #ddd;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.empty-title {
+    color: var(--text-color);
+    margin-bottom: 15px;
+    font-size: 2rem;
+}
+
+.empty-description {
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 1.1rem;
+}
+
+.btn-shop {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.btn-shop:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(63, 81, 181, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+/* Achievement Info */
+.achievement-info {
+    margin-top: 3rem;
+}
+
+.info-card {
+    background: var(--glass-bg);
+    padding: 25px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-light);
+    height: 100%;
+}
+
+.info-title {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.info-title.secondary {
+    color: var(--secondary-color);
+}
+
+.info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.info-item {
+    margin: 10px 0;
+    padding: 8px 0;
+    padding-left: 15px;
+    font-size: 14px;
+}
+
+.info-item.primary {
+    border-left: 3px solid var(--primary-color);
+}
+
+.info-item.secondary {
+    border-left: 3px solid var(--secondary-color);
+}
+
+.info-item.accent {
+    border-left: 3px solid var(--accent-color);
+}
+
+/* Level Items */
+.level-item {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.level-badge {
+    padding: 4px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: bold;
+    flex: 0 0 auto;
+}
+
+.level-badge.legend {
+    background: #FFD700;
+    color: #000;
+}
+
+.level-badge.master {
+    background: #C0C0C0;
+    color: #000;
+}
+
+.level-badge.expert {
+    background: #CD7F32;
+    color: #fff;
+}
+
+.level-badge.novice {
+    background: var(--primary-color);
+    color: #fff;
+}
+
+.level-points {
+    font-size: 14px;
+    color: var(--text-color);
+    flex: 1;
+    text-align: right;
+}
+
+/* Animations */
+.fade-in {
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .podium-section {
+        padding: 30px 15px;
+    }
+    
+    .podium-title {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .podium-card {
+        margin-bottom: 20px;
+        padding: 20px;
+    }
+    
+    .podium-medal {
+        font-size: 3rem;
+    }
+    
+    .podium-name {
+        font-size: 1.1rem;
+    }
+    
+    .classifica-table-container {
+        padding: 15px;
+    }
+    
+    .classifica-th,
+    .classifica-td {
+        padding: 10px 8px;
+        font-size: 14px;
+    }
+    
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+        margin-right: 10px;
+    }
+    
+    .user-name {
+        font-size: 14px;
+    }
+    
+    .user-email {
+        font-size: 12px;
+    }
+    
+    .score-badge,
+    .objects-badge {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+    
+    .stat-card {
+        padding: 20px;
+        margin-bottom: 15px;
+    }
+    
+    .stat-card .stat-icon,
+    .stat-card .stat-icon-gold,
+    .stat-card .stat-icon-secondary {
+        font-size: 2rem;
+    }
+    
+    .stat-card h3 {
+        font-size: 1.5rem;
+    }
+    
+    .info-card {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .empty-classifica {
+        padding: 60px 15px;
+    }
+    
+    .empty-trophy {
+        font-size: 4rem;
+    }
+    
+    .empty-title {
+        font-size: 1.5rem;
+    }
+}
