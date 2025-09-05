@@ -2134,6 +2134,11 @@ img {
     filter: grayscale(80%);
 }
 
+.product-img {
+    max-height: 261px;
+    max-width: 247px;
+}
+
 .product-info {
     padding: 20px;
     flex-grow: 1;

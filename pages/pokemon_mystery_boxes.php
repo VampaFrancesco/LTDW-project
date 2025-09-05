@@ -24,14 +24,14 @@ function getImagePathById($itemId, $itemType, $conn) {
     } elseif ($itemType === 'mystery_box') {
         $fkColumn = 'fk_mystery_box';
     } else {
-        return BASE_URL . '/images/default_product1.jpg'; // Tipo non supportato
+        return BASE_URL . '/images/mystery_box_pokemon.png'; // Tipo non supportato
     }
 
     $stmt = $conn->prepare("SELECT nome_img FROM immagine WHERE {$fkColumn} = ? LIMIT 1");
     if ($stmt === false) {
         // Gestione errore preparazione
         error_log("Errore nella preparazione della query: " . $conn->error);
-        return BASE_URL . '/images/default_product1.jpg';
+        return BASE_URL . '/images/mystery_box_pokemon.png';
     }
 
     $stmt->bind_param('i', $itemId);
@@ -43,7 +43,7 @@ function getImagePathById($itemId, $itemType, $conn) {
         return BASE_URL . '/images/' . htmlspecialchars($row['nome_img']);
     }
 
-    return BASE_URL . '/images/default_product1.jpg';
+    return BASE_URL . '/images/mystery_box_pokemon.png';
 }
 
 // Query per recuperare le Mystery Box Pokémon.
