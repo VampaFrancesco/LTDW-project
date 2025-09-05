@@ -1,442 +1,305 @@
-// wishlist.js - Versione corretta
+// wishlist.js - Versione corretta e riorganizzata
 document.addEventListener('DOMContentLoaded', function() {
-    // Variabili globali
+    // --- VARIABILI GLOBALI ---
     const BASE_URL = window.BASE_URL || '';
-    const isLoggedIn = window.isLoggedIn || false;
 
-    // Aggiungi gli stili CSS necessari
+    // --- INIZIALIZZAZIONE ---
     addWishlistStyles();
-
-    // Inizializza la gestione wishlist
-    initWishlistButtons();
-
-    // Carica lo stato iniziale dei bottoni
+    initGlobalWishlistButtons(); // Per i bottoni a forma di cuore
+    initWishlistPageActions();  // Per i bottoni nella pagina /wishlist.php
     loadWishlistStates();
 });
 
+/**
+ * Aggiunge stili CSS per la wishlist e le notifiche.
+ */
 function addWishlistStyles() {
     if (document.getElementById('wishlist-styles')) return;
 
     const style = document.createElement('style');
     style.id = 'wishlist-styles';
     style.textContent = `
-        /* Bottone wishlist */
+        /* Stile per i bottoni a cuore */
         .wishlist-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 10 !important;
-            background: rgba(255, 255, 255, 0.95) !important;
-            border: 2px solid #dc3545 !important;
-            color: #dc3545 !important;
-            width: 40px !important;
-            height: 40px !important;
-            border-radius: 50% !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            cursor: pointer !important;
-            transition: all 0.3s ease !important;
-            padding: 0 !important;
-            font-size: 1.2rem !important;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
-            pointer-events: auto !important;
+            position: absolute; top: 10px; right: 10px; z-index: 10 !important;
+            background: rgba(255, 255, 255, 0.95) !important; border: 2px solid #dc3545 !important;
+            color: #dc3545 !important; width: 40px !important; height: 40px !important;
+            border-radius: 50% !important; display: flex !important; align-items: center !important;
+            justify-content: center !important; cursor: pointer !important; transition: all 0.3s ease !important;
+            padding: 0 !important; font-size: 1.2rem !important; box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
         }
-        
         .wishlist-btn:hover {
-            background: #dc3545 !important;
-            color: white !important;
+            background: #dc3545 !important; color: white !important;
             transform: scale(1.1) !important;
-            box-shadow: 0 4px 12px rgba(220,53,69,0.4) !important;
         }
-        
-        .wishlist-btn.in-wishlist {
-            background: #dc3545 !important;
-            color: white !important;
-        }
-        
-        .wishlist-btn:disabled {
-            opacity: 0.6 !important;
-            cursor: not-allowed !important;
-            transform: none !important;
-        }
-        
-        /* Container per posizionamento corretto */
-        .wishlist-container {
-            position: relative !important;
-        }
-        
-        /* Assicurati che i container delle immagini abbiano position relative */
-        .mystery-box-image-container,
-        .accessory-card .card-img-top,
-        .funko-image-container {
-            position: relative !important;
-        }
-        
-        /* Evita conflitti con altri elementi */
-        .item-link {
-            position: relative !important;
-            z-index: 1 !important;
-        }
-        
-        /* Notifiche */
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        @keyframes slideOutRight {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
-        }
-        
+        .wishlist-btn.in-wishlist { background: #dc3545 !important; color: white !important; }
+        .wishlist-container, .mystery-box-image-container, .accessory-card .card-img-top, .funko-image-container { position: relative !important; }
+
+        /* Animazioni per le notifiche */
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+
+        /* Stile per le notifiche */
         .wishlist-notification {
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            min-width: 250px;
-            z-index: 10000;
-            animation: slideInRight 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: fixed; top: 80px; right: 20px; min-width: 250px; z-index: 10000;
+            padding: 12px 20px; border-radius: 8px; font-weight: 500;
+            animation: slideInRight 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            color: #fff;
         }
-        
-        .alert-success {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
-        }
-        
-        .alert-info {
-            background-color: #d1ecf1;
-            border-color: #bee5eb;
-            color: #0c5460;
-        }
-        
-        .alert-danger {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
-        }
+        .alert-success { background: linear-gradient(45deg, #28a745, #218838); }
+        .alert-info { background: linear-gradient(45deg, #17a2b8, #138496); }
+        .alert-danger { background: linear-gradient(45deg, #dc3545, #c82333); }
     `;
     document.head.appendChild(style);
 }
 
-function initWishlistButtons() {
-    // Rimuovi event listeners esistenti per evitare duplicati
-    const existingButtons = document.querySelectorAll('.wishlist-btn');
-    existingButtons.forEach(btn => {
-        const newBtn = btn.cloneNode(true);
-        btn.parentNode.replaceChild(newBtn, btn);
-    });
+/**
+ * Inizializza i listener per i bottoni a cuore globali.
+ */
+function initGlobalWishlistButtons() {
+    document.body.addEventListener('click', function(e) {
+        const button = e.target.closest('.wishlist-btn');
+        if (!button) return;
+        e.preventDefault();
+        e.stopPropagation();
 
-    // Aggiungi nuovi event listeners
-    const buttons = document.querySelectorAll('.wishlist-btn');
-    buttons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-
-            // Verifica login
-            if (!isLoggedIn || isLoggedIn === 'false') {
-                const currentPage = window.location.href;
-                window.location.href = `${BASE_URL}/pages/auth/login.php?redirect=${encodeURIComponent(currentPage)}`;
-                return;
-            }
-
-            toggleWishlist(this);
-        });
+        const isLoggedIn = window.isLoggedIn || false;
+        if (!isLoggedIn || isLoggedIn === 'false') {
+            window.location.href = `${window.BASE_URL || ''}/pages/auth/login.php?redirect=${encodeURIComponent(window.location.href)}`;
+            return;
+        }
+        toggleWishlist(button);
     });
 }
 
+/**
+ * Inizializza le azioni sulla pagina della wishlist (Aggiungi/Rimuovi).
+ */
+function initWishlistPageActions() {
+    const container = document.querySelector('.wishlist-page-container');
+    if (!container) return;
+
+    container.addEventListener('click', function(e) {
+        const removeButton = e.target.closest('.btn-remove-wishlist');
+        if (removeButton) {
+            handleRemoveFromWishlistPage(removeButton);
+        }
+
+        const addToCartButton = e.target.closest('.btn-add-to-cart');
+        if (addToCartButton) {
+            handleAddToCartFromWishlist(addToCartButton);
+        }
+    });
+}
+
+/**
+ * Gestisce l'aggiunta/rimozione di un item tramite i bottoni a cuore.
+ */
 async function toggleWishlist(button) {
+    if (button.disabled) return;
+    button.disabled = true;
+
     const itemId = button.dataset.itemId;
     const itemType = button.dataset.itemType;
     const icon = button.querySelector('i');
     const isInWishlist = icon.classList.contains('bi-heart-fill');
 
-    // Disabilita temporaneamente il bottone
-    button.disabled = true;
+    const formData = new FormData();
+    if (isInWishlist) {
+        formData.append('action', 'remove');
+        formData.append('wishlist_id', button.dataset.wishlistId || await getWishlistId(itemId, itemType));
+    } else {
+        formData.append('action', 'add');
+        formData.append('item_id', itemId);
+        formData.append('item_type', itemType);
+    }
 
     try {
-        let response;
-
-        if (isInWishlist) {
-            // Rimuovi dalla wishlist
-            let wishlistId = button.dataset.wishlistId;
-            if (!wishlistId) {
-                wishlistId = await getWishlistId(itemId, itemType);
-            }
-
-            const formData = new FormData();
-            formData.append('action', 'remove');
-            formData.append('wishlist_id', wishlistId);
-
-            response = await fetch(`${BASE_URL}/action/wishlist_action.php`, {
-                method: 'POST',
-                body: formData
-            });
-        } else {
-            // Aggiungi alla wishlist
-            const formData = new FormData();
-            formData.append('action', 'add');
-            formData.append('item_id', itemId);
-            formData.append('item_type', itemType);
-
-            response = await fetch(`${BASE_URL}/action/wishlist_action.php`, {
-                method: 'POST',
-                body: formData
-            });
-        }
-
+        const response = await fetch(`${window.BASE_URL || ''}/action/wishlist_action.php`, { method: 'POST', body: formData });
         const data = await response.json();
-
         if (data.success) {
-            // Aggiorna l'icona
             if (isInWishlist) {
                 icon.classList.remove('bi-heart-fill');
                 icon.classList.add('bi-heart');
                 button.classList.remove('in-wishlist');
-                button.title = 'Aggiungi alla wishlist';
                 showNotification('Rimosso dalla wishlist', 'info');
             } else {
                 icon.classList.remove('bi-heart');
                 icon.classList.add('bi-heart-fill');
                 button.classList.add('in-wishlist');
-                button.title = 'Rimuovi dalla wishlist';
+                button.dataset.wishlistId = data.wishlist_id;
                 showNotification('Aggiunto alla wishlist!', 'success');
             }
-
-            // Aggiorna il contatore nella navbar
             updateWishlistCounter(data.wishlist_count);
         } else {
-            showNotification(data.message || 'Errore', 'error');
+            showNotification(data.message || 'Errore', 'danger');
         }
     } catch (error) {
-        console.error('Errore:', error);
-        showNotification('Si è verificato un errore', 'error');
+        showNotification('Errore di comunicazione col server', 'danger');
     } finally {
-        // Riabilita il bottone
         button.disabled = false;
+    }
+}
+
+/**
+ * ✅ FIX: Gestisce la rimozione immediata dalla pagina wishlist, senza popup.
+ */
+function handleRemoveFromWishlistPage(button) {
+    const wishlistId = button.dataset.wishlistId;
+    const card = button.closest('.col-lg-4'); // Seleziona l'intera colonna per una rimozione pulita
+
+    if (!wishlistId || !card) return;
+
+    fetch(`${window.BASE_URL || ''}/action/wishlist_action.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `action=remove&wishlist_id=${wishlistId}`
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Prodotto rimosso con successo!', 'success');
+
+                // Animazione di scomparsa e rimozione della card
+                card.style.transition = 'opacity 0.5s, transform 0.5s';
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.8)';
+                setTimeout(() => {
+                    card.remove();
+                    updateWishlistCounter(data.wishlist_count);
+                    if (document.querySelectorAll('.wishlist-item-card').length === 0) {
+                        location.reload(); // Ricarica per mostrare il messaggio di wishlist vuota
+                    }
+                }, 500);
+            } else {
+                showNotification(data.message || 'Errore nella rimozione', 'danger');
+            }
+        })
+        .catch(error => {
+            showNotification('Errore di rete', 'danger');
+        });
+}
+
+/**
+ * ✅ FIX: Gestisce l'aggiunta al carrello, leggendo i dati dalla card corretta.
+ */
+function handleAddToCartFromWishlist(button) {
+    const card = button.closest('.wishlist-item-card');
+    // Cerca gli elementi DENTRO la card relativa al bottone premuto
+    const nomeElement = card.querySelector('h5');
+    const prezzoElement = card.querySelector('.price');
+
+    if (button.disabled || !nomeElement || !prezzoElement) return;
+
+    const itemId = button.dataset.itemId;
+    const itemType = button.dataset.itemType;
+    const nome = nomeElement.textContent.trim();
+    const prezzo = prezzoElement.textContent.replace('€', '').replace(',', '.').trim();
+
+    const formData = new FormData();
+    formData.append('id_prodotto', itemId);
+    formData.append('nome_prodotto', nome);
+    formData.append('prezzo', prezzo);
+    formData.append('tipo', itemType === 'box' ? 'mystery_box' : 'oggetto');
+    formData.append('quantita', '1');
+
+    button.disabled = true;
+    const originalContent = button.innerHTML;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+
+    fetch(`${window.BASE_URL || ''}/action/add_to_cart.php`, {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Prodotto aggiunto al carrello!', 'success');
+                updateCartCounter(data.cart_count);
+            } else {
+                showNotification(data.message || 'Errore', 'danger');
+            }
+        })
+        .catch(error => {
+            showNotification('Errore di rete', 'danger');
+        })
+        .finally(() => {
+            button.disabled = false;
+            button.innerHTML = originalContent;
+        });
+}
+
+// --- FUNZIONI HELPER (invariate) ---
+
+async function loadWishlistStates() {
+    if (!window.isLoggedIn || window.isLoggedIn === 'false') return;
+    try {
+        const response = await fetch(`${window.BASE_URL || ''}/action/wishlist_action.php?action=get_user_wishlist`);
+        const data = await response.json();
+        if (!data.success) return;
+
+        const userWishlist = data.wishlist;
+        document.querySelectorAll('.wishlist-btn').forEach(button => {
+            const itemId = button.dataset.itemId;
+            const itemType = button.dataset.itemType;
+            const wishlistItem = userWishlist.find(item => item.item_id == itemId && item.item_type == itemType);
+
+            if (wishlistItem) {
+                const icon = button.querySelector('i');
+                icon.classList.remove('bi-heart');
+                icon.classList.add('bi-heart-fill');
+                button.classList.add('in-wishlist');
+                button.dataset.wishlistId = wishlistItem.wishlist_id;
+            }
+        });
+    } catch (error) {
+        console.error('Errore caricamento stati wishlist:', error);
     }
 }
 
 async function getWishlistId(itemId, itemType) {
     try {
-        const response = await fetch(`${BASE_URL}/action/wishlist_action.php?action=get_wishlist_id&item_id=${itemId}&item_type=${itemType}`);
+        const response = await fetch(`${window.BASE_URL || ''}/action/wishlist_action.php?action=get_wishlist_id&item_id=${itemId}&item_type=${itemType}`);
         const data = await response.json();
-        return data.wishlist_id;
+        return data.success ? data.wishlist_id : null;
     } catch (error) {
-        console.error('Errore nel recupero ID wishlist:', error);
         return null;
     }
 }
 
-async function loadWishlistStates() {
-    if (!isLoggedIn || isLoggedIn === 'false') return;
-
-    const buttons = document.querySelectorAll('.wishlist-btn');
-
-    for (const button of buttons) {
-        const itemId = button.dataset.itemId;
-        const itemType = button.dataset.itemType;
-
-        try {
-            const response = await fetch(`${BASE_URL}/action/wishlist_action.php?action=check&item_id=${itemId}&item_type=${itemType}`);
-            const data = await response.json();
-
-            if (data.success && data.in_wishlist) {
-                const icon = button.querySelector('i');
-                icon.classList.remove('bi-heart');
-                icon.classList.add('bi-heart-fill');
-                button.classList.add('in-wishlist');
-                button.title = 'Rimuovi dalla wishlist';
-                button.dataset.wishlistId = data.wishlist_id;
-            }
-        } catch (error) {
-            console.error('Errore nel verificare stato wishlist:', error);
-        }
-    }
-}
-
 function updateWishlistCounter(count) {
-    const wishlistLink = document.querySelector('a[href*="wishlist.php"]');
-    if (wishlistLink) {
-        let badge = wishlistLink.querySelector('.badge');
-
+    const wishlistBadge = document.querySelector('.wishlist-count-badge');
+    if (wishlistBadge) {
         if (count > 0) {
-            if (!badge) {
-                badge = document.createElement('span');
-                badge.className = 'badge bg-danger position-absolute top-0 start-100 translate-middle';
-                wishlistLink.appendChild(badge);
-            }
-            badge.textContent = count;
-        } else if (badge) {
-            badge.remove();
+            wishlistBadge.textContent = `${count} ${count == 1 ? 'prodotto' : 'prodotti'}`;
+            wishlistBadge.style.display = 'inline-block';
+        } else {
+            wishlistBadge.style.display = 'none';
         }
     }
 }
 
-function showNotification(message, type) {
-    // Rimuovi notifiche esistenti
-    const existingNotifications = document.querySelectorAll('.wishlist-notification');
-    existingNotifications.forEach(n => n.remove());
+function updateCartCounter(count) {
+    const cartBadge = document.querySelector('.cart-count'); // Assicurati di avere un elemento con questa classe nell'header
+    if (cartBadge) {
+        cartBadge.textContent = count;
+        cartBadge.style.display = count > 0 ? 'inline-block' : 'none';
+    }
+}
+
+function showNotification(message, type = 'info') {
+    document.querySelectorAll('.wishlist-notification').forEach(n => n.remove());
 
     const notification = document.createElement('div');
-    notification.className = `wishlist-notification alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'}`;
-    notification.innerHTML = `
-        <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'}"></i>
-        ${message}
-    `;
+    notification.className = `wishlist-notification alert-${type}`;
+    notification.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle-fill' : (type === 'info' ? 'info-circle-fill' : 'exclamation-triangle-fill')}"></i> ${message}`;
 
     document.body.appendChild(notification);
 
-    // Rimuovi dopo 3 secondi
     setTimeout(() => {
-        notification.style.animation = 'slideOutRight 0.3s ease';
+        notification.style.animation = 'slideOutRight 0.3s ease forwards';
         setTimeout(() => notification.remove(), 300);
-    }, 300);
+    }, 3000);
 }
 
-// Gestione rimozione dalla pagina wishlist
-document.addEventListener('DOMContentLoaded', function() {
-    // Gestione rimozione dalla wishlist nella pagina dedicata
-    document.querySelectorAll('.btn-remove-wishlist').forEach(button => {
-        button.addEventListener('click', function() {
-            const wishlistId = this.dataset.wishlistId;
-            const card = this.closest('.wishlist-item-card');
-
-            if (confirm('Vuoi rimuovere questo prodotto dalla wishlist?')) {
-                fetch(`${BASE_URL}/action/wishlist_action.php`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `action=remove&wishlist_id=${wishlistId}`
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            card.style.transition = 'opacity 0.5s, transform 0.5s';
-                            card.style.opacity = '0';
-                            card.style.transform = 'scale(0.8)';
-
-                            setTimeout(() => {
-                                card.remove();
-
-                                // Controlla se la wishlist è vuota
-                                if (document.querySelectorAll('.wishlist-item-card').length === 0) {
-                                    location.reload();
-                                }
-                            }, 500);
-                        } else {
-                            alert(data.message || 'Errore nella rimozione');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Errore:', error);
-                        alert('Si è verificato un errore');
-                    });
-            }
-        });
-    });
-
-    // Gestione aggiunta al carrello dalla wishlist - VERSIONE CORRETTA
-    document.querySelectorAll('.btn-add-to-cart').forEach(button => {
-        button.addEventListener('click', function() {
-            const itemId = this.dataset.itemId;
-            const itemType = this.dataset.itemType;
-
-            // Ottieni dati dal DOM della card wishlist
-            const card = this.closest('.wishlist-item-card');
-            const nome = card.querySelector('h3').textContent.trim();
-            const prezzoElement = card.querySelector('.price');
-            const prezzo = prezzoElement.textContent.replace('€', '').replace(',', '.').trim();
-
-            // Prepara FormData con tutti i parametri richiesti
-            const formData = new FormData();
-            formData.append('id_prodotto', itemId);
-            formData.append('nome_prodotto', nome);
-            formData.append('prezzo', prezzo);
-            formData.append('tipo', itemType === 'box' ? 'mystery_box' : 'oggetto');
-            formData.append('quantita', '1');
-
-            // Disabilita bottone durante la richiesta
-            this.disabled = true;
-            const originalText = this.innerHTML;
-            this.innerHTML = '<i class="bi bi-hourglass-split"></i> Aggiunta...';
-
-            // ✅ CORREZIONE: Usa BASE_URL JavaScript invece di PHP
-            fetch(`${BASE_URL}/action/add_to_cart.php`, {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showNotification('Prodotto aggiunto al carrello!', 'success');
-                        updateCartCounter(data.cart_count);
-                    } else {
-                        showNotification(data.message || 'Errore nell\'aggiunta al carrello', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Errore:', error);
-                    showNotification('Si è verificato un errore', 'error');
-                })
-                .finally(() => {
-                    // Ripristina bottone
-                    this.disabled = false;
-                    this.innerHTML = originalText;
-                });
-        });
-    });
-
-    function showNotification(message, type) {
-        // Rimuovi notifiche esistenti
-        document.querySelectorAll('.wishlist-notification').forEach(n => n.remove());
-
-        const notification = document.createElement('div');
-        notification.className = `wishlist-notification alert alert-${type === 'success' ? 'success' : 'danger'}`;
-        notification.innerHTML = `
-        <i class="bi bi-${type === 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill'}"></i>
-        <strong>${type === 'success' ? 'Perfetto!' : 'Errore!'}</strong> ${message}
-    `;
-        notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 10000;
-        min-width: 300px;
-        border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        animation: slideInRight 0.3s ease-out;
-    `;
-
-        document.body.appendChild(notification);
-
-        setTimeout(() => {
-            notification.style.animation = 'slideOutRight 0.3s ease-out';
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
-    }
-
-    function updateCartCounter(count) {
-        const cartBadge = document.querySelector('.cart-count, .badge');
-        if (cartBadge && count > 0) {
-            cartBadge.textContent = count;
-            cartBadge.style.display = 'inline-block';
-            // Animazione pulse
-            cartBadge.classList.add('animate__animated', 'animate__pulse');
-            setTimeout(() => {
-                cartBadge.classList.remove('animate__animated', 'animate__pulse');
-            }, 1000);
-        }
-    }
-});

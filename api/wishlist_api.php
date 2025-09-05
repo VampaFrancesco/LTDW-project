@@ -32,26 +32,28 @@ switch($action) {
 
         // Query per ottenere gli items con paginazione
         $query = "
-            SELECT 
-                w.id_wishlist,
-                w.data_aggiunta,
-                COALESCE(o.id_oggetto, mb.id_box) as item_id,
-                COALESCE(o.nome_oggetto, mb.nome_box) as nome,
-                COALESCE(o.prezzo_oggetto, mb.prezzo_box) as prezzo,
-                COALESCE(o.descr_oggetto, mb.descr_box) as descrizione,
-                COALESCE(o.qty_oggetto, mb.qty_box) as quantita,
-                CASE 
-                    WHEN o.id_oggetto IS NOT NULL THEN 'oggetto'
-                    ELSE 'box'
-                END as tipo,
-                COALESCE(o.img_oggetto, mb.img_box) as immagine
-            FROM wishlist w
-            LEFT JOIN oggetto o ON w.fk_oggetto = o.id_oggetto
-            LEFT JOIN mystery_box mb ON w.fk_box = mb.id_box
-            WHERE w.fk_utente = ?
-            ORDER BY w.data_aggiunta DESC
-            LIMIT ? OFFSET ?
-        ";
+    SELECT 
+        w.id_wishlist,
+        w.data_aggiunta,
+        COALESCE(o.id_oggetto, mb.id_box) as item_id,
+        COALESCE(o.nome_oggetto, mb.nome_box) as nome,
+        COALESCE(o.prezzo_oggetto, mb.prezzo_box) as prezzo,
+        COALESCE(o.desc_oggetto, mb.desc_box) as descrizione,
+        COALESCE(o.quant_oggetto, mb.quantita_box) as quantita,
+        CASE 
+            WHEN o.id_oggetto IS NOT NULL THEN 'oggetto'
+            ELSE 'box'
+        END as tipo,
+        COALESCE(img_o.nome_img, img_mb.nome_img) as immagine
+    FROM wishlist w
+    LEFT JOIN oggetto o ON w.fk_oggetto = o.id_oggetto
+    LEFT JOIN mystery_box mb ON w.fk_box = mb.id_box
+    LEFT JOIN immagine img_o ON o.id_oggetto = img_o.fk_oggetto
+    LEFT JOIN immagine img_mb ON mb.id_box = img_mb.fk_box
+    WHERE w.fk_utente = ?
+    ORDER BY w.data_aggiunta DESC
+    LIMIT ? OFFSET ?
+";
 
         $stmt = $conn->prepare($query);
         $stmt->bind_param("iii", $user_id, $limit, $offset);
