@@ -229,6 +229,7 @@ img {
 }
 
 /* NAVBAR CSS - FIX APPLIED */
+/* NAVBAR CSS - FIX APPLIED */
 .navbar-custom {
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
@@ -258,6 +259,7 @@ img {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center; /* Centra verticalmente il contenuto */
     text-decoration: none;
     font-family: inherit;
     color: var(--text-color);
@@ -268,7 +270,12 @@ img {
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid var(--glass-border);
     transition: all var(--transition-speed) ease;
-    min-width: 90px;
+
+    /* DIMENSIONI FISSE */
+    width: 90px;
+    height: 103px;
+    min-width: unset; /* Rimuove il min-width precedente */
+
     border-color: #3f51b5;
 }
 
@@ -749,6 +756,7 @@ img {
 }
 
 /* CSS PERSONALIZZATO PER GLI ORDINI - IDENTICO AL PRECEDENTE */
+/* CSS PERSONALIZZATO PER GLI ORDINI - ALTO CONTRASTO */
 .orders-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -765,7 +773,7 @@ img {
     content: '';
     width: 80px;
     height: 4px;
-    background: linear-gradient(45deg, #667eea, #764ba2);
+    background: linear-gradient(45deg, #1a1a1a, #333333);
     position: absolute;
     bottom: -10px;
     left: 50%;
@@ -780,12 +788,11 @@ img {
 }
 
 .order-card {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
+    background: #ffffff;
     border-radius: 20px;
     box-shadow:
-            0 8px 32px rgba(31, 38, 135, 0.15),
-            0 0 0 1px rgba(255, 255, 255, 0.18);
+            0 8px 32px rgba(0, 0, 0, 0.25),
+            0 0 0 2px rgba(0, 0, 0, 0.08);
     overflow: hidden;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
@@ -799,30 +806,30 @@ img {
     right: 0;
     height: 6px;
     background: linear-gradient(90deg,
-    #667eea 0%,
-    #764ba2 25%,
-    #f093fb 50%,
-    #f5576c 75%,
-    #4facfe 100%);
+    #ff0000 0%,
+    #00ff00 25%,
+    #0000ff 50%,
+    #ffff00 75%,
+    #ff00ff 100%);
 }
 
 .order-card:hover {
     transform: translateY(-8px);
     box-shadow:
-            0 20px 60px rgba(31, 38, 135, 0.25),
-            0 0 0 1px rgba(255, 255, 255, 0.25);
+            0 20px 60px rgba(0, 0, 0, 0.35),
+            0 0 0 2px rgba(0, 0, 0, 0.15);
 }
 
 .order-header {
     padding: 25px 25px 20px;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
 }
 
 .order-number {
     font-size: 1.4rem;
     font-weight: 700;
-    color: #2d3748;
+    color: #000000;
     margin-bottom: 8px;
     display: flex;
     align-items: center;
@@ -835,11 +842,12 @@ img {
 }
 
 .order-date {
-    color: #718096;
+    color: #495057;
     font-size: 0.95rem;
     display: flex;
     align-items: center;
     gap: 6px;
+    font-weight: 600;
 }
 
 .order-date::before {
@@ -847,55 +855,63 @@ img {
 }
 
 .order-status {
-    padding: 8px 16px;
-    border-radius: 20px;
+    padding: 10px 18px;
+    border-radius: 8px;
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
     position: absolute;
     top: 15px;
     right: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border: 2px solid;
 }
 
 .status-in-elaborazione {
-    background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
-    color: white;
+    background: #ffc107;
+    color: #000000;
+    border-color: #e0a800;
 }
 
 .status-completato {
-    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-    color: #2d3748;
+    background: #28a745;
+    color: #ffffff;
+    border-color: #1e7e34;
 }
 
 .status-spedito {
-    background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
-    color: #2d3748;
+    background: #007bff;
+    color: #ffffff;
+    border-color: #0056b3;
 }
 
 .status-annullato {
-    background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
-    color: white;
+    background: #dc3545;
+    color: #ffffff;
+    border-color: #a71e2a;
 }
 
 .status-rimborsato {
-    background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
-    color: white;
+    background: #6c757d;
+    color: #ffffff;
+    border-color: #495057;
 }
 
 .order-content {
     padding: 25px;
+    background: #ffffff;
 }
 
 .order-image-container {
     width: 80px;
     height: 80px;
-    border-radius: 15px;
+    border-radius: 10px;
     overflow: hidden;
     margin-bottom: 20px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     position: relative;
+    border: 2px solid #dee2e6;
 }
 
 .order-image {
@@ -917,92 +933,103 @@ img {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 15px 0;
+    border-bottom: 2px solid #e9ecef;
 }
 
 .detail-item:last-child {
     border-bottom: none;
     font-weight: 700;
-    font-size: 1.1rem;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-    margin: 15px -25px -25px;
-    padding: 20px 25px;
+    font-size: 1.2rem;
+    background: #000000;
+    color: #ffffff;
+    margin: 20px -25px -25px;
+    padding: 25px 25px;
 }
 
 .detail-label {
-    color: #718096;
-    font-weight: 600;
-    font-size: 0.9rem;
+    color: #495057;
+    font-weight: 700;
+    font-size: 0.95rem;
 }
 
 .detail-value {
-    color: #2d3748;
-    font-weight: 600;
+    color: #000000;
+    font-weight: 700;
+    font-size: 1rem;
 }
 
 .tracking-section {
-    background: linear-gradient(135deg, rgba(132, 250, 176, 0.2), rgba(143, 211, 244, 0.2));
-    padding: 15px;
+    background: #e3f2fd;
+    padding: 20px;
     border-radius: 10px;
-    margin: 15px 0;
+    margin: 20px 0;
     text-align: center;
+    border: 2px solid #1976d2;
 }
 
 .tracking-code {
     font-family: 'Courier New', monospace;
-    background: rgba(255, 255, 255, 0.8);
-    padding: 8px 12px;
+    background: #ffffff;
+    padding: 12px 16px;
     border-radius: 6px;
     font-weight: bold;
-    color: #2d3748;
+    color: #000000;
     display: inline-block;
-    margin-top: 5px;
+    margin-top: 8px;
     letter-spacing: 1px;
+    border: 2px solid #1976d2;
+    font-size: 1rem;
 }
 
 .empty-orders {
     text-align: center;
     padding: 80px 20px;
-    background: rgba(255, 255, 255, 0.9);
+    background: #ffffff;
     border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
     max-width: 500px;
     margin: 0 auto;
+    border: 2px solid #dee2e6;
 }
 
 .empty-orders-icon {
     font-size: 4rem;
     margin-bottom: 20px;
-    opacity: 0.5;
+    opacity: 0.7;
 }
 
 .empty-orders h3 {
-    color: #2d3748;
+    color: #000000;
     margin-bottom: 15px;
+    font-weight: 700;
 }
 
 .empty-orders p {
-    color: #718096;
+    color: #495057;
     margin-bottom: 30px;
+    font-weight: 600;
 }
 
 .btn-shop {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 15px 30px;
-    border: none;
-    border-radius: 10px;
+    background: #000000;
+    color: #ffffff;
+    padding: 18px 35px;
+    border: 2px solid #000000;
+    border-radius: 8px;
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 700;
     transition: all 0.3s ease;
     display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .btn-shop:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-    color: white;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    background: #ffffff;
+    color: #000000;
     text-decoration: none;
 }
 
@@ -1059,26 +1086,6 @@ img {
         right: auto;
         margin-top: 10px;
         display: inline-block;
-    }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    .order-card {
-        background: rgba(45, 55, 72, 0.95);
-        color: white;
-    }
-
-    .detail-label {
-        color: #a0aec0;
-    }
-
-    .detail-value {
-        color: #e2e8f0;
-    }
-
-    .order-number {
-        color: #e2e8f0;
     }
 }
 
