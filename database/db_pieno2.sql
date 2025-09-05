@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Set 05, 2025 alle 10:22
+-- Creato il: Set 05, 2025 alle 12:26
 -- Versione del server: 10.4.32-MariaDB
--- Versione PHP: 8.0.30
+-- Versione PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -366,7 +366,19 @@ INSERT INTO `immagine` (`id_immagine`, `nome_img`, `descrizione_img`, `dimension
 (142, 'funko_harpie3.png', NULL, NULL, 102, NULL),
 (143, 'funko_avian.png', NULL, NULL, 103, NULL),
 (144, 'funko_jinzo.png', NULL, NULL, 104, NULL),
-(145, 'funko_harpiepet.png', NULL, NULL, 105, NULL);
+(145, 'funko_harpiepet.png', NULL, NULL, 105, NULL),
+(146, 'mystery_box_pokemon.png', NULL, NULL, NULL, 3),
+(147, 'mystery_box_pokemon.png', NULL, NULL, NULL, 2),
+(148, 'mystery_box_pokemon.png', NULL, NULL, NULL, 5),
+(149, 'mystery_box_pokemon.png', NULL, NULL, NULL, 6),
+(150, 'mystery_box_pokemon.png', NULL, NULL, NULL, 4),
+(151, 'mystery_box_pokemon.png', NULL, NULL, NULL, 7),
+(152, 'mystery_box_yugioh.webp', NULL, NULL, NULL, 10),
+(153, 'mystery_box_yugioh.webp', NULL, NULL, NULL, 9),
+(154, 'mystery_box_yugioh.webp', NULL, NULL, NULL, 12),
+(155, 'mystery_box_yugioh.webp', NULL, NULL, NULL, 13),
+(156, 'mystery_box_yugioh.webp', NULL, NULL, NULL, 11),
+(157, 'mystery_box_yugioh.webp', NULL, NULL, NULL, 8);
 
 -- --------------------------------------------------------
 
@@ -449,7 +461,18 @@ CREATE TABLE `mystery_box` (
 --
 
 INSERT INTO `mystery_box` (`id_box`, `nome_box`, `desc_box`, `prezzo_box`, `quantita_box`, `fk_rarita`, `fk_categoria_oggetto`) VALUES
-(2, 'PokéBox - Rara', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: rara', 20.00, 2, 2, 7);
+(2, 'PokéBox - Rara', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: rara. Espansioni: Spada e Scudo – Fragore Ribelle', 20.00, 2, 2, 7),
+(3, 'Pokèbox - Comune', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: comune.\r\nEspansioni: Sole e Luna – Guardiani Nascenti\r\n', 10.00, 5, 1, 7),
+(4, 'Pokébox - Ultra Rara', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: ultra rara.\nEspansioni: Spada e Scudo – Destino Splendente', 30.00, 2, 3, 7),
+(5, 'Pokébox - Epica', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: epica. \r\nEspansioni: Spada e Scudo – Evoluzioni Eteree', 40.00, 3, 4, 7),
+(6, 'Pokébox - Mitica', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: mitica. \r\nEspansioni: X e Y – Destini Incrociati - Shining Legends', 55.00, 2, 5, 7),
+(7, 'Pokébox - Leggendaria', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: leggendaria. \r\nEspansioni: XY – Generazioni - Celebrations', 75.00, 2, 6, 7),
+(8, 'YugiBox - Comune', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: comune. Espansioni: Structure Deck: Saga of Blue-Eyes White Dragon', 10.00, 2, 1, 8),
+(9, 'YugiBox - Rara', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: rara. Espansioni: Legendary Duelists: White Dragon Abyss', 20.00, 3, 2, 8),
+(10, 'YugiBox - Ultra rara', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: ultra rara. Espansioni: Legendary Collection Kaiba', 30.00, 3, 3, 8),
+(11, 'YugiBox - Epica', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: epica. Espansioni: Battles of Legend: Light’s Revenge', 40.00, 3, 4, 8),
+(12, 'YugiBox - Mitica', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: mitica. Espansioni: Hidden Arsenal: Chapter 1 - Dragons of Legend', 55.00, 2, 5, 8),
+(13, 'YugiBox - Leggendaria', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: leggendaria. Espansioni: Legendary Collection 25th Anniversary Edition', 75.00, 2, 6, 8);
 
 -- --------------------------------------------------------
 
@@ -464,6 +487,18 @@ CREATE TABLE `novita_box` (
   `sconto_novita` decimal(10,0) DEFAULT NULL,
   `fine_novita` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dump dei dati per la tabella `novita_box`
+--
+
+INSERT INTO `novita_box` (`fk_mystery_box`, `data_novita`, `desc_novita`, `sconto_novita`, `fine_novita`) VALUES
+(2, '2025-09-05 12:11:15', NULL, 50, NULL),
+(5, '2025-09-05 12:11:15', NULL, 20, '2025-11-20 12:12:18'),
+(6, '2025-09-05 12:16:32', NULL, 12, '2025-11-12 12:16:32'),
+(10, '2025-09-05 12:11:15', NULL, 12, '2025-09-30 12:11:15'),
+(12, '2025-09-05 12:11:15', NULL, 30, '2025-10-15 12:12:18'),
+(13, '2025-09-05 12:16:32', NULL, 15, '2025-09-21 12:16:32');
 
 -- --------------------------------------------------------
 
@@ -485,15 +520,14 @@ CREATE TABLE `novita_oggetto` (
 
 INSERT INTO `novita_oggetto` (`fk_oggetto`, `novita_data`, `novita_desc`, `novita_sconto`, `novita_fine`) VALUES
 (30, '2025-08-27 16:28:49', NULL, 50, '2025-09-01 16:04:40'),
-(32, '2025-08-27 18:07:50', NULL, 75, NULL),
-(34, '2025-08-27 18:12:16', NULL, 12, NULL),
-(36, '2025-08-27 18:12:16', NULL, 3, NULL),
-(38, '2025-08-27 18:13:03', NULL, 30, NULL),
-(39, '2025-08-27 16:25:49', NULL, 10, NULL),
+(32, '2025-08-27 18:07:50', NULL, 75, '2025-10-08 11:21:59'),
+(34, '2025-08-27 18:12:16', NULL, 12, '2025-09-26 11:22:09'),
+(36, '2025-08-27 18:12:16', NULL, 3, '2025-11-12 11:22:13'),
+(38, '2025-08-27 18:13:03', NULL, 30, '2025-09-29 11:22:17'),
+(39, '2025-08-27 16:25:49', NULL, 10, '2025-09-09 11:22:20'),
 (90, '2025-08-27 16:28:24', NULL, 20, NULL),
-(93, '2025-08-27 18:57:54', 'Uno dei più ricercati!', NULL, NULL),
-(97, '2025-08-27 18:29:50', NULL, 1, NULL),
-(103, '2025-08-27 16:27:34', NULL, 5, NULL);
+(97, '2025-08-27 18:29:50', NULL, 1, '2025-12-17 11:22:23'),
+(103, '2025-08-27 16:27:34', NULL, 5, '2025-09-24 11:22:29');
 
 -- --------------------------------------------------------
 
@@ -587,23 +621,23 @@ INSERT INTO `oggetto` (`id_oggetto`, `nome_oggetto`, `desc_oggetto`, `prezzo_ogg
 (68, 'Caterpie', 'Pokémon di tipo Erba', NULL, NULL, 1, 2, 1),
 (69, 'Charmander', 'Pokémon di tipo Fuoco', NULL, NULL, 1, 2, 1),
 (70, 'Squirtle', 'Pokémon di tipo Acqua', NULL, NULL, 1, 2, 1),
-(71, 'Bulbasaur', 'Pokémon di tipo Erba', NULL, NULL, NULL, 2, 1),
-(72, 'Eevee', 'Pokémon di tipo Normale', NULL, NULL, NULL, 2, 1),
-(73, 'Raichu', 'Pokémon di tipo Elettro', NULL, NULL, NULL, 2, 2),
-(74, 'Arcanine', 'Pokémon di tipo Fuoco', NULL, NULL, NULL, 2, 2),
-(75, 'Lapras', 'Pokémon di tipo Acqua', NULL, NULL, NULL, 2, 2),
-(76, 'Charizard', 'Pokémon di tipo Fuoco', NULL, NULL, NULL, 2, 3),
-(77, 'Gengar', 'Pokémon di tipo Spettro', NULL, NULL, NULL, 2, 3),
-(78, 'Dragonite', 'Pokémon di tipo Drago', NULL, NULL, NULL, 2, 3),
-(79, 'Mew', 'Pokémon di tipo Psico', NULL, NULL, NULL, 2, 4),
-(80, 'Lucario', 'Pokémon di tipo Lotta/Acciaio', NULL, NULL, NULL, 2, 4),
-(81, 'Gyarados', 'Pokémon di tipo Acqua', NULL, NULL, NULL, 2, 4),
-(82, 'Mewtwo', 'Pokémon di tipo Psico', NULL, NULL, NULL, 2, 5),
-(83, 'Rayquaza', 'Pokémon di tipo Drago', NULL, NULL, NULL, 2, 5),
-(84, 'Darkrai', 'Pokémon di tipo Buio', NULL, NULL, NULL, 2, 5),
-(85, 'Reshiram', 'Pokémon di tipo Drago/Fuoco', NULL, NULL, NULL, 2, 6),
-(86, 'Zekrom', 'Pokémon di tipo Drago/Elettro', NULL, NULL, NULL, 2, 6),
-(87, 'Giratina', 'Pokémon di tipo Spettro/Drago', NULL, NULL, NULL, 2, 6),
+(71, 'Bulbasaur', 'Pokémon di tipo Erba', NULL, NULL, 1, 2, 1),
+(72, 'Eevee', 'Pokémon di tipo Normale', NULL, NULL, 1, 2, 1),
+(73, 'Raichu', 'Pokémon di tipo Elettro', NULL, NULL, 2, 2, 2),
+(74, 'Arcanine', 'Pokémon di tipo Fuoco', NULL, NULL, 2, 2, 2),
+(75, 'Lapras', 'Pokémon di tipo Acqua', NULL, NULL, 2, 2, 2),
+(76, 'Charizard', 'Pokémon di tipo Fuoco', NULL, NULL, 3, 2, 3),
+(77, 'Gengar', 'Pokémon di tipo Spettro', NULL, NULL, 3, 2, 3),
+(78, 'Dragonite', 'Pokémon di tipo Drago', NULL, NULL, 3, 2, 3),
+(79, 'Mew', 'Pokémon di tipo Psico', NULL, NULL, 4, 2, 4),
+(80, 'Lucario', 'Pokémon di tipo Lotta/Acciaio', NULL, NULL, 4, 2, 4),
+(81, 'Gyarados', 'Pokémon di tipo Acqua', NULL, NULL, 4, 2, 4),
+(82, 'Mewtwo', 'Pokémon di tipo Psico', NULL, NULL, 5, 2, 5),
+(83, 'Rayquaza', 'Pokémon di tipo Drago', NULL, NULL, 5, 2, 5),
+(84, 'Darkrai', 'Pokémon di tipo Buio', NULL, NULL, 5, 2, 5),
+(85, 'Reshiram', 'Pokémon di tipo Drago/Fuoco', NULL, NULL, 6, 2, 6),
+(86, 'Zekrom', 'Pokémon di tipo Drago/Elettro', NULL, NULL, 6, 2, 6),
+(87, 'Giratina', 'Pokémon di tipo Spettro/Drago', NULL, NULL, 6, 2, 6),
 (88, 'Funko POP: Jaden Yuki', 'Funko Pop da collezione di Jaden Yuki, protagonista di Yu-Gi-Oh! GX, raffigurato con la sua divisa rossa della Duel Academy e lo sguardo deciso da vero duellante. Dimensione: 9,5cm.\r\n', 16.00, 5, NULL, 10, NULL),
 (89, 'Funko POP: Yubel', 'Funko Pop da collezione di Yubel, l’enigmatica creatura di Yu-Gi-Oh! GX, raffigurata con dettagli fedeli alle sue forme mostruose e al suo aspetto oscuro. Dimensione: 9,5cm.\r\n', 15.00, 5, NULL, 10, NULL),
 (90, 'Funko POP: Alexis Rhodes', 'Funko Pop da collezione di Alexis Rhodes, elegante duellante di Yu-Gi-Oh! GX, rappresentata con la divisa della Duel Academy e il suo atteggiamento sicuro e determinato. Dimensione: 9,5cm.\r\n', 15.00, 5, NULL, 10, NULL),
@@ -702,15 +736,15 @@ CREATE TABLE `oggetto_utente` (
 INSERT INTO `oggetto_utente` (`fk_utente`, `fk_oggetto`, `quantita_ogg`) VALUES
 (1, 1, 7),
 (1, 2, 8),
-(1, 48, 6),
+(1, 48, 5),
 (1, 53, 1),
 (1, 85, 1),
+(1, 86, 1),
 (7, 1, 4),
 (7, 2, 3),
-(7, 48, 1),
+(7, 48, 2),
 (7, 53, 3),
-(7, 85, 1),
-(7, 86, 1);
+(7, 85, 1);
 
 -- --------------------------------------------------------
 
@@ -736,7 +770,7 @@ INSERT INTO `ordine` (`id_ordine`, `data_ordine`, `tracking`, `stato_ordine`, `f
 (2, '2025-08-10 17:45:30', 'ciaoèiltrackingquesto', 2, 1, 1, NULL),
 (3, '2025-08-10 17:56:37', '-', 4, 1, 1, NULL),
 (4, '2025-08-28 18:33:43', NULL, 0, 1, 1, 19),
-(5, '2025-08-28 18:34:39', 'mamt', 1, 1, 1, 20),
+(5, '2025-08-28 18:34:39', 'ciao', 1, 1, 1, 20),
 (6, '2025-08-30 00:23:55', NULL, 0, 1, 1, 22),
 (7, '2025-09-02 00:58:31', NULL, 0, 7, 2, 27),
 (8, '2025-09-02 00:59:08', NULL, 0, 7, 2, 29),
@@ -862,7 +896,9 @@ INSERT INTO `scambi` (`id_scambio`, `fk_utente_richiedente`, `fk_utente_offerent
 (6, 7, 1, 'concluso', '2025-09-04 21:01:35', '2025-09-04 21:02:31'),
 (7, 1, NULL, 'concluso', '2025-09-04 21:40:31', '2025-09-04 21:40:53'),
 (8, 7, NULL, 'concluso', '2025-09-04 21:43:24', '2025-09-04 21:43:40'),
-(9, 7, NULL, 'in_corso', '2025-09-04 21:45:28', '2025-09-04 21:45:28');
+(9, 7, NULL, 'in_corso', '2025-09-04 21:45:28', '2025-09-04 21:45:28'),
+(10, 1, NULL, 'in_corso', '2025-09-05 08:12:22', '2025-09-05 08:12:22'),
+(11, 1, NULL, 'concluso', '2025-09-05 08:12:32', '2025-09-05 08:13:39');
 
 -- --------------------------------------------------------
 
@@ -891,7 +927,9 @@ INSERT INTO `scambio_offerte` (`id_offerta`, `fk_scambio`, `fk_oggetto`, `quanti
 (6, 6, 1, 1, 7),
 (7, 7, 48, 1, 1),
 (8, 8, 1, 1, 7),
-(9, 9, 48, 1, 7);
+(9, 9, 48, 1, 7),
+(10, 10, 48, 1, 1),
+(11, 11, 48, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -933,7 +971,9 @@ INSERT INTO `scambio_richieste` (`id_richiesta`, `fk_scambio`, `fk_oggetto`, `qu
 (6, 6, 48, 1),
 (7, 7, 53, 1),
 (8, 8, 2, 1),
-(9, 9, 2, 1);
+(9, 9, 2, 1),
+(10, 10, 86, 1),
+(11, 11, 86, 1);
 
 -- --------------------------------------------------------
 
@@ -981,7 +1021,8 @@ INSERT INTO `utente` (`id_utente`, `nome`, `cognome`, `email`, `telefono`, `pass
 (1, 'Davide', 'Blasioli', 'db@gmail.com', '33333333333', '$2y$10$GcEqvT2f6DNgRx39AKAfxOZhHVhPsHfu827tVcun2E7DT38XL4H4K'),
 (2, 'Francesco', 'Vampa', 'fv@boxomnia.it', NULL, '$2y$10$NXPIRLr5x50X6Do73ySyNuX/JkeMiGkfM2r24MPkovCvCV64WfRWi'),
 (6, 'Admin', 'Box Omnia', 'admin@boxomnia.it', NULL, '$2y$10$GcEqvT2f6DNgRx39AKAfxOZhHVhPsHfu827tVcun2E7DT38XL4H4K'),
-(7, 'Francesco', 'Vampa', 'fv@gmail.com', NULL, '$2y$10$jnyMvJzqLNgYpDiTsjS30uKgnlxjevXomBIgSzv88BdmkTMacuk2e');
+(7, 'Francesco', 'Vampa', 'fv@gmail.com', NULL, '$2y$10$jnyMvJzqLNgYpDiTsjS30uKgnlxjevXomBIgSzv88BdmkTMacuk2e'),
+(8, 'Miriam', 'De Vincentiis', 'md@gmail.com', NULL, '$2y$10$y3mqDs1zMhL/Vq7anyGt6O5L7PWY1cqliPs8aCi04akzjqvoTXQYO');
 
 -- --------------------------------------------------------
 
@@ -1324,7 +1365,7 @@ ALTER TABLE `fattura`
 -- AUTO_INCREMENT per la tabella `immagine`
 --
 ALTER TABLE `immagine`
-  MODIFY `id_immagine` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=146;
+  MODIFY `id_immagine` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=158;
 
 --
 -- AUTO_INCREMENT per la tabella `indirizzo_spedizione`
@@ -1342,7 +1383,7 @@ ALTER TABLE `info_ordine`
 -- AUTO_INCREMENT per la tabella `mystery_box`
 --
 ALTER TABLE `mystery_box`
-  MODIFY `id_box` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_box` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT per la tabella `oggetto`
@@ -1378,13 +1419,13 @@ ALTER TABLE `rarita`
 -- AUTO_INCREMENT per la tabella `scambi`
 --
 ALTER TABLE `scambi`
-  MODIFY `id_scambio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_scambio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT per la tabella `scambio_offerte`
 --
 ALTER TABLE `scambio_offerte`
-  MODIFY `id_offerta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_offerta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT per la tabella `scambio_proposte`
@@ -1396,7 +1437,7 @@ ALTER TABLE `scambio_proposte`
 -- AUTO_INCREMENT per la tabella `scambio_richieste`
 --
 ALTER TABLE `scambio_richieste`
-  MODIFY `id_richiesta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_richiesta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT per la tabella `titolo`
@@ -1408,7 +1449,7 @@ ALTER TABLE `titolo`
 -- AUTO_INCREMENT per la tabella `utente`
 --
 ALTER TABLE `utente`
-  MODIFY `id_utente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_utente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT per la tabella `wishlist`
