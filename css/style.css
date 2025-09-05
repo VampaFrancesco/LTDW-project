@@ -303,6 +303,11 @@ img {
     transition: all var(--transition-speed) ease;
 }
 
+.nav-item.dropdown .dropdown-menu .section-divider {
+    margin-bottom: 7px;
+    margin: 8px 0;
+}
+
 .nav-item.dropdown:hover .dropdown-menu {
     display: block;
     visibility: visible;
@@ -447,8 +452,8 @@ img {
     justify-content: center;
 
     /* Proporzioni ufficiali Yu-Gi-Oh! (ratio ~0.714) */
-    width: 28px;
-    height: 39px;
+    width: 24px;
+    height: 35px;
 
     /* Usa immagine del dorso */
     background: url('../images/dorso_yugioh.png') no-repeat center center;

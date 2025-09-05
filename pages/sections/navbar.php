@@ -22,9 +22,9 @@ require_once __DIR__ . '/../../include/config.inc.php';
                 <span>Pokémon</span>
             </a>
             <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/pages/pokemon_mystery_boxes.php">Mystery
+                <li class="section-divider"><a class="dropdown-item" href="<?php echo BASE_URL; ?>/pages/pokemon_mystery_boxes.php">Mystery
                         Box</a></li>
-                <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/pages/pokemon_funko_pops.php">Funko Pop</a>
+                <li class="section-divider"><a class="dropdown-item" href="<?php echo BASE_URL; ?>/pages/pokemon_funko_pops.php">Funko Pop</a>
                 </li>
             </ul>
         </li>
@@ -38,9 +38,9 @@ require_once __DIR__ . '/../../include/config.inc.php';
                 <span>Yu-Gi-Oh!</span>
             </a>
             <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/pages/yugioh_mystery_boxes.php">Mystery
+                <li class="section-divider"><a class="dropdown-item" href="<?php echo BASE_URL; ?>/pages/yugioh_mystery_boxes.php">Mystery
                         Box</a></li>
-                <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/pages/yugioh_funko_pops.php">Funko Pop</a>
+                <li class="section-divider"><a class="dropdown-item" href="<?php echo BASE_URL; ?>/pages/yugioh_funko_pops.php">Funko Pop</a>
                 </li>
             </ul>
         <li class="nav-item">

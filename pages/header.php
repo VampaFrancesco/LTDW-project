@@ -102,8 +102,11 @@ if ($flash_message) {
                                     <li>
                                         <a class="dropdown-item"
                                            href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/pages/home_utente.php">
-                                            <i class="bi bi-house"></i> <?php echo SessionManager::isLoggedIn() ? 'Home Page' : 'Dashboard'; ?>
+                                            <i class="bi bi-house"></i> <?php echo SessionManager::isLoggedIn() ? 'Homepage' : 'Dashboard'; ?>
                                         </a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
                                     </li>
                                     <li>
                                         <a class="dropdown-item"
@@ -116,6 +119,9 @@ if ($flash_message) {
 
                                 <?php if (!$isAdmin): ?>
                                     <!-- Ordini solo per utenti normali -->
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
                                     <li>
                                         <a class="dropdown-item"
                                            href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/pages/ordini.php">
