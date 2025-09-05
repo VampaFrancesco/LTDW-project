@@ -102,7 +102,7 @@ include __DIR__.'/header.php';
                                             <div class="input-group input-group-sm">
                                                 <button class="btn btn-outline-secondary" type="button"
                                                         onclick="updateQuantity('<?php echo htmlspecialchars($item['cart_key']); ?>', -1)">
-                                                    <i class="bi bi-minus"></i>
+                                                    <i class="bi bi-dash"></i>
                                                 </button>
                                                 <input type="number"
                                                        id="qty-<?php echo htmlspecialchars($item['cart_key']); ?>"

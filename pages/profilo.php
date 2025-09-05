@@ -142,7 +142,7 @@ $telefono = $userData['telefono'] ?? '';
 ?>
 
 <main class="background-custom">
-    <div class="container section">
+    <div class="container" style="margin-bottom: 50px;">
 
         <?php
         // Mostra i messaggi flash se presenti
@@ -307,7 +307,7 @@ $telefono = $userData['telefono'] ?? '';
             <?php endif; ?>
 
             <!-- Pulsanti Azione -->
-            <div style="background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+            <div style="background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); , margin-bottom: 40px;">
                 <h2 style="color: #333; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
                     ⚙️ Azioni Account
                 </h2>
