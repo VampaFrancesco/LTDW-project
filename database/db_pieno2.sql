@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Set 05, 2025 alle 09:58
+-- Creato il: Set 05, 2025 alle 10:22
 -- Versione del server: 10.4.32-MariaDB
--- Versione PHP: 8.2.12
+-- Versione PHP: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -507,6 +507,7 @@ CREATE TABLE `oggetto` (
   `desc_oggetto` text NOT NULL,
   `prezzo_oggetto` decimal(10,2) DEFAULT NULL,
   `quant_oggetto` int(11) DEFAULT NULL,
+  `punto` int(20) DEFAULT NULL,
   `fk_categoria_oggetto` int(11) NOT NULL,
   `fk_rarita` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -515,112 +516,112 @@ CREATE TABLE `oggetto` (
 -- Dump dei dati per la tabella `oggetto`
 --
 
-INSERT INTO `oggetto` (`id_oggetto`, `nome_oggetto`, `desc_oggetto`, `prezzo_oggetto`, `quant_oggetto`, `fk_categoria_oggetto`, `fk_rarita`) VALUES
-(1, 'Mago Nero', 'Mostro di tipo Incantesimo', NULL, NULL, 1, 3),
-(2, 'Pikachu', 'Pokémon di tipo Elettro', NULL, NULL, 2, 1),
-(3, 'Plancia di gioco Arancione', 'Tappetino universale per giochi di carte collezionabili, realizzato in neoprene resistente con base antiscivolo.\nDimensione: 60x35cm', 14.99, 5, 4, NULL),
-(4, 'Plancia di gioco Rosa', 'Tappetino universale per giochi di carte collezionabili, realizzato in neoprene resistente con base antiscivolo.\nDimensione: 60x35cm', 14.50, 5, 4, NULL),
-(5, 'Plancia di gioco Viola', 'Tappetino universale per giochi di carte collezionabili, realizzato in neoprene resistente con base antiscivolo.\nDimensione: 60x35cm', 14.99, 5, 4, NULL),
-(6, 'Plancia di gioco Verdeacqua', 'Tappetino universale per giochi di carte collezionabili, realizzato in neoprene resistente con base antiscivolo.\nDimensione: 60x35cm', 14.99, 5, 4, NULL),
-(7, 'Proteggicarte Rosa', 'Pacchetto proteggicarte da 60 bustine.\nDimensione bustine: 62x89mm', 3.00, 5, 3, NULL),
-(8, 'Proteggicarte Blu chiaro', 'Pacchetto proteggicarte da 60 bustine.\nDimensione bustine: 62x89mm', 4.00, 5, 3, NULL),
-(9, 'Proteggicarte Rosso', 'Pacchetto proteggicarte da 60 bustine.\nDimensione bustine: 62x89mm', 3.50, 5, 3, NULL),
-(10, 'Proteggicarte Bianco', 'Pacchetto proteggicarte da 60 bustine.\nDimensione bustine: 62x89mm', 4.50, 5, 3, NULL),
-(11, 'Scatola porta carte Arancione', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 3.50, 5, 5, NULL),
-(12, 'Scatola porta carte Verde', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 3.50, 5, 5, NULL),
-(13, 'Scatola porta carte Rossa', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 3.50, 5, 5, NULL),
-(14, 'Scatola porta carte Blu', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 3.50, 5, 5, NULL),
-(15, 'Scatola porta carte Oro', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 5.00, 5, 5, NULL),
-(16, 'Scatola porta carte Argento', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 4.00, 5, 5, NULL),
-(17, 'Scatola porta carte Rosa', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 3.00, 5, 5, NULL),
-(18, 'Scatola porta carte Marrone', 'Scatola porta carte a 4 scomparti con capienza di 300 carte e bustine', 9.50, 5, 5, NULL),
-(19, 'Porta mazzo Viola', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.00, 5, 6, NULL),
-(20, 'Porta mazzo Arancione', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.00, 5, 6, NULL),
-(21, 'Porta mazzo Bianco', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 4.00, 5, 6, NULL),
-(22, 'Porta mazzo Blu chiaro', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.00, 5, 6, NULL),
-(23, 'Porta mazzo Verde', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.00, 5, 6, NULL),
-(24, 'Porta mazzo Nero', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 4.00, 5, 6, NULL),
-(25, 'Porta mazzo Giallo', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.50, 5, 6, NULL),
-(26, 'Porta mazzo Rosa', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.00, 5, 6, NULL),
-(27, 'Bustina Singola - Astri Lucenti', 'Bustina Pokémon della serie Astri Lucenti', NULL, NULL, 11, NULL),
-(28, 'Funko POP: Umbreon', 'Funko POP da collezione di Umbreon, Pokémon di tipo Buio, famoso per il suo manto nero e gli anelli luminescenti che brillano nella notte. Dimensione: 9,5cm', 15.50, 5, 9, NULL),
-(29, 'Funko POP: Pikachu', 'Funko POP da collezione di Pikachu, l\'iconico Pokémon di tipo Elettro, amato per la sua energia travolgente e il sorriso inconfondibile. Dimensione: 9,5cm', 15.00, 5, 9, NULL),
-(30, 'Funko POP: Charizard', 'Funko POP da collezione di Charizard, potente Pokémon di tipo Fuoco/Volante, temuto per le sue fiamme intense e il volo maestoso. Dimensione: 9,5cm', 15.50, 5, 9, NULL),
-(31, 'Funko POP: Mewtwo', 'Funko POP da collezione di Mewtwo, leggendario Pokémon Psico, creato in laboratorio e dotato di poteri mentali straordinari.Dimensione: 9,5cm', 16.00, 5, 9, NULL),
-(32, 'Funko POP: Dragonite', 'Funko POP da collezione di Dragonite, maestoso Pokémon Drago/Volante, noto per la sua forza impressionante e il cuore gentile. Dimensione: 9,5cm', 16.00, 5, 9, NULL),
-(33, 'Funko POP: Lucario', 'Funko POP da collezione di Lucario, fiero Pokémon Lotta/Acciaio, capace di percepire e controllare le aure con incredibile maestria. Dimensione: 9,5cm', 15.00, 5, 9, NULL),
-(34, 'Funko POP: Greninja', 'Funko POP da collezione di Greninja, Pokémon Acqua/Buio, famoso per la sua velocità e lo stile di combattimento furtivo. Dimensione: 9,5cm', 15.00, 5, 9, NULL),
-(35, 'Funko POP: Gengar', 'Funko POP da collezione di Gengar, enigmatico Pokémon Spettro/Veleno, celebre per i suoi scherzi inquietanti e il sorriso sinistro. Dimensione: 9,5cm', 15.50, 5, 9, NULL),
-(36, 'Funko POP: Espeon', 'Funko POP da collezione di Espeon, elegante Pokémon Psico, apprezzato per la sua grazia e le abilità predittive straordinarie. Dimensione: 9,5cm', 15.50, 5, 9, NULL),
-(37, 'Funko POP: Gardevoir', 'Funko POP da collezione di Gardevoir, elegante Pokémon di tipo Psichico/Folletto, noto per la sua grazia e capacità di proteggere il proprio allenatore con poteri psichici potenti. Dimensione: 9,5cm', 15.00, 5, 9, NULL),
-(38, 'Funko POP: Luxray', 'Funko POP da collezione di Luxray, Pokémon di tipo Elettro, simile a una grossa tigre dai occhi penetranti, famoso per la sua vista acutissima e la forza elettrica che usa in battaglia. Dimensione: 9,5cm', 15.50, 5, 9, NULL),
-(39, 'Funko POP: Alakazam', 'Funko POP da collezione di Alakazam, Pokémon di tipo Psichico, famoso per il suo intelletto straordinario e i potenti poteri psichici, rappresentato con cucchiai per amplificare la telecinesi. Dimensione: 9,5cm', 15.00, 5, 9, NULL),
-(40, 'Funko POP: Sylveon', 'Funko POP da collezione di Sylveon, Pokémon di tipo Folletto, noto per il suo aspetto dolce e i nastri che usa per calmare e proteggere gli altri con poteri magici. Dimensione: 9,5cm', 15.50, 5, 9, NULL),
-(41, 'Funko POP: Horsea', 'Funko POP da collezione di Horsea, Pokémon di tipo Acqua, simile a un piccolo cavalluccio marino, capace di spruzzare getti d\'acqua ad alta pressione per difendersi. Dimensione: 9,5cm', 14.50, 5, 9, NULL),
-(42, 'Funko POP: Blaziken', 'Funko POP da collezione di Blaziken, Pokémon di tipo Fuoco/Lotta, famoso per la sua forza esplosiva e le potenti tecniche di arti marziali che combina con fiamme avvolgenti. Dimensione: 9,5cm', 14.99, 5, 9, NULL),
-(43, 'Funko POP: Chimchar', 'Funko POP da collezione di Chimchar, Pokémon di tipo Fuoco, noto per la sua coda fiammeggiante e il carattere energico e molto curioso. Dimensione: 9,5cm', 15.00, 5, 9, NULL),
-(44, 'Funko POP: Oshawott', 'Funko POP da collezione di Oshawott, Pokémon di tipo Acqua, noto per il suo guscio a forma di conchiglia che usa come arma e per il suo spirito coraggioso. Dimensione: 9,5cm', 15.00, 5, 9, NULL),
-(45, 'Funko POP: Piplup', 'Funko POP da collezione di Piplup, Pokémon di tipo Acqua, noto per il suo carattere orgoglioso e il coraggio nonostante la sua taglia ridotta. Dimensione: 9,5cm', 15.00, 5, 9, NULL),
-(46, 'Funko POP: Sprigatito', 'Funko POP da collezione di Sprigatito, Pokémon di tipo Erba, noto per il suo atteggiamento molto curioso e notevolmente affettuoso. Dimensione: 9,5cm', 15.00, 5, 9, NULL),
-(47, 'Funko POP: Zorua', 'Funko POP da collezione di Zorua, Pokémon di tipo Buio, noto per la sua abilità nel creare illusioni e trasformarsi per ingannare i nemici. Dimensione: 9,5cm', 15.50, 5, 9, NULL),
-(48, 'Drago Bebè', 'Mostro di tipo Drago', NULL, NULL, 1, 1),
-(49, 'Combattente delle Lame', 'Mostro di tipo Guerriero', NULL, NULL, 1, 1),
-(50, 'Folletto della Foresta', 'Mostro di tipo Pianta', NULL, NULL, 1, 1),
-(51, 'Eda Maga del Sole', 'Mostro di tipo Fata', NULL, NULL, 1, 1),
-(52, 'Golem Blocco', 'Mostro di tipo Roccia', NULL, NULL, 1, 1),
-(53, 'Spadaccino Mistico LV6', 'Mostro di tipo Guerriero', NULL, NULL, 1, 2),
-(54, 'Serpente Divino', 'Mostro di tipo Rettile', NULL, NULL, 1, 2),
-(55, 'Cavaliere di Ghiaccio', 'Mostro di tipo Guerriero', NULL, NULL, 1, 2),
-(56, 'Drago Bianco Occhi Blu', 'Mostro di tipo Drago', NULL, NULL, 1, 3),
-(57, 'Arciere Celestiale', 'Mostro di tipo Fata', NULL, NULL, 1, 3),
-(58, 'Monarca delle Ombre', 'Mostro di tipo Demone', NULL, NULL, 1, 3),
-(59, 'Fenice Sacra', 'Mostro di tipo Bestia Alata', NULL, NULL, 1, 4),
-(60, 'Guardiano Celtico', 'Mostro di tipo Guerriero', NULL, NULL, 1, 4),
-(61, 'Drago Leviatano', 'Mostro di tipo Serpente Marino', NULL, NULL, 1, 4),
-(62, 'Drago Divino Sirf', 'Mostro di tipo Drago', NULL, NULL, 1, 5),
-(63, 'Angelo del Caos', 'Mostro di tipo Fata', NULL, NULL, 1, 5),
-(64, 'Re Distruggi Memoria', 'Mostro di tipo Demone', NULL, NULL, 1, 5),
-(65, 'Exodia il Proibito', 'Mostro di tipo Incantesimo', NULL, NULL, 1, 6),
-(66, 'Drago Alato di Ra', 'Mostro di tipo Divino-Bestia', NULL, NULL, 1, 6),
-(67, 'Obelisk il Tormentatore', 'Mostro di tipo Divino-Bestia', NULL, NULL, 1, 6),
-(68, 'Caterpie', 'Pokémon di tipo Erba', NULL, NULL, 2, 1),
-(69, 'Charmander', 'Pokémon di tipo Fuoco', NULL, NULL, 2, 1),
-(70, 'Squirtle', 'Pokémon di tipo Acqua', NULL, NULL, 2, 1),
-(71, 'Bulbasaur', 'Pokémon di tipo Erba', NULL, NULL, 2, 1),
-(72, 'Eevee', 'Pokémon di tipo Normale', NULL, NULL, 2, 1),
-(73, 'Raichu', 'Pokémon di tipo Elettro', NULL, NULL, 2, 2),
-(74, 'Arcanine', 'Pokémon di tipo Fuoco', NULL, NULL, 2, 2),
-(75, 'Lapras', 'Pokémon di tipo Acqua', NULL, NULL, 2, 2),
-(76, 'Charizard', 'Pokémon di tipo Fuoco', NULL, NULL, 2, 3),
-(77, 'Gengar', 'Pokémon di tipo Spettro', NULL, NULL, 2, 3),
-(78, 'Dragonite', 'Pokémon di tipo Drago', NULL, NULL, 2, 3),
-(79, 'Mew', 'Pokémon di tipo Psico', NULL, NULL, 2, 4),
-(80, 'Lucario', 'Pokémon di tipo Lotta/Acciaio', NULL, NULL, 2, 4),
-(81, 'Gyarados', 'Pokémon di tipo Acqua', NULL, NULL, 2, 4),
-(82, 'Mewtwo', 'Pokémon di tipo Psico', NULL, NULL, 2, 5),
-(83, 'Rayquaza', 'Pokémon di tipo Drago', NULL, NULL, 2, 5),
-(84, 'Darkrai', 'Pokémon di tipo Buio', NULL, NULL, 2, 5),
-(85, 'Reshiram', 'Pokémon di tipo Drago/Fuoco', NULL, NULL, 2, 6),
-(86, 'Zekrom', 'Pokémon di tipo Drago/Elettro', NULL, NULL, 2, 6),
-(87, 'Giratina', 'Pokémon di tipo Spettro/Drago', NULL, NULL, 2, 6),
-(88, 'Funko POP: Jaden Yuki', 'Funko Pop da collezione di Jaden Yuki, protagonista di Yu-Gi-Oh! GX, raffigurato con la sua divisa rossa della Duel Academy e lo sguardo deciso da vero duellante. Dimensione: 9,5cm.\r\n', 16.00, 5, 10, NULL),
-(89, 'Funko POP: Yubel', 'Funko Pop da collezione di Yubel, l’enigmatica creatura di Yu-Gi-Oh! GX, raffigurata con dettagli fedeli alle sue forme mostruose e al suo aspetto oscuro. Dimensione: 9,5cm.\r\n', 15.00, 5, 10, NULL),
-(90, 'Funko POP: Alexis Rhodes', 'Funko Pop da collezione di Alexis Rhodes, elegante duellante di Yu-Gi-Oh! GX, rappresentata con la divisa della Duel Academy e il suo atteggiamento sicuro e determinato. Dimensione: 9,5cm.\r\n', 15.00, 5, 10, NULL),
-(91, 'Funko POP: Seto Kaiba', 'Funko Pop da collezione di Seto Kaiba, il geniale e ambizioso duellante di Yu-Gi-Oh!, raffigurato con il suo iconico cappotto blu e lo sguardo fiero da rivale temibile. Dimensione: 9,5cm.\n', 15.50, 5, 10, NULL),
-(92, 'Funko POP: Yami Yugi', 'Funko Pop da collezione di Yami Yugi, il leggendario duellante di Yu-Gi-Oh!, raffigurato con i capelli bicolore iconici, il Puzzle Millenario e lo sguardo deciso da campione. Dimensione: 9,5cm.\r\n', 20.00, 5, 10, NULL),
-(93, 'Funko POP: Dark Magician', 'Funko Pop da collezione di Dark Magician, il potente incantatore di Yu-Gi-Oh!, raffigurato con il suo costume viola e il bastone magico pronto a lanciare incantesimi. Dimensione: 9,5cm.\r\n', 20.00, 5, 10, NULL),
-(94, 'Funko POP: Rainbow Dragon', 'Funko Pop da collezione di Rainbow Dragon, il maestoso drago di Yu-Gi-Oh!, raffigurato con le ali variopinte e il corpo luminoso pronto a incantare ogni collezionista. Dimensione: 9,5cm.\r\n', 35.00, 2, 10, NULL),
-(95, 'Funko POP: Cyber Dragon', 'Funko Pop da collezione di Cyber Dragon, il leggendario drago meccanico di Yu-Gi-Oh!, raffigurato con il corpo argentato e il design futuristico pronto per il duello. Dimensione: 9,5cm.\r\n', 17.00, 4, 10, NULL),
-(96, 'Funko POP: Neos', 'Funko Pop da collezione di Elemental HERO Neos, l’eroe leggendario di Yu-Gi-Oh! GX, raffigurato con la sua armatura bianca e rosa e l’aspetto eroico pronto a combattere. Dimensione: 9,5cm.\r\n', 19.00, 3, 10, NULL),
-(97, 'Funko POP: Kuribo', 'Funko Pop da collezione di Kuriboh, la piccola e adorabile creatura di Yu-Gi-Oh!, raffigurata con il suo corpo marrone peloso e gli occhi grandi e espressivi. Dimensione: 9,5cm.\r\n', 15.00, 5, 10, NULL),
-(98, 'Funko POP: Harpie Lady', 'Funko Pop da collezione di Harpie Lady, l’agile e temibile guerriera alata di Yu-Gi-Oh!, raffigurata con le piume blu e il caratteristico sguardo deciso. Dimensione: 9,5cm.\n', 15.00, 5, 10, NULL),
-(99, 'Funko POP: Joey Wheeler', 'Funko Pop da collezione di Joey Wheeler, il leale e coraggioso duellante di Yu-Gi-Oh!, raffigurato con i capelli biondi, la giacca verde e lo sguardo da vero amico di Yugi. Dimensione: 9,5cm.\n', 15.00, 5, 10, NULL),
-(100, 'Funko POP: Zane Truesdale', 'Funko Pop da collezione di Zane Truesdale, il talentuoso e strategico duellante di Yu-Gi-Oh! GX, raffigurato con la divisa chiara della Duel Academy e lo sguardo concentrato. Dimensione: 9,5cm.\n', 15.00, 5, 10, NULL),
-(101, 'Funko POP: Ojama Yellow', 'Funko Pop da collezione di Ojama Yellow, il buffo e divertente mostriciattolo di Yu-Gi-Oh!, raffigurato con il corpo giallo, le espressioni comiche e il suo caratteristico sorriso. Dimensione: 9,5cm.\r\n', 15.00, 5, 10, NULL),
-(102, 'Funko POP: Harpie Lady 3', 'Funko Pop da collezione di Harpie Lady 3, l’elegante guerriera alata di Yu-Gi-Oh!, raffigurata con le piume viola, il costume caratteristico e lo sguardo determinato da duellante temibile. Dimensione: 9,5cm.\r\n', 23.00, 5, 10, NULL),
-(103, 'Funko POP: Avian', 'Funko Pop da collezione di Avian, il maestoso mostro alato di Yu-Gi-Oh!, raffigurato con le ali spiegate e il corpo verde pronto al duello. Dimensione: 9,5cm.\n', 35.00, 2, 10, NULL),
-(104, 'Funko POP: Jinzo e Time Wizard', 'Funko Pop da collezione di Jinzo, il potente duellante meccanico di Yu-Gi-Oh! e Time Wizard, il piccolo ma potente incantatore di Yu-Gi-Oh!. Dimensione: 9,5cm.', 40.00, 3, 10, NULL),
-(105, 'Funko POP: Harpie\'s Pet Dragon', 'Funko Pop da collezione di Harpie’s Pet Dragon, il drago alato di Yu-Gi-Oh!, raffigurato con le ali, il corpo sinuoso e lo sguardo feroce pronto al duello. Dimensione: 9,5cm.\r\n', 25.00, 5, 10, NULL);
+INSERT INTO `oggetto` (`id_oggetto`, `nome_oggetto`, `desc_oggetto`, `prezzo_oggetto`, `quant_oggetto`, `punto`, `fk_categoria_oggetto`, `fk_rarita`) VALUES
+(1, 'Mago Nero', 'Mostro di tipo Incantesimo', NULL, NULL, 3, 1, 3),
+(2, 'Pikachu', 'Pokémon di tipo Elettro', NULL, NULL, 1, 2, 1),
+(3, 'Plancia di gioco Arancione', 'Tappetino universale per giochi di carte collezionabili, realizzato in neoprene resistente con base antiscivolo.\nDimensione: 60x35cm', 14.99, 5, NULL, 4, NULL),
+(4, 'Plancia di gioco Rosa', 'Tappetino universale per giochi di carte collezionabili, realizzato in neoprene resistente con base antiscivolo.\nDimensione: 60x35cm', 14.50, 5, NULL, 4, NULL),
+(5, 'Plancia di gioco Viola', 'Tappetino universale per giochi di carte collezionabili, realizzato in neoprene resistente con base antiscivolo.\nDimensione: 60x35cm', 14.99, 5, NULL, 4, NULL),
+(6, 'Plancia di gioco Verdeacqua', 'Tappetino universale per giochi di carte collezionabili, realizzato in neoprene resistente con base antiscivolo.\nDimensione: 60x35cm', 14.99, 5, NULL, 4, NULL),
+(7, 'Proteggicarte Rosa', 'Pacchetto proteggicarte da 60 bustine.\nDimensione bustine: 62x89mm', 3.00, 5, NULL, 3, NULL),
+(8, 'Proteggicarte Blu chiaro', 'Pacchetto proteggicarte da 60 bustine.\nDimensione bustine: 62x89mm', 4.00, 5, NULL, 3, NULL),
+(9, 'Proteggicarte Rosso', 'Pacchetto proteggicarte da 60 bustine.\nDimensione bustine: 62x89mm', 3.50, 5, NULL, 3, NULL),
+(10, 'Proteggicarte Bianco', 'Pacchetto proteggicarte da 60 bustine.\nDimensione bustine: 62x89mm', 4.50, 5, NULL, 3, NULL),
+(11, 'Scatola porta carte Arancione', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 3.50, 5, NULL, 5, NULL),
+(12, 'Scatola porta carte Verde', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 3.50, 5, NULL, 5, NULL),
+(13, 'Scatola porta carte Rossa', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 3.50, 5, NULL, 5, NULL),
+(14, 'Scatola porta carte Blu', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 3.50, 5, NULL, 5, NULL),
+(15, 'Scatola porta carte Oro', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 5.00, 5, NULL, 5, NULL),
+(16, 'Scatola porta carte Argento', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 4.00, 5, NULL, 5, NULL),
+(17, 'Scatola porta carte Rosa', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 3.00, 5, NULL, 5, NULL),
+(18, 'Scatola porta carte Marrone', 'Scatola porta carte a 4 scomparti con capienza di 300 carte e bustine', 9.50, 5, NULL, 5, NULL),
+(19, 'Porta mazzo Viola', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.00, 5, NULL, 6, NULL),
+(20, 'Porta mazzo Arancione', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.00, 5, NULL, 6, NULL),
+(21, 'Porta mazzo Bianco', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 4.00, 5, NULL, 6, NULL),
+(22, 'Porta mazzo Blu chiaro', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.00, 5, NULL, 6, NULL),
+(23, 'Porta mazzo Verde', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.00, 5, NULL, 6, NULL),
+(24, 'Porta mazzo Nero', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 4.00, 5, NULL, 6, NULL),
+(25, 'Porta mazzo Giallo', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.50, 5, NULL, 6, NULL),
+(26, 'Porta mazzo Rosa', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.00, 5, NULL, 6, NULL),
+(27, 'Bustina Singola - Astri Lucenti', 'Bustina Pokémon della serie Astri Lucenti', NULL, NULL, NULL, 11, NULL),
+(28, 'Funko POP: Umbreon', 'Funko POP da collezione di Umbreon, Pokémon di tipo Buio, famoso per il suo manto nero e gli anelli luminescenti che brillano nella notte. Dimensione: 9,5cm', 15.50, 5, NULL, 9, NULL),
+(29, 'Funko POP: Pikachu', 'Funko POP da collezione di Pikachu, l\'iconico Pokémon di tipo Elettro, amato per la sua energia travolgente e il sorriso inconfondibile. Dimensione: 9,5cm', 15.00, 5, NULL, 9, NULL),
+(30, 'Funko POP: Charizard', 'Funko POP da collezione di Charizard, potente Pokémon di tipo Fuoco/Volante, temuto per le sue fiamme intense e il volo maestoso. Dimensione: 9,5cm', 15.50, 5, NULL, 9, NULL),
+(31, 'Funko POP: Mewtwo', 'Funko POP da collezione di Mewtwo, leggendario Pokémon Psico, creato in laboratorio e dotato di poteri mentali straordinari.Dimensione: 9,5cm', 16.00, 5, NULL, 9, NULL),
+(32, 'Funko POP: Dragonite', 'Funko POP da collezione di Dragonite, maestoso Pokémon Drago/Volante, noto per la sua forza impressionante e il cuore gentile. Dimensione: 9,5cm', 16.00, 5, NULL, 9, NULL),
+(33, 'Funko POP: Lucario', 'Funko POP da collezione di Lucario, fiero Pokémon Lotta/Acciaio, capace di percepire e controllare le aure con incredibile maestria. Dimensione: 9,5cm', 15.00, 5, NULL, 9, NULL),
+(34, 'Funko POP: Greninja', 'Funko POP da collezione di Greninja, Pokémon Acqua/Buio, famoso per la sua velocità e lo stile di combattimento furtivo. Dimensione: 9,5cm', 15.00, 5, NULL, 9, NULL),
+(35, 'Funko POP: Gengar', 'Funko POP da collezione di Gengar, enigmatico Pokémon Spettro/Veleno, celebre per i suoi scherzi inquietanti e il sorriso sinistro. Dimensione: 9,5cm', 15.50, 5, NULL, 9, NULL),
+(36, 'Funko POP: Espeon', 'Funko POP da collezione di Espeon, elegante Pokémon Psico, apprezzato per la sua grazia e le abilità predittive straordinarie. Dimensione: 9,5cm', 15.50, 5, NULL, 9, NULL),
+(37, 'Funko POP: Gardevoir', 'Funko POP da collezione di Gardevoir, elegante Pokémon di tipo Psichico/Folletto, noto per la sua grazia e capacità di proteggere il proprio allenatore con poteri psichici potenti. Dimensione: 9,5cm', 15.00, 5, NULL, 9, NULL),
+(38, 'Funko POP: Luxray', 'Funko POP da collezione di Luxray, Pokémon di tipo Elettro, simile a una grossa tigre dai occhi penetranti, famoso per la sua vista acutissima e la forza elettrica che usa in battaglia. Dimensione: 9,5cm', 15.50, 5, NULL, 9, NULL),
+(39, 'Funko POP: Alakazam', 'Funko POP da collezione di Alakazam, Pokémon di tipo Psichico, famoso per il suo intelletto straordinario e i potenti poteri psichici, rappresentato con cucchiai per amplificare la telecinesi. Dimensione: 9,5cm', 15.00, 5, NULL, 9, NULL),
+(40, 'Funko POP: Sylveon', 'Funko POP da collezione di Sylveon, Pokémon di tipo Folletto, noto per il suo aspetto dolce e i nastri che usa per calmare e proteggere gli altri con poteri magici. Dimensione: 9,5cm', 15.50, 5, NULL, 9, NULL),
+(41, 'Funko POP: Horsea', 'Funko POP da collezione di Horsea, Pokémon di tipo Acqua, simile a un piccolo cavalluccio marino, capace di spruzzare getti d\'acqua ad alta pressione per difendersi. Dimensione: 9,5cm', 14.50, 5, NULL, 9, NULL),
+(42, 'Funko POP: Blaziken', 'Funko POP da collezione di Blaziken, Pokémon di tipo Fuoco/Lotta, famoso per la sua forza esplosiva e le potenti tecniche di arti marziali che combina con fiamme avvolgenti. Dimensione: 9,5cm', 14.99, 5, NULL, 9, NULL),
+(43, 'Funko POP: Chimchar', 'Funko POP da collezione di Chimchar, Pokémon di tipo Fuoco, noto per la sua coda fiammeggiante e il carattere energico e molto curioso. Dimensione: 9,5cm', 15.00, 5, NULL, 9, NULL),
+(44, 'Funko POP: Oshawott', 'Funko POP da collezione di Oshawott, Pokémon di tipo Acqua, noto per il suo guscio a forma di conchiglia che usa come arma e per il suo spirito coraggioso. Dimensione: 9,5cm', 15.00, 5, NULL, 9, NULL),
+(45, 'Funko POP: Piplup', 'Funko POP da collezione di Piplup, Pokémon di tipo Acqua, noto per il suo carattere orgoglioso e il coraggio nonostante la sua taglia ridotta. Dimensione: 9,5cm', 15.00, 5, NULL, 9, NULL),
+(46, 'Funko POP: Sprigatito', 'Funko POP da collezione di Sprigatito, Pokémon di tipo Erba, noto per il suo atteggiamento molto curioso e notevolmente affettuoso. Dimensione: 9,5cm', 15.00, 5, NULL, 9, NULL),
+(47, 'Funko POP: Zorua', 'Funko POP da collezione di Zorua, Pokémon di tipo Buio, noto per la sua abilità nel creare illusioni e trasformarsi per ingannare i nemici. Dimensione: 9,5cm', 15.50, 5, NULL, 9, NULL),
+(48, 'Drago Bebè', 'Mostro di tipo Drago', NULL, NULL, 1, 1, 1),
+(49, 'Combattente delle Lame', 'Mostro di tipo Guerriero', NULL, NULL, 1, 1, 1),
+(50, 'Folletto della Foresta', 'Mostro di tipo Pianta', NULL, NULL, 1, 1, 1),
+(51, 'Eda Maga del Sole', 'Mostro di tipo Fata', NULL, NULL, 1, 1, 1),
+(52, 'Golem Blocco', 'Mostro di tipo Roccia', NULL, NULL, 1, 1, 1),
+(53, 'Spadaccino Mistico LV6', 'Mostro di tipo Guerriero', NULL, NULL, 2, 1, 2),
+(54, 'Serpente Divino', 'Mostro di tipo Rettile', NULL, NULL, 2, 1, 2),
+(55, 'Cavaliere di Ghiaccio', 'Mostro di tipo Guerriero', NULL, NULL, 2, 1, 2),
+(56, 'Drago Bianco Occhi Blu', 'Mostro di tipo Drago', NULL, NULL, 3, 1, 3),
+(57, 'Arciere Celestiale', 'Mostro di tipo Fata', NULL, NULL, 3, 1, 3),
+(58, 'Monarca delle Ombre', 'Mostro di tipo Demone', NULL, NULL, 3, 1, 3),
+(59, 'Fenice Sacra', 'Mostro di tipo Bestia Alata', NULL, NULL, 4, 1, 4),
+(60, 'Guardiano Celtico', 'Mostro di tipo Guerriero', NULL, NULL, 4, 1, 4),
+(61, 'Drago Leviatano', 'Mostro di tipo Serpente Marino', NULL, NULL, 4, 1, 4),
+(62, 'Drago Divino Sirf', 'Mostro di tipo Drago', NULL, NULL, 5, 1, 5),
+(63, 'Angelo del Caos', 'Mostro di tipo Fata', NULL, NULL, 5, 1, 5),
+(64, 'Re Distruggi Memoria', 'Mostro di tipo Demone', NULL, NULL, 5, 1, 5),
+(65, 'Exodia il Proibito', 'Mostro di tipo Incantesimo', NULL, NULL, 6, 1, 6),
+(66, 'Drago Alato di Ra', 'Mostro di tipo Divino-Bestia', NULL, NULL, 6, 1, 6),
+(67, 'Obelisk il Tormentatore', 'Mostro di tipo Divino-Bestia', NULL, NULL, 6, 1, 6),
+(68, 'Caterpie', 'Pokémon di tipo Erba', NULL, NULL, 1, 2, 1),
+(69, 'Charmander', 'Pokémon di tipo Fuoco', NULL, NULL, 1, 2, 1),
+(70, 'Squirtle', 'Pokémon di tipo Acqua', NULL, NULL, 1, 2, 1),
+(71, 'Bulbasaur', 'Pokémon di tipo Erba', NULL, NULL, NULL, 2, 1),
+(72, 'Eevee', 'Pokémon di tipo Normale', NULL, NULL, NULL, 2, 1),
+(73, 'Raichu', 'Pokémon di tipo Elettro', NULL, NULL, NULL, 2, 2),
+(74, 'Arcanine', 'Pokémon di tipo Fuoco', NULL, NULL, NULL, 2, 2),
+(75, 'Lapras', 'Pokémon di tipo Acqua', NULL, NULL, NULL, 2, 2),
+(76, 'Charizard', 'Pokémon di tipo Fuoco', NULL, NULL, NULL, 2, 3),
+(77, 'Gengar', 'Pokémon di tipo Spettro', NULL, NULL, NULL, 2, 3),
+(78, 'Dragonite', 'Pokémon di tipo Drago', NULL, NULL, NULL, 2, 3),
+(79, 'Mew', 'Pokémon di tipo Psico', NULL, NULL, NULL, 2, 4),
+(80, 'Lucario', 'Pokémon di tipo Lotta/Acciaio', NULL, NULL, NULL, 2, 4),
+(81, 'Gyarados', 'Pokémon di tipo Acqua', NULL, NULL, NULL, 2, 4),
+(82, 'Mewtwo', 'Pokémon di tipo Psico', NULL, NULL, NULL, 2, 5),
+(83, 'Rayquaza', 'Pokémon di tipo Drago', NULL, NULL, NULL, 2, 5),
+(84, 'Darkrai', 'Pokémon di tipo Buio', NULL, NULL, NULL, 2, 5),
+(85, 'Reshiram', 'Pokémon di tipo Drago/Fuoco', NULL, NULL, NULL, 2, 6),
+(86, 'Zekrom', 'Pokémon di tipo Drago/Elettro', NULL, NULL, NULL, 2, 6),
+(87, 'Giratina', 'Pokémon di tipo Spettro/Drago', NULL, NULL, NULL, 2, 6),
+(88, 'Funko POP: Jaden Yuki', 'Funko Pop da collezione di Jaden Yuki, protagonista di Yu-Gi-Oh! GX, raffigurato con la sua divisa rossa della Duel Academy e lo sguardo deciso da vero duellante. Dimensione: 9,5cm.\r\n', 16.00, 5, NULL, 10, NULL),
+(89, 'Funko POP: Yubel', 'Funko Pop da collezione di Yubel, l’enigmatica creatura di Yu-Gi-Oh! GX, raffigurata con dettagli fedeli alle sue forme mostruose e al suo aspetto oscuro. Dimensione: 9,5cm.\r\n', 15.00, 5, NULL, 10, NULL),
+(90, 'Funko POP: Alexis Rhodes', 'Funko Pop da collezione di Alexis Rhodes, elegante duellante di Yu-Gi-Oh! GX, rappresentata con la divisa della Duel Academy e il suo atteggiamento sicuro e determinato. Dimensione: 9,5cm.\r\n', 15.00, 5, NULL, 10, NULL),
+(91, 'Funko POP: Seto Kaiba', 'Funko Pop da collezione di Seto Kaiba, il geniale e ambizioso duellante di Yu-Gi-Oh!, raffigurato con il suo iconico cappotto blu e lo sguardo fiero da rivale temibile. Dimensione: 9,5cm.\n', 15.50, 5, NULL, 10, NULL),
+(92, 'Funko POP: Yami Yugi', 'Funko Pop da collezione di Yami Yugi, il leggendario duellante di Yu-Gi-Oh!, raffigurato con i capelli bicolore iconici, il Puzzle Millenario e lo sguardo deciso da campione. Dimensione: 9,5cm.\r\n', 20.00, 5, NULL, 10, NULL),
+(93, 'Funko POP: Dark Magician', 'Funko Pop da collezione di Dark Magician, il potente incantatore di Yu-Gi-Oh!, raffigurato con il suo costume viola e il bastone magico pronto a lanciare incantesimi. Dimensione: 9,5cm.\r\n', 20.00, 5, NULL, 10, NULL),
+(94, 'Funko POP: Rainbow Dragon', 'Funko Pop da collezione di Rainbow Dragon, il maestoso drago di Yu-Gi-Oh!, raffigurato con le ali variopinte e il corpo luminoso pronto a incantare ogni collezionista. Dimensione: 9,5cm.\r\n', 35.00, 2, NULL, 10, NULL),
+(95, 'Funko POP: Cyber Dragon', 'Funko Pop da collezione di Cyber Dragon, il leggendario drago meccanico di Yu-Gi-Oh!, raffigurato con il corpo argentato e il design futuristico pronto per il duello. Dimensione: 9,5cm.\r\n', 17.00, 4, NULL, 10, NULL),
+(96, 'Funko POP: Neos', 'Funko Pop da collezione di Elemental HERO Neos, l’eroe leggendario di Yu-Gi-Oh! GX, raffigurato con la sua armatura bianca e rosa e l’aspetto eroico pronto a combattere. Dimensione: 9,5cm.\r\n', 19.00, 3, NULL, 10, NULL),
+(97, 'Funko POP: Kuribo', 'Funko Pop da collezione di Kuriboh, la piccola e adorabile creatura di Yu-Gi-Oh!, raffigurata con il suo corpo marrone peloso e gli occhi grandi e espressivi. Dimensione: 9,5cm.\r\n', 15.00, 5, NULL, 10, NULL),
+(98, 'Funko POP: Harpie Lady', 'Funko Pop da collezione di Harpie Lady, l’agile e temibile guerriera alata di Yu-Gi-Oh!, raffigurata con le piume blu e il caratteristico sguardo deciso. Dimensione: 9,5cm.\n', 15.00, 5, NULL, 10, NULL),
+(99, 'Funko POP: Joey Wheeler', 'Funko Pop da collezione di Joey Wheeler, il leale e coraggioso duellante di Yu-Gi-Oh!, raffigurato con i capelli biondi, la giacca verde e lo sguardo da vero amico di Yugi. Dimensione: 9,5cm.\n', 15.00, 5, NULL, 10, NULL),
+(100, 'Funko POP: Zane Truesdale', 'Funko Pop da collezione di Zane Truesdale, il talentuoso e strategico duellante di Yu-Gi-Oh! GX, raffigurato con la divisa chiara della Duel Academy e lo sguardo concentrato. Dimensione: 9,5cm.\n', 15.00, 5, NULL, 10, NULL),
+(101, 'Funko POP: Ojama Yellow', 'Funko Pop da collezione di Ojama Yellow, il buffo e divertente mostriciattolo di Yu-Gi-Oh!, raffigurato con il corpo giallo, le espressioni comiche e il suo caratteristico sorriso. Dimensione: 9,5cm.\r\n', 15.00, 5, NULL, 10, NULL),
+(102, 'Funko POP: Harpie Lady 3', 'Funko Pop da collezione di Harpie Lady 3, l’elegante guerriera alata di Yu-Gi-Oh!, raffigurata con le piume viola, il costume caratteristico e lo sguardo determinato da duellante temibile. Dimensione: 9,5cm.\r\n', 23.00, 5, NULL, 10, NULL),
+(103, 'Funko POP: Avian', 'Funko Pop da collezione di Avian, il maestoso mostro alato di Yu-Gi-Oh!, raffigurato con le ali spiegate e il corpo verde pronto al duello. Dimensione: 9,5cm.\n', 35.00, 2, NULL, 10, NULL),
+(104, 'Funko POP: Jinzo e Time Wizard', 'Funko Pop da collezione di Jinzo, il potente duellante meccanico di Yu-Gi-Oh! e Time Wizard, il piccolo ma potente incantatore di Yu-Gi-Oh!. Dimensione: 9,5cm.', 40.00, 3, NULL, 10, NULL),
+(105, 'Funko POP: Harpie\'s Pet Dragon', 'Funko Pop da collezione di Harpie’s Pet Dragon, il drago alato di Yu-Gi-Oh!, raffigurato con le ali, il corpo sinuoso e lo sguardo feroce pronto al duello. Dimensione: 9,5cm.\r\n', 25.00, 5, NULL, 10, NULL);
 
 -- --------------------------------------------------------
 
@@ -806,19 +807,6 @@ CREATE TABLE `proposta_dettagli` (
   `quantita` int(11) NOT NULL,
   `tipo_azione` enum('offerta','richiesta') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Struttura della tabella `punti_utente`
---
-
-CREATE TABLE `punti_utente` (
-  `id_punti` int(11) NOT NULL,
-  `punti` int(11) NOT NULL DEFAULT 0,
-  `livello` int(11) NOT NULL DEFAULT 0,
-  `fk_utente` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -1225,13 +1213,6 @@ ALTER TABLE `proposta_dettagli`
   ADD KEY `fk_oggetto` (`fk_oggetto`);
 
 --
--- Indici per le tabelle `punti_utente`
---
-ALTER TABLE `punti_utente`
-  ADD PRIMARY KEY (`id_punti`),
-  ADD KEY `fk_utente_punti_utente` (`fk_utente`);
-
---
 -- Indici per le tabelle `rarita`
 --
 ALTER TABLE `rarita`
@@ -1386,12 +1367,6 @@ ALTER TABLE `ordine_log`
 --
 ALTER TABLE `proposta_dettagli`
   MODIFY `id_dettaglio` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT per la tabella `punti_utente`
---
-ALTER TABLE `punti_utente`
-  MODIFY `id_punti` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT per la tabella `rarita`
@@ -1569,12 +1544,6 @@ ALTER TABLE `ordine_log`
 ALTER TABLE `proposta_dettagli`
   ADD CONSTRAINT `proposta_dettagli_ibfk_1` FOREIGN KEY (`fk_proposta`) REFERENCES `scambio_proposte` (`id_proposta`) ON DELETE CASCADE,
   ADD CONSTRAINT `proposta_dettagli_ibfk_2` FOREIGN KEY (`fk_oggetto`) REFERENCES `oggetto` (`id_oggetto`);
-
---
--- Limiti per la tabella `punti_utente`
---
-ALTER TABLE `punti_utente`
-  ADD CONSTRAINT `fk_utente_punti_utente` FOREIGN KEY (`fk_utente`) REFERENCES `utente` (`id_utente`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Limiti per la tabella `scambi`
