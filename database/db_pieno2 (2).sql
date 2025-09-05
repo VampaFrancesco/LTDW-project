@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Set 05, 2025 alle 12:26
+-- Creato il: Set 05, 2025 alle 14:56
 -- Versione del server: 10.4.32-MariaDB
 -- Versione PHP: 8.2.12
 
@@ -467,12 +467,12 @@ INSERT INTO `mystery_box` (`id_box`, `nome_box`, `desc_box`, `prezzo_box`, `quan
 (5, 'Pokébox - Epica', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: epica. \r\nEspansioni: Spada e Scudo – Evoluzioni Eteree', 40.00, 3, 4, 7),
 (6, 'Pokébox - Mitica', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: mitica. \r\nEspansioni: X e Y – Destini Incrociati - Shining Legends', 55.00, 2, 5, 7),
 (7, 'Pokébox - Leggendaria', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: leggendaria. \r\nEspansioni: XY – Generazioni - Celebrations', 75.00, 2, 6, 7),
-(8, 'YugiBox - Comune', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: comune. Espansioni: Structure Deck: Saga of Blue-Eyes White Dragon', 10.00, 2, 1, 8),
+(8, 'YugiBox - Comune', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: comune. Espansioni: Deck: Saga of Blue-Eyes White Dragon', 10.00, 2, 1, 8),
 (9, 'YugiBox - Rara', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: rara. Espansioni: Legendary Duelists: White Dragon Abyss', 20.00, 3, 2, 8),
 (10, 'YugiBox - Ultra rara', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: ultra rara. Espansioni: Legendary Collection Kaiba', 30.00, 3, 3, 8),
 (11, 'YugiBox - Epica', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: epica. Espansioni: Battles of Legend: Light’s Revenge', 40.00, 3, 4, 8),
 (12, 'YugiBox - Mitica', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: mitica. Espansioni: Hidden Arsenal: Chapter 1 - Dragons of Legend', 55.00, 2, 5, 8),
-(13, 'YugiBox - Leggendaria', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: leggendaria. Espansioni: Legendary Collection 25th Anniversary Edition', 75.00, 2, 6, 8);
+(13, 'YugiBox - Leggendaria', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: leggendaria. Espansioni: Legendary Collection Anniversary Edition', 75.00, 2, 6, 8);
 
 -- --------------------------------------------------------
 
