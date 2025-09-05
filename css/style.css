@@ -335,7 +335,7 @@ img {
 
 .dropdown-item:hover {
     background: var(--primary-color);
-    color: #3f51b5 !important;
+    color: white !important;
     transform: translateX(5px);
 }
 
@@ -369,7 +369,7 @@ img {
 
 .btn-filter:hover {
     background: var(--primary-color);
-    color: #3f51b5 !important;
+    color: white !important;
     transform: translateY(-2px);
     box-shadow: var(--shadow-light);
 }
@@ -708,7 +708,7 @@ img {
 /* BUTTONS */
 .btn-add-to-cart {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: whit !important;
+    color: white !important;
     padding: 12px 24px;
     border-radius: 25px;
     font-size: 16px;
