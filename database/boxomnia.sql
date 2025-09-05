@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:8889
--- Creato il: Set 04, 2025 alle 15:46
+-- Creato il: Set 05, 2025 alle 23:09
 -- Versione del server: 8.0.40
 -- Versione PHP: 8.3.14
 
@@ -64,7 +64,7 @@ DELIMITER ;
 CREATE TABLE `admin` (
   `id_admin` int NOT NULL,
   `fk_utente` int NOT NULL,
-  `livello_admin` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'admin',
+  `livello_admin` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'admin',
   `data_creazione` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `creato_da` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -111,7 +111,7 @@ CREATE TABLE `carrello` (
   `data_creazione` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `data_ultima_modifica` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `quantita` bigint NOT NULL,
-  `stato` enum('attivo','checkout','completato','abbandonato') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'attivo',
+  `stato` enum('attivo','checkout','completato','abbandonato') COLLATE utf8mb4_unicode_ci DEFAULT 'attivo',
   `fk_mystery_box` int DEFAULT NULL,
   `fk_oggetto` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -148,7 +148,13 @@ INSERT INTO `carrello` (`id_carrello`, `totale`, `fk_utente`, `data_creazione`, 
 (49, 4.50, 7, '2025-09-04 17:39:06', '2025-09-04 17:39:28', 1, 'completato', NULL, 10),
 (50, 15.00, 7, '2025-09-04 17:39:09', '2025-09-04 17:39:28', 1, 'completato', NULL, 29),
 (51, 15.00, 7, '2025-09-04 17:42:38', '2025-09-04 17:42:50', 1, 'completato', NULL, 89),
-(52, 15.50, 7, '2025-09-04 17:42:41', '2025-09-04 17:42:50', 1, 'completato', NULL, 28);
+(52, 15.50, 7, '2025-09-04 17:42:41', '2025-09-04 17:42:50', 1, 'completato', NULL, 28),
+(53, 75.00, 7, '2025-09-05 14:48:15', '2025-09-05 14:48:24', 1, 'completato', 13, NULL),
+(54, 4.50, 7, '2025-09-05 15:30:15', '2025-09-05 16:12:00', 1, 'completato', NULL, 10),
+(55, 15.00, 7, '2025-09-05 16:11:49', '2025-09-05 16:12:00', 1, 'completato', NULL, 89),
+(56, 16.00, 7, '2025-09-05 16:11:52', '2025-09-05 16:12:00', 1, 'completato', NULL, 88),
+(57, 63.75, 7, '2025-09-05 16:25:10', '2025-09-05 16:32:58', 1, 'completato', 13, NULL),
+(58, 32.00, 7, '2025-09-05 23:26:02', '2025-09-05 23:26:02', 1, 'attivo', 5, NULL);
 
 --
 -- Trigger `carrello`
@@ -195,8 +201,8 @@ CREATE TABLE `carrello_utente` (
 
 CREATE TABLE `categoria_oggetto` (
   `id_categoria` int NOT NULL,
-  `nome_categoria` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `tipo_oggetto` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
+  `nome_categoria` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tipo_oggetto` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -224,10 +230,39 @@ INSERT INTO `categoria_oggetto` (`id_categoria`, `nome_categoria`, `tipo_oggetto
 
 CREATE TABLE `classifica` (
   `id_classifica` int NOT NULL,
-  `nome_classifica` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `tipo_classifica` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `desc_classifica` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
+  `nome_classifica` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tipo_classifica` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `desc_classifica` text COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `contenuti_modificabili`
+--
+
+CREATE TABLE `contenuti_modificabili` (
+  `id_contenuto` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `testo_contenuto` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `data_modifica` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dump dei dati per la tabella `contenuti_modificabili`
+--
+
+INSERT INTO `contenuti_modificabili` (`id_contenuto`, `testo_contenuto`, `data_modifica`) VALUES
+('avviso_promozioni', 'MUVTTTT COMBÀ', '2025-09-06 00:46:30'),
+('community_classifica_desc', 'Sfida gli altri collezionisti e scala la classifica per diventare il numero uno!', '2025-09-06 00:46:30'),
+('community_classifica_titolo', 'Classifica - [EVENTO IN CORSO]', '2025-09-06 00:46:30'),
+('community_collezione_desc', 'Gestisci e mostra le tue carte Pokémon e Yu-Gi-Oh! alla community.', '2025-09-06 00:46:30'),
+('community_collezione_titolo', 'La Mia Collezione, in una veste tutta nuova', '2025-09-06 00:46:30'),
+('community_scambi_desc', 'Scambia le tue carte doppie e completa la tua collezione con altri appassionati.', '2025-09-06 00:46:30'),
+('community_scambi_titolo', 'Scambi di Carte - [PUNTI DOPPI]', '2025-09-06 00:46:30'),
+('testo_benvenuto', 'BOX OMNIA!', '2025-09-06 00:46:30'),
+('titolo_community', 'La Community di BoxOmnia', '2025-09-06 00:46:30'),
+('titolo_funko_pop', 'Novità Funko POP', '2025-09-06 00:46:30'),
+('titolo_mystery_box', 'Nuove Mystery Box', '2025-09-06 00:46:30');
 
 -- --------------------------------------------------------
 
@@ -237,7 +272,7 @@ CREATE TABLE `classifica` (
 
 CREATE TABLE `fattura` (
   `id_fattura` int NOT NULL,
-  `tipo` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tipo` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `totale_fattura` decimal(10,2) NOT NULL,
   `data_emissione` datetime NOT NULL,
   `fk_utente` int NOT NULL
@@ -251,8 +286,8 @@ CREATE TABLE `fattura` (
 
 CREATE TABLE `immagine` (
   `id_immagine` int NOT NULL,
-  `nome_img` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `descrizione_img` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nome_img` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `descrizione_img` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `dimensione` int DEFAULT NULL,
   `fk_oggetto` int DEFAULT NULL,
   `fk_mystery_box` int DEFAULT NULL
@@ -366,7 +401,19 @@ INSERT INTO `immagine` (`id_immagine`, `nome_img`, `descrizione_img`, `dimension
 (142, 'funko_harpie3.png', NULL, NULL, 102, NULL),
 (143, 'funko_avian.png', NULL, NULL, 103, NULL),
 (144, 'funko_jinzo.png', NULL, NULL, 104, NULL),
-(145, 'funko_harpiepet.png', NULL, NULL, 105, NULL);
+(145, 'funko_harpiepet.png', NULL, NULL, 105, NULL),
+(146, 'mystery_box_pokemon.png', NULL, NULL, NULL, 3),
+(147, 'mystery_box_pokemon.png', NULL, NULL, NULL, 2),
+(148, 'mystery_box_pokemon.png', NULL, NULL, NULL, 5),
+(149, 'mystery_box_pokemon.png', NULL, NULL, NULL, 6),
+(150, 'mystery_box_pokemon.png', NULL, NULL, NULL, 4),
+(151, 'mystery_box_pokemon.png', NULL, NULL, NULL, 7),
+(152, 'mystery_box_yugioh.webp', NULL, NULL, NULL, 10),
+(153, 'mystery_box_yugioh.webp', NULL, NULL, NULL, 9),
+(154, 'mystery_box_yugioh.webp', NULL, NULL, NULL, 12),
+(155, 'mystery_box_yugioh.webp', NULL, NULL, NULL, 13),
+(156, 'mystery_box_yugioh.webp', NULL, NULL, NULL, 11),
+(157, 'mystery_box_yugioh.webp', NULL, NULL, NULL, 8);
 
 -- --------------------------------------------------------
 
@@ -376,12 +423,12 @@ INSERT INTO `immagine` (`id_immagine`, `nome_img`, `descrizione_img`, `dimension
 
 CREATE TABLE `indirizzo_spedizione` (
   `id_indirizzo` int NOT NULL,
-  `via` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `via` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `civico` bigint NOT NULL,
   `cap` bigint NOT NULL,
-  `citta` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `nazione` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `provincia` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `citta` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nazione` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `provincia` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `fk_utente` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -390,8 +437,7 @@ CREATE TABLE `indirizzo_spedizione` (
 --
 
 INSERT INTO `indirizzo_spedizione` (`id_indirizzo`, `via`, `civico`, `cap`, `citta`, `nazione`, `provincia`, `fk_utente`) VALUES
-(1, 'Ticino', 4, 64028, 'Silvi', 'Italia', 'Teramo', 1),
-(2, 'Abruzzo', 89, 64028, 'Silvi', 'Italia', 'TE', 7);
+(6, 'Abruzzo', 89, 64028, 'Silvi', 'Italia', 'TE', 7);
 
 -- --------------------------------------------------------
 
@@ -406,7 +452,7 @@ CREATE TABLE `info_ordine` (
   `fk_oggetto` int DEFAULT NULL,
   `quantita_ordine` int NOT NULL,
   `totale_ordine` decimal(10,2) NOT NULL,
-  `note_ordine` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+  `note_ordine` text COLLATE utf8mb4_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -414,18 +460,10 @@ CREATE TABLE `info_ordine` (
 --
 
 INSERT INTO `info_ordine` (`id_info_ordine`, `fk_ordine`, `fk_box`, `fk_oggetto`, `quantita_ordine`, `totale_ordine`, `note_ordine`) VALUES
-(1, 2, 2, NULL, 1, 20.00, NULL),
-(2, 3, 2, NULL, 2, 40.00, NULL),
-(4, 20, NULL, 89, 1, 15.00, NULL),
-(5, 20, NULL, 88, 1, 16.00, NULL),
-(6, 21, NULL, 29, 1, 15.00, NULL),
-(7, 21, NULL, 90, 1, 15.00, NULL),
-(8, 22, NULL, 89, 1, 15.00, NULL),
-(9, 22, NULL, 28, 1, 15.50, NULL),
-(10, 23, NULL, 10, 1, 4.50, NULL),
-(11, 23, NULL, 29, 1, 15.00, NULL),
-(12, 24, NULL, 89, 1, 15.00, NULL),
-(13, 24, NULL, 28, 1, 15.50, NULL);
+(15, 26, NULL, 10, 1, 4.50, NULL),
+(16, 26, NULL, 89, 1, 15.00, NULL),
+(17, 26, NULL, 88, 1, 16.00, NULL),
+(18, 27, 13, NULL, 1, 63.75, NULL);
 
 -- --------------------------------------------------------
 
@@ -435,8 +473,8 @@ INSERT INTO `info_ordine` (`id_info_ordine`, `fk_ordine`, `fk_box`, `fk_oggetto`
 
 CREATE TABLE `mystery_box` (
   `id_box` int NOT NULL,
-  `nome_box` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `desc_box` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nome_box` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `desc_box` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `prezzo_box` decimal(10,2) NOT NULL,
   `quantita_box` int NOT NULL,
   `fk_rarita` int NOT NULL,
@@ -448,7 +486,18 @@ CREATE TABLE `mystery_box` (
 --
 
 INSERT INTO `mystery_box` (`id_box`, `nome_box`, `desc_box`, `prezzo_box`, `quantita_box`, `fk_rarita`, `fk_categoria_oggetto`) VALUES
-(2, 'PokéBox - Rara', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: rara', 20.00, 2, 2, 7);
+(2, 'PokéBox - Rara', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: rara. Espansioni: Spada e Scudo – Fragore Ribelle', 20.00, 2, 2, 7),
+(3, 'Pokèbox - Comune', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: comune.\r\nEspansioni: Sole e Luna – Guardiani Nascenti\r\n', 10.00, 5, 1, 7),
+(4, 'Pokébox - Ultra Rara', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: ultra rara.\nEspansioni: Spada e Scudo – Destino Splendente', 30.00, 2, 3, 7),
+(5, 'Pokébox - Epica', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: epica. \r\nEspansioni: Spada e Scudo – Evoluzioni Eteree', 40.00, 3, 4, 7),
+(6, 'Pokébox - Mitica', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: mitica. \r\nEspansioni: X e Y – Destini Incrociati - Shining Legends', 55.00, 2, 5, 7),
+(7, 'Pokébox - Leggendaria', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: leggendaria. \r\nEspansioni: XY – Generazioni - Celebrations', 75.00, 2, 6, 7),
+(8, 'YugiBox - Comune', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: comune. Espansioni: Structure Deck: Saga of Blue-Eyes White Dragon', 10.00, 2, 1, 8),
+(9, 'YugiBox - Rara', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: rara. Espansioni: Legendary Duelists: White Dragon Abyss', 20.00, 3, 2, 8),
+(10, 'YugiBox - Ultra rara', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: ultra rara. Espansioni: Legendary Collection Kaiba', 30.00, 3, 3, 8),
+(11, 'YugiBox - Epica', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: epica. Espansioni: Battles of Legend: Light’s Revenge', 40.00, 3, 4, 8),
+(12, 'YugiBox - Mitica', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: mitica. Espansioni: Hidden Arsenal: Chapter 1 - Dragons of Legend', 55.00, 2, 5, 8),
+(13, 'YugiBox - Leggendaria', 'Mystery Box che potrebbe contenere carte singole, bustine e/o starter pack di rarità: leggendaria. Espansioni: Legendary Collection 25th Anniversary Edition', 75.00, 2, 6, 8);
 
 -- --------------------------------------------------------
 
@@ -459,10 +508,22 @@ INSERT INTO `mystery_box` (`id_box`, `nome_box`, `desc_box`, `prezzo_box`, `quan
 CREATE TABLE `novita_box` (
   `fk_mystery_box` int NOT NULL,
   `data_novita` datetime NOT NULL,
-  `desc_novita` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `desc_novita` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sconto_novita` decimal(10,0) DEFAULT NULL,
   `fine_novita` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dump dei dati per la tabella `novita_box`
+--
+
+INSERT INTO `novita_box` (`fk_mystery_box`, `data_novita`, `desc_novita`, `sconto_novita`, `fine_novita`) VALUES
+(2, '2025-09-05 12:11:15', NULL, 50, NULL),
+(5, '2025-09-05 12:11:15', NULL, 20, '2025-11-20 12:12:18'),
+(6, '2025-09-05 12:16:32', NULL, 12, '2025-11-12 12:16:32'),
+(10, '2025-09-05 12:11:15', NULL, 12, '2025-09-30 12:11:15'),
+(12, '2025-09-05 12:11:15', NULL, 30, '2025-10-15 12:12:18'),
+(13, '2025-09-05 12:16:32', NULL, 15, '2025-09-21 12:16:32');
 
 -- --------------------------------------------------------
 
@@ -473,7 +534,7 @@ CREATE TABLE `novita_box` (
 CREATE TABLE `novita_oggetto` (
   `fk_oggetto` int NOT NULL,
   `novita_data` datetime NOT NULL,
-  `novita_desc` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `novita_desc` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `novita_sconto` decimal(10,0) DEFAULT NULL,
   `novita_fine` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -484,15 +545,14 @@ CREATE TABLE `novita_oggetto` (
 
 INSERT INTO `novita_oggetto` (`fk_oggetto`, `novita_data`, `novita_desc`, `novita_sconto`, `novita_fine`) VALUES
 (30, '2025-08-27 16:28:49', NULL, 50, '2025-09-01 16:04:40'),
-(32, '2025-08-27 18:07:50', NULL, 75, NULL),
-(34, '2025-08-27 18:12:16', NULL, 12, NULL),
-(36, '2025-08-27 18:12:16', NULL, 3, NULL),
-(38, '2025-08-27 18:13:03', NULL, 30, NULL),
-(39, '2025-08-27 16:25:49', NULL, 10, NULL),
+(32, '2025-08-27 18:07:50', NULL, 75, '2025-10-08 11:21:59'),
+(34, '2025-08-27 18:12:16', NULL, 12, '2025-09-26 11:22:09'),
+(36, '2025-08-27 18:12:16', NULL, 3, '2025-11-12 11:22:13'),
+(38, '2025-08-27 18:13:03', NULL, 30, '2025-09-29 11:22:17'),
+(39, '2025-08-27 16:25:49', NULL, 10, '2025-09-09 11:22:20'),
 (90, '2025-08-27 16:28:24', NULL, 20, NULL),
-(93, '2025-08-27 18:57:54', 'Uno dei più ricercati!', NULL, NULL),
-(97, '2025-08-27 18:29:50', NULL, 1, NULL),
-(103, '2025-08-27 16:27:34', NULL, 5, NULL);
+(97, '2025-08-27 18:29:50', NULL, 1, '2025-12-17 11:22:23'),
+(103, '2025-08-27 16:27:34', NULL, 5, '2025-09-24 11:22:29');
 
 -- --------------------------------------------------------
 
@@ -502,10 +562,11 @@ INSERT INTO `novita_oggetto` (`fk_oggetto`, `novita_data`, `novita_desc`, `novit
 
 CREATE TABLE `oggetto` (
   `id_oggetto` int NOT NULL,
-  `nome_oggetto` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `desc_oggetto` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nome_oggetto` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `desc_oggetto` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `prezzo_oggetto` decimal(10,2) DEFAULT NULL,
   `quant_oggetto` int DEFAULT NULL,
+  `punto` int DEFAULT NULL,
   `fk_categoria_oggetto` int NOT NULL,
   `fk_rarita` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -514,112 +575,112 @@ CREATE TABLE `oggetto` (
 -- Dump dei dati per la tabella `oggetto`
 --
 
-INSERT INTO `oggetto` (`id_oggetto`, `nome_oggetto`, `desc_oggetto`, `prezzo_oggetto`, `quant_oggetto`, `fk_categoria_oggetto`, `fk_rarita`) VALUES
-(1, 'Mago Nero', 'Mostro di tipo Incantesimo', NULL, NULL, 1, 3),
-(2, 'Pikachu', 'Pokémon di tipo Elettro', NULL, NULL, 2, 1),
-(3, 'Plancia di gioco Arancione', 'Tappetino universale per giochi di carte collezionabili, realizzato in neoprene resistente con base antiscivolo.\nDimensione: 60x35cm', 14.99, 5, 4, NULL),
-(4, 'Plancia di gioco Rosa', 'Tappetino universale per giochi di carte collezionabili, realizzato in neoprene resistente con base antiscivolo.\nDimensione: 60x35cm', 14.50, 5, 4, NULL),
-(5, 'Plancia di gioco Viola', 'Tappetino universale per giochi di carte collezionabili, realizzato in neoprene resistente con base antiscivolo.\nDimensione: 60x35cm', 14.99, 5, 4, NULL),
-(6, 'Plancia di gioco Verdeacqua', 'Tappetino universale per giochi di carte collezionabili, realizzato in neoprene resistente con base antiscivolo.\nDimensione: 60x35cm', 14.99, 5, 4, NULL),
-(7, 'Proteggicarte Rosa', 'Pacchetto proteggicarte da 60 bustine.\nDimensione bustine: 62x89mm', 3.00, 5, 3, NULL),
-(8, 'Proteggicarte Blu chiaro', 'Pacchetto proteggicarte da 60 bustine.\nDimensione bustine: 62x89mm', 4.00, 5, 3, NULL),
-(9, 'Proteggicarte Rosso', 'Pacchetto proteggicarte da 60 bustine.\nDimensione bustine: 62x89mm', 3.50, 5, 3, NULL),
-(10, 'Proteggicarte Bianco', 'Pacchetto proteggicarte da 60 bustine.\nDimensione bustine: 62x89mm', 4.50, 5, 3, NULL),
-(11, 'Scatola porta carte Arancione', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 3.50, 5, 5, NULL),
-(12, 'Scatola porta carte Verde', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 3.50, 5, 5, NULL),
-(13, 'Scatola porta carte Rossa', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 3.50, 5, 5, NULL),
-(14, 'Scatola porta carte Blu', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 3.50, 5, 5, NULL),
-(15, 'Scatola porta carte Oro', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 5.00, 5, 5, NULL),
-(16, 'Scatola porta carte Argento', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 4.00, 5, 5, NULL),
-(17, 'Scatola porta carte Rosa', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 3.00, 5, 5, NULL),
-(18, 'Scatola porta carte Marrone', 'Scatola porta carte a 4 scomparti con capienza di 300 carte e bustine', 9.50, 5, 5, NULL),
-(19, 'Porta mazzo Viola', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.00, 5, 6, NULL),
-(20, 'Porta mazzo Arancione', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.00, 5, 6, NULL),
-(21, 'Porta mazzo Bianco', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 4.00, 5, 6, NULL),
-(22, 'Porta mazzo Blu chiaro', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.00, 5, 6, NULL),
-(23, 'Porta mazzo Verde', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.00, 5, 6, NULL),
-(24, 'Porta mazzo Nero', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 4.00, 5, 6, NULL),
-(25, 'Porta mazzo Giallo', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.50, 5, 6, NULL),
-(26, 'Porta mazzo Rosa', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.00, 5, 6, NULL),
-(27, 'Bustina Singola - Astri Lucenti', 'Bustina Pokémon della serie Astri Lucenti', NULL, NULL, 11, NULL),
-(28, 'Funko POP: Umbreon', 'Funko POP da collezione di Umbreon, Pokémon di tipo Buio, famoso per il suo manto nero e gli anelli luminescenti che brillano nella notte. Dimensione: 9,5cm', 15.50, 5, 9, NULL),
-(29, 'Funko POP: Pikachu', 'Funko POP da collezione di Pikachu, l\'iconico Pokémon di tipo Elettro, amato per la sua energia travolgente e il sorriso inconfondibile. Dimensione: 9,5cm', 15.00, 5, 9, NULL),
-(30, 'Funko POP: Charizard', 'Funko POP da collezione di Charizard, potente Pokémon di tipo Fuoco/Volante, temuto per le sue fiamme intense e il volo maestoso. Dimensione: 9,5cm', 15.50, 5, 9, NULL),
-(31, 'Funko POP: Mewtwo', 'Funko POP da collezione di Mewtwo, leggendario Pokémon Psico, creato in laboratorio e dotato di poteri mentali straordinari.Dimensione: 9,5cm', 16.00, 5, 9, NULL),
-(32, 'Funko POP: Dragonite', 'Funko POP da collezione di Dragonite, maestoso Pokémon Drago/Volante, noto per la sua forza impressionante e il cuore gentile. Dimensione: 9,5cm', 16.00, 5, 9, NULL),
-(33, 'Funko POP: Lucario', 'Funko POP da collezione di Lucario, fiero Pokémon Lotta/Acciaio, capace di percepire e controllare le aure con incredibile maestria. Dimensione: 9,5cm', 15.00, 5, 9, NULL),
-(34, 'Funko POP: Greninja', 'Funko POP da collezione di Greninja, Pokémon Acqua/Buio, famoso per la sua velocità e lo stile di combattimento furtivo. Dimensione: 9,5cm', 15.00, 5, 9, NULL),
-(35, 'Funko POP: Gengar', 'Funko POP da collezione di Gengar, enigmatico Pokémon Spettro/Veleno, celebre per i suoi scherzi inquietanti e il sorriso sinistro. Dimensione: 9,5cm', 15.50, 5, 9, NULL),
-(36, 'Funko POP: Espeon', 'Funko POP da collezione di Espeon, elegante Pokémon Psico, apprezzato per la sua grazia e le abilità predittive straordinarie. Dimensione: 9,5cm', 15.50, 5, 9, NULL),
-(37, 'Funko POP: Gardevoir', 'Funko POP da collezione di Gardevoir, elegante Pokémon di tipo Psichico/Folletto, noto per la sua grazia e capacità di proteggere il proprio allenatore con poteri psichici potenti. Dimensione: 9,5cm', 15.00, 5, 9, NULL),
-(38, 'Funko POP: Luxray', 'Funko POP da collezione di Luxray, Pokémon di tipo Elettro, simile a una grossa tigre dai occhi penetranti, famoso per la sua vista acutissima e la forza elettrica che usa in battaglia. Dimensione: 9,5cm', 15.50, 5, 9, NULL),
-(39, 'Funko POP: Alakazam', 'Funko POP da collezione di Alakazam, Pokémon di tipo Psichico, famoso per il suo intelletto straordinario e i potenti poteri psichici, rappresentato con cucchiai per amplificare la telecinesi. Dimensione: 9,5cm', 15.00, 5, 9, NULL),
-(40, 'Funko POP: Sylveon', 'Funko POP da collezione di Sylveon, Pokémon di tipo Folletto, noto per il suo aspetto dolce e i nastri che usa per calmare e proteggere gli altri con poteri magici. Dimensione: 9,5cm', 15.50, 5, 9, NULL),
-(41, 'Funko POP: Horsea', 'Funko POP da collezione di Horsea, Pokémon di tipo Acqua, simile a un piccolo cavalluccio marino, capace di spruzzare getti d\'acqua ad alta pressione per difendersi. Dimensione: 9,5cm', 14.50, 5, 9, NULL),
-(42, 'Funko POP: Blaziken', 'Funko POP da collezione di Blaziken, Pokémon di tipo Fuoco/Lotta, famoso per la sua forza esplosiva e le potenti tecniche di arti marziali che combina con fiamme avvolgenti. Dimensione: 9,5cm', 14.99, 5, 9, NULL),
-(43, 'Funko POP: Chimchar', 'Funko POP da collezione di Chimchar, Pokémon di tipo Fuoco, noto per la sua coda fiammeggiante e il carattere energico e molto curioso. Dimensione: 9,5cm', 15.00, 5, 9, NULL),
-(44, 'Funko POP: Oshawott', 'Funko POP da collezione di Oshawott, Pokémon di tipo Acqua, noto per il suo guscio a forma di conchiglia che usa come arma e per il suo spirito coraggioso. Dimensione: 9,5cm', 15.00, 5, 9, NULL),
-(45, 'Funko POP: Piplup', 'Funko POP da collezione di Piplup, Pokémon di tipo Acqua, noto per il suo carattere orgoglioso e il coraggio nonostante la sua taglia ridotta. Dimensione: 9,5cm', 15.00, 5, 9, NULL),
-(46, 'Funko POP: Sprigatito', 'Funko POP da collezione di Sprigatito, Pokémon di tipo Erba, noto per il suo atteggiamento molto curioso e notevolmente affettuoso. Dimensione: 9,5cm', 15.00, 5, 9, NULL),
-(47, 'Funko POP: Zorua', 'Funko POP da collezione di Zorua, Pokémon di tipo Buio, noto per la sua abilità nel creare illusioni e trasformarsi per ingannare i nemici. Dimensione: 9,5cm', 15.50, 5, 9, NULL),
-(48, 'Drago Bebè', 'Mostro di tipo Drago', NULL, NULL, 1, 1),
-(49, 'Combattente delle Lame', 'Mostro di tipo Guerriero', NULL, NULL, 1, 1),
-(50, 'Folletto della Foresta', 'Mostro di tipo Pianta', NULL, NULL, 1, 1),
-(51, 'Eda Maga del Sole', 'Mostro di tipo Fata', NULL, NULL, 1, 1),
-(52, 'Golem Blocco', 'Mostro di tipo Roccia', NULL, NULL, 1, 1),
-(53, 'Spadaccino Mistico LV6', 'Mostro di tipo Guerriero', NULL, NULL, 1, 2),
-(54, 'Serpente Divino', 'Mostro di tipo Rettile', NULL, NULL, 1, 2),
-(55, 'Cavaliere di Ghiaccio', 'Mostro di tipo Guerriero', NULL, NULL, 1, 2),
-(56, 'Drago Bianco Occhi Blu', 'Mostro di tipo Drago', NULL, NULL, 1, 3),
-(57, 'Arciere Celestiale', 'Mostro di tipo Fata', NULL, NULL, 1, 3),
-(58, 'Monarca delle Ombre', 'Mostro di tipo Demone', NULL, NULL, 1, 3),
-(59, 'Fenice Sacra', 'Mostro di tipo Bestia Alata', NULL, NULL, 1, 4),
-(60, 'Guardiano Celtico', 'Mostro di tipo Guerriero', NULL, NULL, 1, 4),
-(61, 'Drago Leviatano', 'Mostro di tipo Serpente Marino', NULL, NULL, 1, 4),
-(62, 'Drago Divino Sirf', 'Mostro di tipo Drago', NULL, NULL, 1, 5),
-(63, 'Angelo del Caos', 'Mostro di tipo Fata', NULL, NULL, 1, 5),
-(64, 'Re Distruggi Memoria', 'Mostro di tipo Demone', NULL, NULL, 1, 5),
-(65, 'Exodia il Proibito', 'Mostro di tipo Incantesimo', NULL, NULL, 1, 6),
-(66, 'Drago Alato di Ra', 'Mostro di tipo Divino-Bestia', NULL, NULL, 1, 6),
-(67, 'Obelisk il Tormentatore', 'Mostro di tipo Divino-Bestia', NULL, NULL, 1, 6),
-(68, 'Caterpie', 'Pokémon di tipo Erba', NULL, NULL, 2, 1),
-(69, 'Charmander', 'Pokémon di tipo Fuoco', NULL, NULL, 2, 1),
-(70, 'Squirtle', 'Pokémon di tipo Acqua', NULL, NULL, 2, 1),
-(71, 'Bulbasaur', 'Pokémon di tipo Erba', NULL, NULL, 2, 1),
-(72, 'Eevee', 'Pokémon di tipo Normale', NULL, NULL, 2, 1),
-(73, 'Raichu', 'Pokémon di tipo Elettro', NULL, NULL, 2, 2),
-(74, 'Arcanine', 'Pokémon di tipo Fuoco', NULL, NULL, 2, 2),
-(75, 'Lapras', 'Pokémon di tipo Acqua', NULL, NULL, 2, 2),
-(76, 'Charizard', 'Pokémon di tipo Fuoco', NULL, NULL, 2, 3),
-(77, 'Gengar', 'Pokémon di tipo Spettro', NULL, NULL, 2, 3),
-(78, 'Dragonite', 'Pokémon di tipo Drago', NULL, NULL, 2, 3),
-(79, 'Mew', 'Pokémon di tipo Psico', NULL, NULL, 2, 4),
-(80, 'Lucario', 'Pokémon di tipo Lotta/Acciaio', NULL, NULL, 2, 4),
-(81, 'Gyarados', 'Pokémon di tipo Acqua', NULL, NULL, 2, 4),
-(82, 'Mewtwo', 'Pokémon di tipo Psico', NULL, NULL, 2, 5),
-(83, 'Rayquaza', 'Pokémon di tipo Drago', NULL, NULL, 2, 5),
-(84, 'Darkrai', 'Pokémon di tipo Buio', NULL, NULL, 2, 5),
-(85, 'Reshiram', 'Pokémon di tipo Drago/Fuoco', NULL, NULL, 2, 6),
-(86, 'Zekrom', 'Pokémon di tipo Drago/Elettro', NULL, NULL, 2, 6),
-(87, 'Giratina', 'Pokémon di tipo Spettro/Drago', NULL, NULL, 2, 6),
-(88, 'Funko POP: Jaden Yuki', 'Funko Pop da collezione di Jaden Yuki, protagonista di Yu-Gi-Oh! GX, raffigurato con la sua divisa rossa della Duel Academy e lo sguardo deciso da vero duellante. Dimensione: 9,5cm.\r\n', 16.00, 5, 10, NULL),
-(89, 'Funko POP: Yubel', 'Funko Pop da collezione di Yubel, l’enigmatica creatura di Yu-Gi-Oh! GX, raffigurata con dettagli fedeli alle sue forme mostruose e al suo aspetto oscuro. Dimensione: 9,5cm.\r\n', 15.00, 5, 10, NULL),
-(90, 'Funko POP: Alexis Rhodes', 'Funko Pop da collezione di Alexis Rhodes, elegante duellante di Yu-Gi-Oh! GX, rappresentata con la divisa della Duel Academy e il suo atteggiamento sicuro e determinato. Dimensione: 9,5cm.\r\n', 15.00, 5, 10, NULL),
-(91, 'Funko POP: Seto Kaiba', 'Funko Pop da collezione di Seto Kaiba, il geniale e ambizioso duellante di Yu-Gi-Oh!, raffigurato con il suo iconico cappotto blu e lo sguardo fiero da rivale temibile. Dimensione: 9,5cm.\n', 15.50, 5, 10, NULL),
-(92, 'Funko POP: Yami Yugi', 'Funko Pop da collezione di Yami Yugi, il leggendario duellante di Yu-Gi-Oh!, raffigurato con i capelli bicolore iconici, il Puzzle Millenario e lo sguardo deciso da campione. Dimensione: 9,5cm.\r\n', 20.00, 5, 10, NULL),
-(93, 'Funko POP: Dark Magician', 'Funko Pop da collezione di Dark Magician, il potente incantatore di Yu-Gi-Oh!, raffigurato con il suo costume viola e il bastone magico pronto a lanciare incantesimi. Dimensione: 9,5cm.\r\n', 20.00, 5, 10, NULL),
-(94, 'Funko POP: Rainbow Dragon', 'Funko Pop da collezione di Rainbow Dragon, il maestoso drago di Yu-Gi-Oh!, raffigurato con le ali variopinte e il corpo luminoso pronto a incantare ogni collezionista. Dimensione: 9,5cm.\r\n', 35.00, 2, 10, NULL),
-(95, 'Funko POP: Cyber Dragon', 'Funko Pop da collezione di Cyber Dragon, il leggendario drago meccanico di Yu-Gi-Oh!, raffigurato con il corpo argentato e il design futuristico pronto per il duello. Dimensione: 9,5cm.\r\n', 17.00, 4, 10, NULL),
-(96, 'Funko POP: Neos', 'Funko Pop da collezione di Elemental HERO Neos, l’eroe leggendario di Yu-Gi-Oh! GX, raffigurato con la sua armatura bianca e rosa e l’aspetto eroico pronto a combattere. Dimensione: 9,5cm.\r\n', 19.00, 3, 10, NULL),
-(97, 'Funko POP: Kuribo', 'Funko Pop da collezione di Kuriboh, la piccola e adorabile creatura di Yu-Gi-Oh!, raffigurata con il suo corpo marrone peloso e gli occhi grandi e espressivi. Dimensione: 9,5cm.\r\n', 15.00, 5, 10, NULL),
-(98, 'Funko POP: Harpie Lady', 'Funko Pop da collezione di Harpie Lady, l’agile e temibile guerriera alata di Yu-Gi-Oh!, raffigurata con le piume blu e il caratteristico sguardo deciso. Dimensione: 9,5cm.\n', 15.00, 5, 10, NULL),
-(99, 'Funko POP: Joey Wheeler', 'Funko Pop da collezione di Joey Wheeler, il leale e coraggioso duellante di Yu-Gi-Oh!, raffigurato con i capelli biondi, la giacca verde e lo sguardo da vero amico di Yugi. Dimensione: 9,5cm.\n', 15.00, 5, 10, NULL),
-(100, 'Funko POP: Zane Truesdale', 'Funko Pop da collezione di Zane Truesdale, il talentuoso e strategico duellante di Yu-Gi-Oh! GX, raffigurato con la divisa chiara della Duel Academy e lo sguardo concentrato. Dimensione: 9,5cm.\n', 15.00, 5, 10, NULL),
-(101, 'Funko POP: Ojama Yellow', 'Funko Pop da collezione di Ojama Yellow, il buffo e divertente mostriciattolo di Yu-Gi-Oh!, raffigurato con il corpo giallo, le espressioni comiche e il suo caratteristico sorriso. Dimensione: 9,5cm.\r\n', 15.00, 5, 10, NULL),
-(102, 'Funko POP: Harpie Lady 3', 'Funko Pop da collezione di Harpie Lady 3, l’elegante guerriera alata di Yu-Gi-Oh!, raffigurata con le piume viola, il costume caratteristico e lo sguardo determinato da duellante temibile. Dimensione: 9,5cm.\r\n', 23.00, 5, 10, NULL),
-(103, 'Funko POP: Avian', 'Funko Pop da collezione di Avian, il maestoso mostro alato di Yu-Gi-Oh!, raffigurato con le ali spiegate e il corpo verde pronto al duello. Dimensione: 9,5cm.\n', 35.00, 2, 10, NULL),
-(104, 'Funko POP: Jinzo e Time Wizard', 'Funko Pop da collezione di Jinzo, il potente duellante meccanico di Yu-Gi-Oh! e Time Wizard, il piccolo ma potente incantatore di Yu-Gi-Oh!. Dimensione: 9,5cm.', 40.00, 3, 10, NULL),
-(105, 'Funko POP: Harpie\'s Pet Dragon', 'Funko Pop da collezione di Harpie’s Pet Dragon, il drago alato di Yu-Gi-Oh!, raffigurato con le ali, il corpo sinuoso e lo sguardo feroce pronto al duello. Dimensione: 9,5cm.\r\n', 25.00, 5, 10, NULL);
+INSERT INTO `oggetto` (`id_oggetto`, `nome_oggetto`, `desc_oggetto`, `prezzo_oggetto`, `quant_oggetto`, `punto`, `fk_categoria_oggetto`, `fk_rarita`) VALUES
+(1, 'Mago Nero', 'Mostro di tipo Incantesimo', NULL, NULL, 3, 1, 3),
+(2, 'Pikachu', 'Pokémon di tipo Elettro', NULL, NULL, 1, 2, 1),
+(3, 'Plancia di gioco Arancione', 'Tappetino universale per giochi di carte collezionabili, realizzato in neoprene resistente con base antiscivolo.\nDimensione: 60x35cm', 14.99, 5, NULL, 4, NULL),
+(4, 'Plancia di gioco Rosa', 'Tappetino universale per giochi di carte collezionabili, realizzato in neoprene resistente con base antiscivolo.\nDimensione: 60x35cm', 14.50, 5, NULL, 4, NULL),
+(5, 'Plancia di gioco Viola', 'Tappetino universale per giochi di carte collezionabili, realizzato in neoprene resistente con base antiscivolo.\nDimensione: 60x35cm', 14.99, 5, NULL, 4, NULL),
+(6, 'Plancia di gioco Verdeacqua', 'Tappetino universale per giochi di carte collezionabili, realizzato in neoprene resistente con base antiscivolo.\nDimensione: 60x35cm', 14.99, 5, NULL, 4, NULL),
+(7, 'Proteggicarte Rosa', 'Pacchetto proteggicarte da 60 bustine.\nDimensione bustine: 62x89mm', 3.00, 5, NULL, 3, NULL),
+(8, 'Proteggicarte Blu chiaro', 'Pacchetto proteggicarte da 60 bustine.\nDimensione bustine: 62x89mm', 4.00, 5, NULL, 3, NULL),
+(9, 'Proteggicarte Rosso', 'Pacchetto proteggicarte da 60 bustine.\nDimensione bustine: 62x89mm', 3.50, 5, NULL, 3, NULL),
+(10, 'Proteggicarte Bianco', 'Pacchetto proteggicarte da 60 bustine.\nDimensione bustine: 62x89mm', 4.50, 5, NULL, 3, NULL),
+(11, 'Scatola porta carte Arancione', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 3.50, 5, NULL, 5, NULL),
+(12, 'Scatola porta carte Verde', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 3.50, 5, NULL, 5, NULL),
+(13, 'Scatola porta carte Rossa', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 3.50, 5, NULL, 5, NULL),
+(14, 'Scatola porta carte Blu', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 3.50, 5, NULL, 5, NULL),
+(15, 'Scatola porta carte Oro', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 5.00, 5, NULL, 5, NULL),
+(16, 'Scatola porta carte Argento', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 4.00, 5, NULL, 5, NULL),
+(17, 'Scatola porta carte Rosa', 'Scatola porta carte a incastro con capienza di 100 carte e bustine', 3.00, 5, NULL, 5, NULL),
+(18, 'Scatola porta carte Marrone', 'Scatola porta carte a 4 scomparti con capienza di 300 carte e bustine', 9.50, 5, NULL, 5, NULL),
+(19, 'Porta mazzo Viola', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.00, 5, NULL, 6, NULL),
+(20, 'Porta mazzo Arancione', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.00, 5, NULL, 6, NULL),
+(21, 'Porta mazzo Bianco', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 4.00, 5, NULL, 6, NULL),
+(22, 'Porta mazzo Blu chiaro', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.00, 5, NULL, 6, NULL),
+(23, 'Porta mazzo Verde', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.00, 5, NULL, 6, NULL),
+(24, 'Porta mazzo Nero', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 4.00, 5, NULL, 6, NULL),
+(25, 'Porta mazzo Giallo', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.50, 5, NULL, 6, NULL),
+(26, 'Porta mazzo Rosa', 'Porta mazzo universale in plastica rigida, con capienza fino a 75 carte con bustine protettive. Protezione da polvere e piegature', 3.00, 5, NULL, 6, NULL),
+(27, 'Bustina Singola - Astri Lucenti', 'Bustina Pokémon della serie Astri Lucenti', NULL, NULL, NULL, 11, NULL),
+(28, 'Funko POP: Umbreon', 'Funko POP da collezione di Umbreon, Pokémon di tipo Buio, famoso per il suo manto nero e gli anelli luminescenti che brillano nella notte. Dimensione: 9,5cm', 15.50, 5, NULL, 9, NULL),
+(29, 'Funko POP: Pikachu', 'Funko POP da collezione di Pikachu, l\'iconico Pokémon di tipo Elettro, amato per la sua energia travolgente e il sorriso inconfondibile. Dimensione: 9,5cm', 15.00, 5, NULL, 9, NULL),
+(30, 'Funko POP: Charizard', 'Funko POP da collezione di Charizard, potente Pokémon di tipo Fuoco/Volante, temuto per le sue fiamme intense e il volo maestoso. Dimensione: 9,5cm', 15.50, 5, NULL, 9, NULL),
+(31, 'Funko POP: Mewtwo', 'Funko POP da collezione di Mewtwo, leggendario Pokémon Psico, creato in laboratorio e dotato di poteri mentali straordinari.Dimensione: 9,5cm', 16.00, 5, NULL, 9, NULL),
+(32, 'Funko POP: Dragonite', 'Funko POP da collezione di Dragonite, maestoso Pokémon Drago/Volante, noto per la sua forza impressionante e il cuore gentile. Dimensione: 9,5cm', 16.00, 5, NULL, 9, NULL),
+(33, 'Funko POP: Lucario', 'Funko POP da collezione di Lucario, fiero Pokémon Lotta/Acciaio, capace di percepire e controllare le aure con incredibile maestria. Dimensione: 9,5cm', 15.00, 5, NULL, 9, NULL),
+(34, 'Funko POP: Greninja', 'Funko POP da collezione di Greninja, Pokémon Acqua/Buio, famoso per la sua velocità e lo stile di combattimento furtivo. Dimensione: 9,5cm', 15.00, 5, NULL, 9, NULL),
+(35, 'Funko POP: Gengar', 'Funko POP da collezione di Gengar, enigmatico Pokémon Spettro/Veleno, celebre per i suoi scherzi inquietanti e il sorriso sinistro. Dimensione: 9,5cm', 15.50, 5, NULL, 9, NULL),
+(36, 'Funko POP: Espeon', 'Funko POP da collezione di Espeon, elegante Pokémon Psico, apprezzato per la sua grazia e le abilità predittive straordinarie. Dimensione: 9,5cm', 15.50, 5, NULL, 9, NULL),
+(37, 'Funko POP: Gardevoir', 'Funko POP da collezione di Gardevoir, elegante Pokémon di tipo Psichico/Folletto, noto per la sua grazia e capacità di proteggere il proprio allenatore con poteri psichici potenti. Dimensione: 9,5cm', 15.00, 5, NULL, 9, NULL),
+(38, 'Funko POP: Luxray', 'Funko POP da collezione di Luxray, Pokémon di tipo Elettro, simile a una grossa tigre dai occhi penetranti, famoso per la sua vista acutissima e la forza elettrica che usa in battaglia. Dimensione: 9,5cm', 15.50, 5, NULL, 9, NULL),
+(39, 'Funko POP: Alakazam', 'Funko POP da collezione di Alakazam, Pokémon di tipo Psichico, famoso per il suo intelletto straordinario e i potenti poteri psichici, rappresentato con cucchiai per amplificare la telecinesi. Dimensione: 9,5cm', 15.00, 5, NULL, 9, NULL),
+(40, 'Funko POP: Sylveon', 'Funko POP da collezione di Sylveon, Pokémon di tipo Folletto, noto per il suo aspetto dolce e i nastri che usa per calmare e proteggere gli altri con poteri magici. Dimensione: 9,5cm', 15.50, 5, NULL, 9, NULL),
+(41, 'Funko POP: Horsea', 'Funko POP da collezione di Horsea, Pokémon di tipo Acqua, simile a un piccolo cavalluccio marino, capace di spruzzare getti d\'acqua ad alta pressione per difendersi. Dimensione: 9,5cm', 14.50, 5, NULL, 9, NULL),
+(42, 'Funko POP: Blaziken', 'Funko POP da collezione di Blaziken, Pokémon di tipo Fuoco/Lotta, famoso per la sua forza esplosiva e le potenti tecniche di arti marziali che combina con fiamme avvolgenti. Dimensione: 9,5cm', 14.99, 5, NULL, 9, NULL),
+(43, 'Funko POP: Chimchar', 'Funko POP da collezione di Chimchar, Pokémon di tipo Fuoco, noto per la sua coda fiammeggiante e il carattere energico e molto curioso. Dimensione: 9,5cm', 15.00, 5, NULL, 9, NULL),
+(44, 'Funko POP: Oshawott', 'Funko POP da collezione di Oshawott, Pokémon di tipo Acqua, noto per il suo guscio a forma di conchiglia che usa come arma e per il suo spirito coraggioso. Dimensione: 9,5cm', 15.00, 5, NULL, 9, NULL),
+(45, 'Funko POP: Piplup', 'Funko POP da collezione di Piplup, Pokémon di tipo Acqua, noto per il suo carattere orgoglioso e il coraggio nonostante la sua taglia ridotta. Dimensione: 9,5cm', 15.00, 5, NULL, 9, NULL),
+(46, 'Funko POP: Sprigatito', 'Funko POP da collezione di Sprigatito, Pokémon di tipo Erba, noto per il suo atteggiamento molto curioso e notevolmente affettuoso. Dimensione: 9,5cm', 15.00, 5, NULL, 9, NULL),
+(47, 'Funko POP: Zorua', 'Funko POP da collezione di Zorua, Pokémon di tipo Buio, noto per la sua abilità nel creare illusioni e trasformarsi per ingannare i nemici. Dimensione: 9,5cm', 15.50, 5, NULL, 9, NULL),
+(48, 'Drago Bebè', 'Mostro di tipo Drago', NULL, NULL, 1, 1, 1),
+(49, 'Combattente delle Lame', 'Mostro di tipo Guerriero', NULL, NULL, 1, 1, 1),
+(50, 'Folletto della Foresta', 'Mostro di tipo Pianta', NULL, NULL, 1, 1, 1),
+(51, 'Eda Maga del Sole', 'Mostro di tipo Fata', NULL, NULL, 1, 1, 1),
+(52, 'Golem Blocco', 'Mostro di tipo Roccia', NULL, NULL, 1, 1, 1),
+(53, 'Spadaccino Mistico LV6', 'Mostro di tipo Guerriero', NULL, NULL, 2, 1, 2),
+(54, 'Serpente Divino', 'Mostro di tipo Rettile', NULL, NULL, 2, 1, 2),
+(55, 'Cavaliere di Ghiaccio', 'Mostro di tipo Guerriero', NULL, NULL, 2, 1, 2),
+(56, 'Drago Bianco Occhi Blu', 'Mostro di tipo Drago', NULL, NULL, 3, 1, 3),
+(57, 'Arciere Celestiale', 'Mostro di tipo Fata', NULL, NULL, 3, 1, 3),
+(58, 'Monarca delle Ombre', 'Mostro di tipo Demone', NULL, NULL, 3, 1, 3),
+(59, 'Fenice Sacra', 'Mostro di tipo Bestia Alata', NULL, NULL, 4, 1, 4),
+(60, 'Guardiano Celtico', 'Mostro di tipo Guerriero', NULL, NULL, 4, 1, 4),
+(61, 'Drago Leviatano', 'Mostro di tipo Serpente Marino', NULL, NULL, 4, 1, 4),
+(62, 'Drago Divino Sirf', 'Mostro di tipo Drago', NULL, NULL, 5, 1, 5),
+(63, 'Angelo del Caos', 'Mostro di tipo Fata', NULL, NULL, 5, 1, 5),
+(64, 'Re Distruggi Memoria', 'Mostro di tipo Demone', NULL, NULL, 5, 1, 5),
+(65, 'Exodia il Proibito', 'Mostro di tipo Incantesimo', NULL, NULL, 6, 1, 6),
+(66, 'Drago Alato di Ra', 'Mostro di tipo Divino-Bestia', NULL, NULL, 6, 1, 6),
+(67, 'Obelisk il Tormentatore', 'Mostro di tipo Divino-Bestia', NULL, NULL, 6, 1, 6),
+(68, 'Caterpie', 'Pokémon di tipo Erba', NULL, NULL, 1, 2, 1),
+(69, 'Charmander', 'Pokémon di tipo Fuoco', NULL, NULL, 1, 2, 1),
+(70, 'Squirtle', 'Pokémon di tipo Acqua', NULL, NULL, 1, 2, 1),
+(71, 'Bulbasaur', 'Pokémon di tipo Erba', NULL, NULL, 1, 2, 1),
+(72, 'Eevee', 'Pokémon di tipo Normale', NULL, NULL, 1, 2, 1),
+(73, 'Raichu', 'Pokémon di tipo Elettro', NULL, NULL, 2, 2, 2),
+(74, 'Arcanine', 'Pokémon di tipo Fuoco', NULL, NULL, 2, 2, 2),
+(75, 'Lapras', 'Pokémon di tipo Acqua', NULL, NULL, 2, 2, 2),
+(76, 'Charizard', 'Pokémon di tipo Fuoco', NULL, NULL, 3, 2, 3),
+(77, 'Gengar', 'Pokémon di tipo Spettro', NULL, NULL, 3, 2, 3),
+(78, 'Dragonite', 'Pokémon di tipo Drago', NULL, NULL, 3, 2, 3),
+(79, 'Mew', 'Pokémon di tipo Psico', NULL, NULL, 4, 2, 4),
+(80, 'Lucario', 'Pokémon di tipo Lotta/Acciaio', NULL, NULL, 4, 2, 4),
+(81, 'Gyarados', 'Pokémon di tipo Acqua', NULL, NULL, 4, 2, 4),
+(82, 'Mewtwo', 'Pokémon di tipo Psico', NULL, NULL, 5, 2, 5),
+(83, 'Rayquaza', 'Pokémon di tipo Drago', NULL, NULL, 5, 2, 5),
+(84, 'Darkrai', 'Pokémon di tipo Buio', NULL, NULL, 5, 2, 5),
+(85, 'Reshiram', 'Pokémon di tipo Drago/Fuoco', NULL, NULL, 6, 2, 6),
+(86, 'Zekrom', 'Pokémon di tipo Drago/Elettro', NULL, NULL, 6, 2, 6),
+(87, 'Giratina', 'Pokémon di tipo Spettro/Drago', NULL, NULL, 6, 2, 6),
+(88, 'Funko POP: Jaden Yuki', 'Funko Pop da collezione di Jaden Yuki, protagonista di Yu-Gi-Oh! GX, raffigurato con la sua divisa rossa della Duel Academy e lo sguardo deciso da vero duellante. Dimensione: 9,5cm.\r\n', 16.00, 5, NULL, 10, NULL),
+(89, 'Funko POP: Yubel', 'Funko Pop da collezione di Yubel, l’enigmatica creatura di Yu-Gi-Oh! GX, raffigurata con dettagli fedeli alle sue forme mostruose e al suo aspetto oscuro. Dimensione: 9,5cm.\r\n', 15.00, 5, NULL, 10, NULL),
+(90, 'Funko POP: Alexis Rhodes', 'Funko Pop da collezione di Alexis Rhodes, elegante duellante di Yu-Gi-Oh! GX, rappresentata con la divisa della Duel Academy e il suo atteggiamento sicuro e determinato. Dimensione: 9,5cm.\r\n', 15.00, 5, NULL, 10, NULL),
+(91, 'Funko POP: Seto Kaiba', 'Funko Pop da collezione di Seto Kaiba, il geniale e ambizioso duellante di Yu-Gi-Oh!, raffigurato con il suo iconico cappotto blu e lo sguardo fiero da rivale temibile. Dimensione: 9,5cm.\n', 15.50, 5, NULL, 10, NULL),
+(92, 'Funko POP: Yami Yugi', 'Funko Pop da collezione di Yami Yugi, il leggendario duellante di Yu-Gi-Oh!, raffigurato con i capelli bicolore iconici, il Puzzle Millenario e lo sguardo deciso da campione. Dimensione: 9,5cm.\r\n', 20.00, 5, NULL, 10, NULL),
+(93, 'Funko POP: Dark Magician', 'Funko Pop da collezione di Dark Magician, il potente incantatore di Yu-Gi-Oh!, raffigurato con il suo costume viola e il bastone magico pronto a lanciare incantesimi. Dimensione: 9,5cm.\r\n', 20.00, 5, NULL, 10, NULL),
+(94, 'Funko POP: Rainbow Dragon', 'Funko Pop da collezione di Rainbow Dragon, il maestoso drago di Yu-Gi-Oh!, raffigurato con le ali variopinte e il corpo luminoso pronto a incantare ogni collezionista. Dimensione: 9,5cm.\r\n', 35.00, 2, NULL, 10, NULL),
+(95, 'Funko POP: Cyber Dragon', 'Funko Pop da collezione di Cyber Dragon, il leggendario drago meccanico di Yu-Gi-Oh!, raffigurato con il corpo argentato e il design futuristico pronto per il duello. Dimensione: 9,5cm.\r\n', 17.00, 4, NULL, 10, NULL),
+(96, 'Funko POP: Neos', 'Funko Pop da collezione di Elemental HERO Neos, l’eroe leggendario di Yu-Gi-Oh! GX, raffigurato con la sua armatura bianca e rosa e l’aspetto eroico pronto a combattere. Dimensione: 9,5cm.\r\n', 19.00, 3, NULL, 10, NULL),
+(97, 'Funko POP: Kuribo', 'Funko Pop da collezione di Kuriboh, la piccola e adorabile creatura di Yu-Gi-Oh!, raffigurata con il suo corpo marrone peloso e gli occhi grandi e espressivi. Dimensione: 9,5cm.\r\n', 15.00, 5, NULL, 10, NULL),
+(98, 'Funko POP: Harpie Lady', 'Funko Pop da collezione di Harpie Lady, l’agile e temibile guerriera alata di Yu-Gi-Oh!, raffigurata con le piume blu e il caratteristico sguardo deciso. Dimensione: 9,5cm.\n', 15.00, 5, NULL, 10, NULL),
+(99, 'Funko POP: Joey Wheeler', 'Funko Pop da collezione di Joey Wheeler, il leale e coraggioso duellante di Yu-Gi-Oh!, raffigurato con i capelli biondi, la giacca verde e lo sguardo da vero amico di Yugi. Dimensione: 9,5cm.\n', 15.00, 5, NULL, 10, NULL),
+(100, 'Funko POP: Zane Truesdale', 'Funko Pop da collezione di Zane Truesdale, il talentuoso e strategico duellante di Yu-Gi-Oh! GX, raffigurato con la divisa chiara della Duel Academy e lo sguardo concentrato. Dimensione: 9,5cm.\n', 15.00, 5, NULL, 10, NULL),
+(101, 'Funko POP: Ojama Yellow', 'Funko Pop da collezione di Ojama Yellow, il buffo e divertente mostriciattolo di Yu-Gi-Oh!, raffigurato con il corpo giallo, le espressioni comiche e il suo caratteristico sorriso. Dimensione: 9,5cm.\r\n', 15.00, 5, NULL, 10, NULL),
+(102, 'Funko POP: Harpie Lady 3', 'Funko Pop da collezione di Harpie Lady 3, l’elegante guerriera alata di Yu-Gi-Oh!, raffigurata con le piume viola, il costume caratteristico e lo sguardo determinato da duellante temibile. Dimensione: 9,5cm.\r\n', 23.00, 5, NULL, 10, NULL),
+(103, 'Funko POP: Avian', 'Funko Pop da collezione di Avian, il maestoso mostro alato di Yu-Gi-Oh!, raffigurato con le ali spiegate e il corpo verde pronto al duello. Dimensione: 9,5cm.\n', 35.00, 2, NULL, 10, NULL),
+(104, 'Funko POP: Jinzo e Time Wizard', 'Funko Pop da collezione di Jinzo, il potente duellante meccanico di Yu-Gi-Oh! e Time Wizard, il piccolo ma potente incantatore di Yu-Gi-Oh!. Dimensione: 9,5cm.', 40.00, 3, NULL, 10, NULL),
+(105, 'Funko POP: Harpie\'s Pet Dragon', 'Funko Pop da collezione di Harpie’s Pet Dragon, il drago alato di Yu-Gi-Oh!, raffigurato con le ali, il corpo sinuoso e lo sguardo feroce pronto al duello. Dimensione: 9,5cm.\r\n', 25.00, 5, NULL, 10, NULL);
 
 -- --------------------------------------------------------
 
@@ -629,7 +690,7 @@ INSERT INTO `oggetto` (`id_oggetto`, `nome_oggetto`, `desc_oggetto`, `prezzo_ogg
 
 CREATE TABLE `oggetto_collezione` (
   `fk_oggetto` int NOT NULL,
-  `numero_carta` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `numero_carta` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `valore_stimato` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -698,13 +759,21 @@ CREATE TABLE `oggetto_utente` (
 --
 
 INSERT INTO `oggetto_utente` (`fk_utente`, `fk_oggetto`, `quantita_ogg`) VALUES
-(1, 1, 6),
-(1, 2, 6),
-(1, 48, 1),
+(1, 1, 7),
+(1, 2, 7),
+(1, 48, 6),
+(1, 53, 1),
 (1, 85, 1),
+(1, 86, 1),
 (7, 1, 4),
-(7, 2, 1),
-(7, 53, 1);
+(7, 2, 4),
+(7, 48, 1),
+(7, 53, 3),
+(7, 65, 100),
+(7, 66, 50),
+(7, 67, 1),
+(7, 76, 1),
+(7, 85, 1);
 
 -- --------------------------------------------------------
 
@@ -715,7 +784,7 @@ INSERT INTO `oggetto_utente` (`fk_utente`, `fk_oggetto`, `quantita_ogg`) VALUES
 CREATE TABLE `ordine` (
   `id_ordine` int NOT NULL,
   `data_ordine` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `tracking` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `tracking` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `stato_ordine` tinyint(1) NOT NULL,
   `fk_utente` int NOT NULL,
   `fk_indirizzo` int NOT NULL,
@@ -727,23 +796,8 @@ CREATE TABLE `ordine` (
 --
 
 INSERT INTO `ordine` (`id_ordine`, `data_ordine`, `tracking`, `stato_ordine`, `fk_utente`, `fk_indirizzo`, `fk_carrello`) VALUES
-(2, '2025-08-10 17:45:30', 'ciaoèiltrackingquesto', 2, 1, 1, NULL),
-(3, '2025-08-10 17:56:37', '-', 4, 1, 1, NULL),
-(4, '2025-08-28 18:33:43', NULL, 0, 1, 1, 19),
-(5, '2025-08-28 18:34:39', 'mamt', 1, 1, 1, 20),
-(6, '2025-08-30 00:23:55', NULL, 0, 1, 1, 22),
-(7, '2025-09-02 00:58:31', NULL, 0, 7, 2, 27),
-(8, '2025-09-02 00:59:08', NULL, 0, 7, 2, 29),
-(9, '2025-09-02 01:08:50', '56ghg4wbw4yhj', 2, 7, 2, 30),
-(13, '2025-09-03 22:53:23', NULL, 0, 7, 2, 32),
-(14, '2025-09-03 22:53:46', NULL, 0, 7, 2, 34),
-(15, '2025-09-03 22:59:56', NULL, 0, 7, 2, 36),
-(16, '2025-09-04 16:53:12', NULL, 0, 7, 2, 38),
-(20, '2025-09-04 17:21:14', NULL, 0, 7, 2, NULL),
-(21, '2025-09-04 17:25:43', NULL, 0, 7, 2, NULL),
-(22, '2025-09-04 17:28:04', NULL, 0, 7, 2, NULL),
-(23, '2025-09-04 17:39:28', NULL, 0, 7, 2, NULL),
-(24, '2025-09-04 17:42:50', NULL, 0, 7, 2, NULL);
+(26, '2025-09-05 16:12:00', NULL, 0, 7, 6, NULL),
+(27, '2025-09-05 16:32:58', NULL, 0, 7, 6, NULL);
 
 -- --------------------------------------------------------
 
@@ -756,7 +810,7 @@ CREATE TABLE `ordine_log` (
   `fk_ordine` int NOT NULL,
   `stato_precedente` tinyint(1) DEFAULT NULL,
   `stato_nuovo` tinyint(1) NOT NULL,
-  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `note` text COLLATE utf8mb4_unicode_ci,
   `modificato_da` int DEFAULT NULL,
   `data_modifica` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -766,39 +820,21 @@ CREATE TABLE `ordine_log` (
 --
 
 INSERT INTO `ordine_log` (`id_log`, `fk_ordine`, `stato_precedente`, `stato_nuovo`, `note`, `modificato_da`, `data_modifica`) VALUES
-(1, 2, 0, 1, '', NULL, '2025-08-10 17:46:50'),
-(2, 2, 1, 2, '', NULL, '2025-08-10 17:54:40'),
-(3, 3, 0, 4, '', NULL, '2025-08-10 17:57:30'),
-(4, 4, NULL, 0, 'Ordine creato', NULL, '2025-08-28 18:33:43'),
-(5, 5, NULL, 0, 'Ordine creato', NULL, '2025-08-28 18:34:39'),
-(6, 5, 0, 1, '', NULL, '2025-08-30 00:05:35'),
-(7, 6, NULL, 0, 'Ordine creato', NULL, '2025-08-30 00:23:55'),
-(8, 7, NULL, 0, 'Ordine creato con 2 articoli per un totale di €31.00', NULL, '2025-09-02 00:58:31'),
-(9, 8, NULL, 0, 'Ordine creato con 1 articoli per un totale di €4.00', NULL, '2025-09-02 00:59:08'),
-(10, 9, NULL, 0, 'Ordine ORD-68b627828ca8e9.21534116 creato con 1 articoli (1 prodotti distinti) per €4.00', NULL, '2025-09-02 01:08:50'),
-(11, 9, 0, 1, '', NULL, '2025-09-02 01:11:42'),
-(12, 9, 1, 2, '', NULL, '2025-09-03 19:42:55'),
-(13, 13, NULL, 0, 'Ordine ORD-68b8aac32aa353.61421679 creato con 2 articoli (2 prodotti distinti) per €24.50', NULL, '2025-09-03 22:53:23'),
-(14, 14, NULL, 0, 'Ordine ORD-68b8aadaa0c3d1.10371649 creato con 2 articoli (2 prodotti distinti) per €30.50', NULL, '2025-09-03 22:53:46'),
-(15, 15, NULL, 0, 'Ordine ORD-68b8ac4c053470.32904934 creato con 2 articoli (2 prodotti distinti) per €30.50', NULL, '2025-09-03 22:59:56'),
-(16, 16, NULL, 0, 'Ordine ORD-68b9a7d8c77b63.70980885 creato con 5 articoli (5 prodotti distinti) per €64.00', NULL, '2025-09-04 16:53:12'),
-(17, 20, NULL, 0, 'Ordine ORD-68b9ae6adf5770.62679302 creato - 2 articoli (0 Mystery Box, 2 oggetti) - Totale: €36.00 - Pagamento: carta_credito', NULL, '2025-09-04 17:21:14'),
-(18, 21, NULL, 0, 'Ordine ORD-68b9af770ceb24.15758946 creato - 2 articoli (0 Mystery Box, 2 oggetti) - Totale: €35.00 - Pagamento: carta_credito', NULL, '2025-09-04 17:25:43'),
-(19, 22, NULL, 0, 'Ordine ORD-68b9b00407f340.79732152 creato - 2 articoli (0 Mystery Box, 2 oggetti) - Totale: €35.50 - Pagamento: carta_credito', NULL, '2025-09-04 17:28:04'),
-(20, 23, NULL, 0, 'Ordine ORD-68b9b2b0cb8d72.79879642 creato - 2 articoli (0 Mystery Box, 2 oggetti) - Totale: €24.50 - Pagamento: carta_credito', NULL, '2025-09-04 17:39:28'),
-(21, 24, NULL, 0, 'Ordine ORD-68b9b37ad5d615.06676003 creato - 2 articoli (0 Mystery Box, 2 oggetti) - Totale: €35.50 - Pagamento: carta_credito', NULL, '2025-09-04 17:42:50');
+(23, 26, NULL, 0, 'Ordine ORD-68baefb0759373.79004227 creato - 3 articoli (0 Mystery Box, 3 oggetti) - Totale: €40.50 - Pagamento: carta_credito', NULL, '2025-09-05 16:12:00'),
+(24, 27, NULL, 0, 'Ordine ORD-68baf49a1ee451.93783038 creato - 1 articoli (1 Mystery Box, 0 oggetti) - Totale: €63.75 - Pagamento: carta_credito', NULL, '2025-09-05 16:32:58');
 
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `punti_utente`
+-- Struttura della tabella `proposta_dettagli`
 --
 
-CREATE TABLE `punti_utente` (
-  `id_punti` int NOT NULL,
-  `punti` int NOT NULL DEFAULT '0',
-  `livello` int NOT NULL DEFAULT '0',
-  `fk_utente` int NOT NULL
+CREATE TABLE `proposta_dettagli` (
+  `id_dettaglio` int NOT NULL,
+  `fk_proposta` int NOT NULL,
+  `fk_oggetto` int NOT NULL,
+  `quantita` int NOT NULL,
+  `tipo_azione` enum('offerta','richiesta') COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -809,8 +845,8 @@ CREATE TABLE `punti_utente` (
 
 CREATE TABLE `rarita` (
   `id_rarita` int NOT NULL,
-  `nome_rarita` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `colore` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nome_rarita` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `colore` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `ordine` int DEFAULT NULL,
   `probabilita` float DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -830,62 +866,118 @@ INSERT INTO `rarita` (`id_rarita`, `nome_rarita`, `colore`, `ordine`, `probabili
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `scambio`
+-- Struttura della tabella `scambi`
 --
 
-CREATE TABLE `scambio` (
+CREATE TABLE `scambi` (
   `id_scambio` int NOT NULL,
-  `data_scambio` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `stato_scambio` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `fk_utente` int NOT NULL
+  `fk_utente_richiedente` int NOT NULL,
+  `fk_utente_offerente` int DEFAULT NULL,
+  `stato_scambio` enum('in_corso','in_attesa','concluso','annullato') COLLATE utf8mb4_unicode_ci DEFAULT 'in_corso',
+  `data_creazione` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `data_modifica` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dump dei dati per la tabella `scambio`
+-- Dump dei dati per la tabella `scambi`
 --
 
-INSERT INTO `scambio` (`id_scambio`, `data_scambio`, `stato_scambio`, `fk_utente`) VALUES
-(1, '2025-08-31 10:39:19', 'completato', 2),
-(2, '2025-08-30 01:20:31', 'completato', 2),
-(3, '2025-08-31 10:39:24', 'completato', 2),
-(4, '2025-08-30 01:20:17', 'completato', 2);
+INSERT INTO `scambi` (`id_scambio`, `fk_utente_richiedente`, `fk_utente_offerente`, `stato_scambio`, `data_creazione`, `data_modifica`) VALUES
+(1, 1, 7, 'concluso', '2025-09-04 20:16:22', '2025-09-04 20:17:31'),
+(2, 1, 7, 'concluso', '2025-09-04 20:28:21', '2025-09-04 20:29:59'),
+(3, 1, 7, 'concluso', '2025-09-04 20:32:04', '2025-09-04 20:37:51'),
+(4, 1, 7, 'concluso', '2025-09-04 20:49:07', '2025-09-04 20:50:05'),
+(5, 1, 7, 'concluso', '2025-09-04 20:55:04', '2025-09-04 20:55:55'),
+(6, 7, 1, 'concluso', '2025-09-04 21:01:35', '2025-09-04 21:02:31'),
+(7, 1, NULL, 'concluso', '2025-09-04 21:40:31', '2025-09-04 21:40:53'),
+(8, 7, NULL, 'concluso', '2025-09-04 21:43:24', '2025-09-04 21:43:40'),
+(9, 7, NULL, 'concluso', '2025-09-04 21:45:28', '2025-09-05 13:40:02'),
+(10, 1, NULL, 'in_corso', '2025-09-05 08:12:22', '2025-09-05 08:12:22'),
+(11, 1, NULL, 'concluso', '2025-09-05 08:12:32', '2025-09-05 08:13:39'),
+(12, 7, NULL, 'in_corso', '2025-09-05 12:20:24', '2025-09-05 12:20:24'),
+(13, 7, NULL, 'in_corso', '2025-09-05 12:23:23', '2025-09-05 12:23:23'),
+(14, 7, NULL, 'in_corso', '2025-09-05 21:01:46', '2025-09-05 21:01:46');
 
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `scambio_cartaceo`
+-- Struttura della tabella `scambio_offerte`
 --
 
-CREATE TABLE `scambio_cartaceo` (
-  `id` int NOT NULL,
-  `fk_scambio` int NOT NULL,
-  `nome_carta` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `quantita` int NOT NULL DEFAULT '1',
-  `stato` enum('scarso','buono','eccellente') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'buono'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Struttura della tabella `scambio_oggetto`
---
-
-CREATE TABLE `scambio_oggetto` (
+CREATE TABLE `scambio_offerte` (
+  `id_offerta` int NOT NULL,
   `fk_scambio` int NOT NULL,
   `fk_oggetto` int NOT NULL,
-  `da_utente` tinyint(1) NOT NULL,
-  `quantita_scambio` int NOT NULL DEFAULT '1'
+  `quantita_offerta` int NOT NULL,
+  `fk_utente_offerente` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dump dei dati per la tabella `scambio_oggetto`
+-- Dump dei dati per la tabella `scambio_offerte`
 --
 
-INSERT INTO `scambio_oggetto` (`fk_scambio`, `fk_oggetto`, `da_utente`, `quantita_scambio`) VALUES
-(1, 2, 1, 1),
-(2, 1, 1, 1),
-(3, 1, 1, 1),
-(4, 1, 1, 1);
+INSERT INTO `scambio_offerte` (`id_offerta`, `fk_scambio`, `fk_oggetto`, `quantita_offerta`, `fk_utente_offerente`) VALUES
+(1, 1, 2, 2, 1),
+(2, 2, 48, 1, 1),
+(3, 3, 48, 1, 1),
+(4, 4, 48, 1, 1),
+(5, 5, 48, 1, 1),
+(6, 6, 1, 1, 7),
+(7, 7, 48, 1, 1),
+(8, 8, 1, 1, 7),
+(9, 9, 48, 1, 7),
+(10, 10, 48, 1, 1),
+(11, 11, 48, 1, 1),
+(12, 12, 48, 1, 7),
+(13, 13, 48, 1, 7),
+(14, 14, 66, 1, 7);
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `scambio_proposte`
+--
+
+CREATE TABLE `scambio_proposte` (
+  `id_proposta` int NOT NULL,
+  `fk_scambio` int NOT NULL,
+  `fk_utente_proponente` int NOT NULL,
+  `stato_proposta` enum('in_attesa','accettata','rifiutata') COLLATE utf8mb4_unicode_ci DEFAULT 'in_attesa',
+  `data_proposta` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `scambio_richieste`
+--
+
+CREATE TABLE `scambio_richieste` (
+  `id_richiesta` int NOT NULL,
+  `fk_scambio` int NOT NULL,
+  `fk_oggetto` int NOT NULL,
+  `quantita_richiesta` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dump dei dati per la tabella `scambio_richieste`
+--
+
+INSERT INTO `scambio_richieste` (`id_richiesta`, `fk_scambio`, `fk_oggetto`, `quantita_richiesta`) VALUES
+(1, 1, 86, 1),
+(2, 2, 53, 1),
+(3, 3, 53, 1),
+(4, 4, 53, 1),
+(5, 5, 53, 1),
+(6, 6, 48, 1),
+(7, 7, 53, 1),
+(8, 8, 2, 1),
+(9, 9, 2, 1),
+(10, 10, 86, 1),
+(11, 11, 86, 1),
+(12, 12, 63, 1),
+(13, 13, 63, 1),
+(14, 14, 63, 1);
 
 -- --------------------------------------------------------
 
@@ -895,8 +987,8 @@ INSERT INTO `scambio_oggetto` (`fk_scambio`, `fk_oggetto`, `da_utente`, `quantit
 
 CREATE TABLE `titolo` (
   `id_titolo` int NOT NULL,
-  `nome_titolo` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `descrizione_titolo` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
+  `nome_titolo` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descrizione_titolo` text COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -918,11 +1010,11 @@ CREATE TABLE `titolo_utente` (
 
 CREATE TABLE `utente` (
   `id_utente` int NOT NULL,
-  `nome` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `cognome` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `telefono` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
+  `nome` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cognome` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `telefono` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `password` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -930,10 +1022,11 @@ CREATE TABLE `utente` (
 --
 
 INSERT INTO `utente` (`id_utente`, `nome`, `cognome`, `email`, `telefono`, `password`) VALUES
-(1, 'Davide', 'Blasioli', 'db@gmail.com', NULL, '$2y$10$GcEqvT2f6DNgRx39AKAfxOZhHVhPsHfu827tVcun2E7DT38XL4H4K'),
+(1, 'Davide', 'Blasioli', 'db@gmail.com', '33333333333', '$2y$10$GcEqvT2f6DNgRx39AKAfxOZhHVhPsHfu827tVcun2E7DT38XL4H4K'),
 (2, 'Francesco', 'Vampa', 'fv@boxomnia.it', NULL, '$2y$10$NXPIRLr5x50X6Do73ySyNuX/JkeMiGkfM2r24MPkovCvCV64WfRWi'),
 (6, 'Admin', 'Box Omnia', 'admin@boxomnia.it', NULL, '$2y$10$GcEqvT2f6DNgRx39AKAfxOZhHVhPsHfu827tVcun2E7DT38XL4H4K'),
-(7, 'Francesco', 'Vampa', 'fv@gmail.com', NULL, '$2y$10$jnyMvJzqLNgYpDiTsjS30uKgnlxjevXomBIgSzv88BdmkTMacuk2e');
+(7, 'Francesco', 'Vampa', 'fv@gmail.com', NULL, '$2y$10$jnyMvJzqLNgYpDiTsjS30uKgnlxjevXomBIgSzv88BdmkTMacuk2e'),
+(8, 'Miriam', 'De Vincentiis', 'md@gmail.com', NULL, '$2y$10$y3mqDs1zMhL/Vq7anyGt6O5L7PWY1cqliPs8aCi04akzjqvoTXQYO');
 
 -- --------------------------------------------------------
 
@@ -987,7 +1080,7 @@ CREATE TABLE `wishlist` (
   `fk_oggetto` int DEFAULT NULL,
   `fk_box` int DEFAULT NULL,
   `data_aggiunta` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -1066,6 +1159,12 @@ ALTER TABLE `classifica`
   ADD PRIMARY KEY (`id_classifica`);
 
 --
+-- Indici per le tabelle `contenuti_modificabili`
+--
+ALTER TABLE `contenuti_modificabili`
+  ADD PRIMARY KEY (`id_contenuto`);
+
+--
 -- Indici per le tabelle `fattura`
 --
 ALTER TABLE `fattura`
@@ -1085,6 +1184,7 @@ ALTER TABLE `immagine`
 --
 ALTER TABLE `indirizzo_spedizione`
   ADD PRIMARY KEY (`id_indirizzo`),
+  ADD UNIQUE KEY `via` (`via`,`civico`,`cap`),
   ADD KEY `fk_utente_indirizzo_spedizione` (`fk_utente`);
 
 --
@@ -1157,11 +1257,12 @@ ALTER TABLE `ordine_log`
   ADD KEY `fk_admin_log` (`modificato_da`);
 
 --
--- Indici per le tabelle `punti_utente`
+-- Indici per le tabelle `proposta_dettagli`
 --
-ALTER TABLE `punti_utente`
-  ADD PRIMARY KEY (`id_punti`),
-  ADD KEY `fk_utente_punti_utente` (`fk_utente`);
+ALTER TABLE `proposta_dettagli`
+  ADD PRIMARY KEY (`id_dettaglio`),
+  ADD KEY `fk_proposta` (`fk_proposta`),
+  ADD KEY `fk_oggetto` (`fk_oggetto`);
 
 --
 -- Indici per le tabelle `rarita`
@@ -1170,25 +1271,37 @@ ALTER TABLE `rarita`
   ADD PRIMARY KEY (`id_rarita`);
 
 --
--- Indici per le tabelle `scambio`
+-- Indici per le tabelle `scambi`
 --
-ALTER TABLE `scambio`
+ALTER TABLE `scambi`
   ADD PRIMARY KEY (`id_scambio`),
-  ADD KEY `fk_utente_scambio` (`fk_utente`);
+  ADD KEY `fk_utente_richiedente` (`fk_utente_richiedente`),
+  ADD KEY `fk_utente_offerente` (`fk_utente_offerente`);
 
 --
--- Indici per le tabelle `scambio_cartaceo`
+-- Indici per le tabelle `scambio_offerte`
 --
-ALTER TABLE `scambio_cartaceo`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_scambio_cartaceo_scambio` (`fk_scambio`);
+ALTER TABLE `scambio_offerte`
+  ADD PRIMARY KEY (`id_offerta`),
+  ADD KEY `fk_scambio` (`fk_scambio`),
+  ADD KEY `fk_oggetto` (`fk_oggetto`),
+  ADD KEY `fk_utente_offerente` (`fk_utente_offerente`);
 
 --
--- Indici per le tabelle `scambio_oggetto`
+-- Indici per le tabelle `scambio_proposte`
 --
-ALTER TABLE `scambio_oggetto`
-  ADD PRIMARY KEY (`fk_scambio`,`fk_oggetto`),
-  ADD KEY `fk_oggetto_scambio_oggetto` (`fk_oggetto`);
+ALTER TABLE `scambio_proposte`
+  ADD PRIMARY KEY (`id_proposta`),
+  ADD KEY `fk_scambio` (`fk_scambio`),
+  ADD KEY `fk_utente_proponente` (`fk_utente_proponente`);
+
+--
+-- Indici per le tabelle `scambio_richieste`
+--
+ALTER TABLE `scambio_richieste`
+  ADD PRIMARY KEY (`id_richiesta`),
+  ADD KEY `fk_scambio` (`fk_scambio`),
+  ADD KEY `fk_oggetto` (`fk_oggetto`);
 
 --
 -- Indici per le tabelle `titolo`
@@ -1233,7 +1346,7 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT per la tabella `carrello`
 --
 ALTER TABLE `carrello`
-  MODIFY `id_carrello` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id_carrello` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT per la tabella `carrello_salvato`
@@ -1263,25 +1376,25 @@ ALTER TABLE `fattura`
 -- AUTO_INCREMENT per la tabella `immagine`
 --
 ALTER TABLE `immagine`
-  MODIFY `id_immagine` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=146;
+  MODIFY `id_immagine` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=158;
 
 --
 -- AUTO_INCREMENT per la tabella `indirizzo_spedizione`
 --
 ALTER TABLE `indirizzo_spedizione`
-  MODIFY `id_indirizzo` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_indirizzo` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT per la tabella `info_ordine`
 --
 ALTER TABLE `info_ordine`
-  MODIFY `id_info_ordine` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id_info_ordine` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT per la tabella `mystery_box`
 --
 ALTER TABLE `mystery_box`
-  MODIFY `id_box` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_box` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT per la tabella `oggetto`
@@ -1293,19 +1406,19 @@ ALTER TABLE `oggetto`
 -- AUTO_INCREMENT per la tabella `ordine`
 --
 ALTER TABLE `ordine`
-  MODIFY `id_ordine` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id_ordine` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT per la tabella `ordine_log`
 --
 ALTER TABLE `ordine_log`
-  MODIFY `id_log` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id_log` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
--- AUTO_INCREMENT per la tabella `punti_utente`
+-- AUTO_INCREMENT per la tabella `proposta_dettagli`
 --
-ALTER TABLE `punti_utente`
-  MODIFY `id_punti` int NOT NULL AUTO_INCREMENT;
+ALTER TABLE `proposta_dettagli`
+  MODIFY `id_dettaglio` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT per la tabella `rarita`
@@ -1314,16 +1427,28 @@ ALTER TABLE `rarita`
   MODIFY `id_rarita` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
--- AUTO_INCREMENT per la tabella `scambio`
+-- AUTO_INCREMENT per la tabella `scambi`
 --
-ALTER TABLE `scambio`
-  MODIFY `id_scambio` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+ALTER TABLE `scambi`
+  MODIFY `id_scambio` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
--- AUTO_INCREMENT per la tabella `scambio_cartaceo`
+-- AUTO_INCREMENT per la tabella `scambio_offerte`
 --
-ALTER TABLE `scambio_cartaceo`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+ALTER TABLE `scambio_offerte`
+  MODIFY `id_offerta` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT per la tabella `scambio_proposte`
+--
+ALTER TABLE `scambio_proposte`
+  MODIFY `id_proposta` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT per la tabella `scambio_richieste`
+--
+ALTER TABLE `scambio_richieste`
+  MODIFY `id_richiesta` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT per la tabella `titolo`
@@ -1335,13 +1460,13 @@ ALTER TABLE `titolo`
 -- AUTO_INCREMENT per la tabella `utente`
 --
 ALTER TABLE `utente`
-  MODIFY `id_utente` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_utente` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT per la tabella `wishlist`
 --
 ALTER TABLE `wishlist`
-  MODIFY `id_wishlist` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_wishlist` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Limiti per le tabelle scaricate
@@ -1466,29 +1591,40 @@ ALTER TABLE `ordine_log`
   ADD CONSTRAINT `fk_ordine_ordine_log` FOREIGN KEY (`fk_ordine`) REFERENCES `ordine` (`id_ordine`) ON DELETE CASCADE;
 
 --
--- Limiti per la tabella `punti_utente`
+-- Limiti per la tabella `proposta_dettagli`
 --
-ALTER TABLE `punti_utente`
-  ADD CONSTRAINT `fk_utente_punti_utente` FOREIGN KEY (`fk_utente`) REFERENCES `utente` (`id_utente`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `proposta_dettagli`
+  ADD CONSTRAINT `proposta_dettagli_ibfk_1` FOREIGN KEY (`fk_proposta`) REFERENCES `scambio_proposte` (`id_proposta`) ON DELETE CASCADE,
+  ADD CONSTRAINT `proposta_dettagli_ibfk_2` FOREIGN KEY (`fk_oggetto`) REFERENCES `oggetto` (`id_oggetto`);
 
 --
--- Limiti per la tabella `scambio`
+-- Limiti per la tabella `scambi`
 --
-ALTER TABLE `scambio`
-  ADD CONSTRAINT `fk_utente_scambio` FOREIGN KEY (`fk_utente`) REFERENCES `utente` (`id_utente`);
+ALTER TABLE `scambi`
+  ADD CONSTRAINT `scambi_ibfk_1` FOREIGN KEY (`fk_utente_richiedente`) REFERENCES `utente` (`id_utente`),
+  ADD CONSTRAINT `scambi_ibfk_2` FOREIGN KEY (`fk_utente_offerente`) REFERENCES `utente` (`id_utente`);
 
 --
--- Limiti per la tabella `scambio_cartaceo`
+-- Limiti per la tabella `scambio_offerte`
 --
-ALTER TABLE `scambio_cartaceo`
-  ADD CONSTRAINT `fk_scambio_cartaceo_scambio` FOREIGN KEY (`fk_scambio`) REFERENCES `scambio` (`id_scambio`) ON DELETE CASCADE;
+ALTER TABLE `scambio_offerte`
+  ADD CONSTRAINT `scambio_offerte_ibfk_1` FOREIGN KEY (`fk_scambio`) REFERENCES `scambi` (`id_scambio`) ON DELETE CASCADE,
+  ADD CONSTRAINT `scambio_offerte_ibfk_2` FOREIGN KEY (`fk_oggetto`) REFERENCES `oggetto` (`id_oggetto`),
+  ADD CONSTRAINT `scambio_offerte_ibfk_3` FOREIGN KEY (`fk_utente_offerente`) REFERENCES `utente` (`id_utente`);
 
 --
--- Limiti per la tabella `scambio_oggetto`
+-- Limiti per la tabella `scambio_proposte`
 --
-ALTER TABLE `scambio_oggetto`
-  ADD CONSTRAINT `fk_oggetto_scambio_oggetto` FOREIGN KEY (`fk_oggetto`) REFERENCES `oggetto` (`id_oggetto`),
-  ADD CONSTRAINT `fk_scambio_scambio_oggetto` FOREIGN KEY (`fk_scambio`) REFERENCES `scambio` (`id_scambio`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `scambio_proposte`
+  ADD CONSTRAINT `scambio_proposte_ibfk_1` FOREIGN KEY (`fk_scambio`) REFERENCES `scambi` (`id_scambio`) ON DELETE CASCADE,
+  ADD CONSTRAINT `scambio_proposte_ibfk_2` FOREIGN KEY (`fk_utente_proponente`) REFERENCES `utente` (`id_utente`);
+
+--
+-- Limiti per la tabella `scambio_richieste`
+--
+ALTER TABLE `scambio_richieste`
+  ADD CONSTRAINT `scambio_richieste_ibfk_1` FOREIGN KEY (`fk_scambio`) REFERENCES `scambi` (`id_scambio`) ON DELETE CASCADE,
+  ADD CONSTRAINT `scambio_richieste_ibfk_2` FOREIGN KEY (`fk_oggetto`) REFERENCES `oggetto` (`id_oggetto`);
 
 --
 -- Limiti per la tabella `titolo_utente`
