@@ -129,7 +129,7 @@ foreach ($available_cards as $card_id => $card) {
         <div class="container">
             <!-- NUOVO LAYOUT: Header unificato con titolo e navigazione -->
             <div class="collection-header">
-                <h1 class="fashion_taverage">La mia Collezione</h1>
+                <h1 class="fashion_taverage">Le mie Collezioni</h1>
                 <div class="category-nav-filter-container">
                     <a href="#yu-gi-oh-collection" class="btn btn-filter-nav">Yu-Gi-Oh!</a>
                     <a href="#pokemon-collection" class="btn btn-filter-nav">Pokémon</a>
@@ -296,7 +296,7 @@ foreach ($available_cards as $card_id => $card) {
                             <input type="number" class="form-control" id="cardQuantity" name="card_quantity" value="1" min="0" required>
                             <small class="form-text text-muted">Inserisci la quantità della carta che possiedi</small>
                         </div>
-                        <button type="submit" class="btn btn-add-card">Aggiungi Carta alla Collezione</button>
+                        <button type="submit" class="btn btn-add-card">Aggiungi Carta alle Collezioni</button>
                     </form>
                 </div>
             </div>

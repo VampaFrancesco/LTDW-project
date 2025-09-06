@@ -92,12 +92,12 @@ $conn->close();
 
 <main class="background-custom filter-container accessory-section">
     <div class="container">
-
-        <div class="d-flex justify-content-between align-items-start mb-4">
-            <h1 class="fashion_taverage m-0">Accessori</h1>
-            <div class="d-flex flex-column align-items-end">
+        <h1 class="fashion_taital mt-1 mb-5 text-center">Accessori</h1>
+        
+        <div class="d-flex justify-content-start align-items-start mb-4">
+            <div class="d-flex flex-column align-items-end ms-auto">
                 <div class="dropdown mb-2">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn btn-secondary dropdown-toggle filtro-uniforme" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Filtra per categoria
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" id="category-filter-menu">
@@ -108,7 +108,7 @@ $conn->close();
                     </ul>
                 </div>
                 <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn btn-secondary dropdown-toggle filtro-uniforme" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Filtra per prezzo
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" id="price-filter-menu">
@@ -116,7 +116,6 @@ $conn->close();
                         <li><a class="dropdown-item filter-link" href="#" data-filter-type="price" data-filter-value="<5">&lt; 5€</a></li>
                         <li><a class="dropdown-item filter-link" href="#" data-filter-type="price" data-filter-value="5-10">5-10€</a></li>
                         <li><a class="dropdown-item filter-link" href="#" data-filter-type="price" data-filter-value=">10">&gt; 10€</a></li>
-
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item filter-link" href="#" data-filter-type="price" data-filter-value="asc">Prezzo crescente</a></li>
                         <li><a class="dropdown-item filter-link" href="#" data-filter-type="price" data-filter-value="desc">Prezzo decrescente</a></li>
@@ -134,12 +133,12 @@ $conn->close();
                             <?php foreach ($accessori_by_type[$type] as $accessory): ?>
                                 <div class="col accessory-item" data-price="<?php echo htmlspecialchars($accessory['price'] ?? 0); ?>" data-category="<?php echo str_replace(' ', '_', $type); ?>">
                                     <div class="accessory-card card h-100"
-                                        data-id="<?php echo htmlspecialchars($accessory['id_oggetto']); ?>"
-                                        data-name="<?php echo htmlspecialchars($accessory['name']); ?>"
-                                        data-description="<?php echo htmlspecialchars($accessory['description']); ?>"
-                                        data-price="<?php echo htmlspecialchars($accessory['price']); ?>"
-                                        data-availability="<?php echo htmlspecialchars($accessory['availability']); ?>"
-                                        data-image-url="<?php echo htmlspecialchars($accessory['image_url']); ?>">
+                                         data-id="<?php echo htmlspecialchars($accessory['id_oggetto']); ?>"
+                                         data-name="<?php echo htmlspecialchars($accessory['name']); ?>"
+                                         data-description="<?php echo htmlspecialchars($accessory['description']); ?>"
+                                         data-price="<?php echo htmlspecialchars($accessory['price']); ?>"
+                                         data-availability="<?php echo htmlspecialchars($accessory['availability']); ?>"
+                                         data-image-url="<?php echo htmlspecialchars($accessory['image_url']); ?>">
                                         <div class="card-img-container">
                                             <div class="card-img-container">
                                                 <?php if (SessionManager::isLoggedIn()): ?>
@@ -155,7 +154,6 @@ $conn->close();
                                         </div>
                                         <div class="card-body">
                                             <h5 class="card-title"><?php echo htmlspecialchars($accessory['name']); ?></h5>
-
                                             <p class="card-text text-muted"><?php echo htmlspecialchars($accessory['description']); ?></p>
                                         </div>
                                         <div class="card-footer text-center">

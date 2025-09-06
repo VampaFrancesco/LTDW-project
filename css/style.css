@@ -485,7 +485,8 @@ img {
     background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    height: 100%;
+    height: 515px; /* Esempio di altezza fissa */
+    width: 250px;
     padding: 20px;
     border: 2px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.3);
@@ -537,6 +538,16 @@ img {
 }
 
 /* FIX PER ALTEZZA UNIFORME */
+.filter-btn {
+    margin-top: 0px; 
+    margin-bottom: -75px;
+}
+
+.filter-btn-btn {
+    margin-bottom: -200px;
+    margin-top: -100px; 
+}
+
 .mystery-box-item,
 .funko-pop-item,
 .accessori-item {
@@ -598,7 +609,7 @@ img {
     text-align: center;
     line-height: 1.6;
     margin-bottom: 15px;
-    min-height: 70px;
+    height: 70px;
 }
 
 .mystery-box-price {
@@ -703,7 +714,7 @@ img {
     align-items: flex-start !important;
     justify-content: space-between !important;
     flex-wrap: wrap !important;
-    gap: 20px !important;
+    gap: 0px !important;
 }
 
 .accessory-section .dropdown {
@@ -2324,6 +2335,12 @@ img {
     padding-bottom: 0;
 }
 
+.filtro-uniforme {
+    width: 180px !important;
+    text-align: right !important;
+    justify-content: flex-end !important;
+}
+
 .margin_top90 {
     margin-top: 50px;
 }
@@ -2341,7 +2358,7 @@ img {
     font-size: 48px;
     color: var(--text-color);
     font-weight: 600;
-    text-align: center;
+    text-align: center !important;
     text-transform: uppercase;
     margin-bottom: 40px;
     position: relative;
@@ -2365,7 +2382,7 @@ img {
     font-size: 30px;
     color: var(--text-color);
     font-weight: 600;
-    text-align: center;
+    text-align: left;
     border-bottom: 2px solid var(--glass-border);
     padding-bottom: 10px;
     margin-bottom: 40px;

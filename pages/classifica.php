@@ -76,7 +76,7 @@ $conn->close();
                         <i class="fas fa-medal medal-silver"></i>
                     </h1>
                     <p class="lead classifica-description">
-                        Scopri chi sono i collezionisti più esperti della community! La classifica è basata sui punti totali degli oggetti posseduti.
+                        Scopri chi sono i collezionisti più esperti della community! La classifica è basata sui punti totali delle carte possedute
                     </p>
                 </div>
 
@@ -100,7 +100,7 @@ $conn->close();
                         <div class="stat-card">
                             <i class="fas fa-gem stat-icon-secondary"></i>
                             <h3><?php echo !empty($classifica) ? $classifica[0]['oggetti_posseduti'] : '0'; ?></h3>
-                            <p>Oggetti del Leader</p>
+                            <p>Carte del Leader</p>
                         </div>
                     </div>
                 </div>
@@ -127,7 +127,7 @@ $conn->close();
                                             <?php echo number_format($utente['punteggio_totale']); ?> punti
                                         </div>
                                         <small class="podium-objects">
-                                            <i class="fas fa-box"></i> <?php echo $utente['oggetti_posseduti']; ?> oggetti
+                                            <i class="fas fa-box"></i> <?php echo $utente['oggetti_posseduti']; ?> carte
                                         </small>
                                     </div>
                                 </div>
@@ -150,7 +150,7 @@ $conn->close();
                                             <i class="fas fa-star"></i> Punteggio
                                         </th>
                                         <th class="classifica-th">
-                                            <i class="fas fa-box"></i> Oggetti
+                                            <i class="fas fa-box"></i> Carte
                                         </th>
                                         <th class="classifica-th">
                                             <i class="fas fa-chart-line"></i> Media
@@ -203,7 +203,7 @@ $conn->close();
                                             
                                             <td class="classifica-td">
                                                 <div class="average-score">
-                                                    <?php echo $utente['oggetti_posseduti'] > 0 ? number_format($utente['punteggio_totale'] / $utente['oggetti_posseduti'], 1) : '0'; ?> pt/obj
+                                                    <?php echo $utente['oggetti_posseduti'] > 0 ? number_format($utente['punteggio_totale'] / $utente['oggetti_posseduti'], 1) : '0'; ?> pt/carte
                                                 </div>
                                             </td>
                                         </tr>
@@ -217,7 +217,7 @@ $conn->close();
                         <div class="empty-classifica">
                             <i class="fas fa-trophy empty-trophy"></i>
                             <h3 class="empty-title">Classifica in Costruzione</h3>
-                            <p class="empty-description">Non ci sono ancora utenti con oggetti nella collezione.</p>
+                            <p class="empty-description">Non ci sono ancora utenti con carte nelle collezioni</p>
                             <a href="mystery_box.php" class="btn-shop">
                                 <i class="fas fa-box"></i> Inizia a Collezionare
                             </a>
@@ -235,10 +235,10 @@ $conn->close();
                                 </h4>
                                 <ul class="info-list">
                                     <li class="info-item primary">
-                                        <strong>Punteggio:</strong> Somma dei punti di tutti gli oggetti posseduti
+                                        <strong>Punteggio:</strong> Somma dei punti di tutti le carte possedute
                                     </li>
                                     <li class="info-item secondary">
-                                        <strong>Quantità:</strong> Gli oggetti multipli moltiplicano i punti
+                                        <strong>Quantità:</strong> Le carte multiple moltiplicano i punti
                                     </li>
                                     <li class="info-item accent">
                                         <strong>Classifica:</strong> Ordinata per punteggio totale

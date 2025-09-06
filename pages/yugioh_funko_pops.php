@@ -103,7 +103,7 @@ $conn->close();
             </div>
             <div class="filter-dropdown-container">
                 <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="priceDropdownFunko" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn btn-secondary dropdown-toggle filtro-uniforme" type="button" id="priceDropdownFunko" data-bs-toggle="dropdown" aria-expanded="false">
                         Filtra per prezzo
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="priceDropdownFunko">
@@ -177,14 +177,14 @@ $conn->close();
                         </div>
                     </div>
                     <div class="modal fade" id="funkoModal_<?php echo $funko['id']; ?>" tabindex="-1" aria-labelledby="funkoModalLabel_<?php echo $funko['id']; ?>" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-dialog modal-lg modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="funkoModalLabel_<?php echo $funko['id']; ?>"><?php echo htmlspecialchars($funko['name']); ?></h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <img src="<?php echo htmlspecialchars($funko['image_url']); ?>" alt="<?php echo htmlspecialchars($funko['name']); ?>" class="img-fluid mb-3">
+                                    <img src="<?php echo htmlspecialchars($funko['image_url']); ?>" alt="<?php echo htmlspecialchars($funko['name']); ?>" class="img-fluid mb-3 w-25 mx-auto d-block">
                                     <p><?php echo htmlspecialchars($funko['description']); ?></p>
                                     <p><strong>Prezzo:</strong> €<?php echo number_format($funko['price'], 2); ?></p>
                                     <p class="stock-info"><strong>Disponibilità:</strong> <?php echo $funko['stock']; ?> pezzi</p>
