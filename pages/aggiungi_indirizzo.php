@@ -87,8 +87,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: ".(defined('BASE_URL') ? BASE_URL : '')."/pages/profilo.php");
             exit;
         } catch (Exception $e) {
-            $errors[] = "Errore durante il salvataggio dell'indirizzo. Dettagli: " . $e->getMessage();
-            error_log("Errore inserimento indirizzo: " . $e->getMessage());
+            if ($e->getMessage() == "SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry") {
+                $errors = "Questo indirizzo è già stato aggiunto.";
+                error_log($errors);
+            } else {
+                $errors[] = "Errore durante il salvataggio dell'indirizzo. Riprova.";
+                error_log("Errore DB: " . $e->getMessage());
+            }
         }
     }
 }
