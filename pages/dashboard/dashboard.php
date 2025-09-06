@@ -21,8 +21,12 @@ if ($conn->connect_error) {
 
 // ✅ STATISTICHE CORRETTE E SICURE
 try {
-    // 1. Numero utenti registrati
-    $result = $conn->query("SELECT COUNT(*) as total FROM utente");
+    // 1. Numero utenti registrati (escludendo admin interni)
+    $result = $conn->query("
+        SELECT COUNT(*) as total 
+        FROM utente 
+        WHERE email NOT LIKE '%@boxomnia.%'
+    ");
     $stats['utenti_totali'] = $result ? $result->fetch_assoc()['total'] : 0;
 
     // 2. Ordini di oggi
@@ -33,23 +37,52 @@ try {
     $result = $stmt->get_result();
     $stats['ordini_oggi'] = $result->fetch_assoc()['total'];
     $stmt->close();
-    // 3. Fatturato mensile (valori già in EURO)
+
+    // 3. Fatturato mensile REALE (da carrelli completati)
     $currentMonth = date('Y-m');
     $stmt = $conn->prepare("
-    SELECT COALESCE(SUM(totale_fattura), 0) as total 
-    FROM fattura 
-    WHERE DATE_FORMAT(data_emissione, '%Y-%m') = ?
-");
+        SELECT COALESCE(SUM(c.totale), 0) as total 
+        FROM carrello c
+        JOIN ordine o ON c.id_carrello = o.fk_carrello
+        WHERE c.stato IN ('completato', 'checkout')
+        AND DATE_FORMAT(o.data_ordine, '%Y-%m') = ?
+        AND o.stato_ordine NOT IN (3, 4)
+    ");
     $stmt->bind_param("s", $currentMonth);
     $stmt->execute();
     $result = $stmt->get_result();
-    $stats['fatturato_mensile'] = $result->fetch_assoc()['total']; // NON DIVIDERE PER 100!
+    $stats['fatturato_mensile'] = $result->fetch_assoc()['total'];
     $stmt->close();
-    // 4. Prodotti attivi
-    $result1 = $conn->query("SELECT COUNT(*) as total FROM oggetto WHERE quant_oggetto IS NULL OR quant_oggetto > 0");
+
+    // Fallback: se non ci sono carrelli collegati, calcola da fatture
+    if ($stats['fatturato_mensile'] <= 0) {
+        $stmt = $conn->prepare("
+            SELECT COALESCE(SUM(totale_fattura), 0) as total 
+            FROM fattura 
+            WHERE DATE_FORMAT(data_emissione, '%Y-%m') = ?
+        ");
+        $stmt->bind_param("s", $currentMonth);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $stats['fatturato_mensile'] = $result->fetch_assoc()['total'];
+        $stmt->close();
+    }
+
+    // 4. Prodotti effettivamente disponibili
+    $result1 = $conn->query("
+        SELECT COUNT(*) as total 
+        FROM oggetto 
+        WHERE (quant_oggetto IS NULL OR quant_oggetto > 0)
+        AND prezzo_oggetto IS NOT NULL 
+        AND prezzo_oggetto > 0
+    ");
     $oggetti_attivi = $result1 ? $result1->fetch_assoc()['total'] : 0;
 
-    $result2 = $conn->query("SELECT COUNT(*) as total FROM mystery_box WHERE quantita_box > 0");
+    $result2 = $conn->query("
+        SELECT COUNT(*) as total 
+        FROM mystery_box 
+        WHERE quantita_box > 0
+    ");
     $box_attive = $result2 ? $result2->fetch_assoc()['total'] : 0;
 
     $stats['prodotti_attivi'] = $oggetti_attivi + $box_attive;
@@ -58,7 +91,7 @@ try {
     $result = $conn->query("SELECT COUNT(*) as total FROM admin");
     $stats['admin_attivi'] = $result ? $result->fetch_assoc()['total'] : 0;
 
-    // 6. Ultimi ordini (massimo 5)
+    // 6. Ultimi ordini (massimo 5) con totale corretto
     $ordini_recenti = [];
     $result = $conn->query("
         SELECT 
@@ -66,12 +99,13 @@ try {
             o.data_ordine,
             o.stato_ordine,
             CONCAT(u.nome, ' ', u.cognome) as cliente_nome,
-            c.totale,
+            COALESCE(c.totale, 0) as totale,
             CASE 
                 WHEN o.stato_ordine = 0 THEN 'In Elaborazione'
-                WHEN o.stato_ordine = 1 THEN 'Completato'
-                WHEN o.stato_ordine = 2 THEN 'Spedito'
+                WHEN o.stato_ordine = 1 THEN 'Spedito'
+                WHEN o.stato_ordine = 2 THEN 'Consegnato'
                 WHEN o.stato_ordine = 3 THEN 'Annullato'
+                WHEN o.stato_ordine = 4 THEN 'Rimborsato'
                 ELSE 'Sconosciuto'
             END as stato_nome
         FROM ordine o
@@ -87,6 +121,61 @@ try {
         }
     }
 
+    // 7. Statistiche aggiuntive per insight migliori
+
+    // Valore medio ordine
+    $result = $conn->query("
+        SELECT COALESCE(AVG(c.totale), 0) as media
+        FROM carrello c
+        JOIN ordine o ON c.id_carrello = o.fk_carrello
+        WHERE c.stato IN ('completato', 'checkout')
+        AND o.stato_ordine NOT IN (3, 4)
+        AND DATE_FORMAT(o.data_ordine, '%Y-%m') = '$currentMonth'
+    ");
+    $stats['valore_medio_ordine'] = $result ? $result->fetch_assoc()['media'] : 0;
+
+    // Prodotti più venduti (top 3)
+    $prodotti_top = [];
+    $result = $conn->query("
+        SELECT 
+            COALESCE(mb.nome_box, og.nome_oggetto) as nome_prodotto,
+            COUNT(*) as vendite,
+            SUM(c.totale) as ricavo_totale,
+            CASE WHEN mb.id_box IS NOT NULL THEN 'Mystery Box' ELSE 'Oggetto' END as tipo
+        FROM carrello c
+        LEFT JOIN mystery_box mb ON c.fk_mystery_box = mb.id_box
+        LEFT JOIN oggetto og ON c.fk_oggetto = og.id_oggetto
+        JOIN ordine o ON c.id_carrello = o.fk_carrello
+        WHERE c.stato IN ('completato', 'checkout')
+        AND o.stato_ordine NOT IN (3, 4)
+        AND DATE_FORMAT(o.data_ordine, '%Y-%m') = '$currentMonth'
+        GROUP BY COALESCE(mb.id_box, og.id_oggetto), nome_prodotto, tipo
+        ORDER BY vendite DESC
+        LIMIT 3
+    ");
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            $prodotti_top[] = $row;
+        }
+    }
+
+    // Trend vendite ultimi 7 giorni
+    $trend_vendite = [];
+    for ($i = 6; $i >= 0; $i--) {
+        $data = date('Y-m-d', strtotime("-$i days"));
+        $result = $conn->query("
+            SELECT 
+                COUNT(DISTINCT o.id_ordine) as ordini,
+                COALESCE(SUM(c.totale), 0) as fatturato
+            FROM ordine o
+            LEFT JOIN carrello c ON o.fk_carrello = c.id_carrello
+            WHERE DATE(o.data_ordine) = '$data'
+            AND o.stato_ordine NOT IN (3, 4)
+        ");
+        $trend_data = $result ? $result->fetch_assoc() : ['ordini' => 0, 'fatturato' => 0];
+        $trend_vendite[date('d/m', strtotime($data))] = $trend_data;
+    }
+
 } catch (Exception $e) {
     error_log("Dashboard stats error: " . $e->getMessage());
     // Valori di default in caso di errore
@@ -95,9 +184,12 @@ try {
             'ordini_oggi' => 0,
             'fatturato_mensile' => 0,
             'prodotti_attivi' => 0,
-            'admin_attivi' => 0
+            'admin_attivi' => 0,
+            'valore_medio_ordine' => 0
     ];
     $ordini_recenti = [];
+    $prodotti_top = [];
+    $trend_vendite = [];
 }
 
 $conn->close();
@@ -156,6 +248,26 @@ $conn->close();
 
         .badge-status {
             font-size: 0.8rem;
+        }
+
+        .trend-chart {
+            height: 150px;
+        }
+
+        .insight-card {
+            border-left: 4px solid var(--bs-primary);
+        }
+
+        .metric-change {
+            font-size: 0.875rem;
+        }
+
+        .metric-up {
+            color: var(--bs-success);
+        }
+
+        .metric-down {
+            color: var(--bs-danger);
         }
     </style>
 </head>
@@ -225,7 +337,7 @@ $conn->close();
                 <small class="text-muted">Ultimo accesso: <?php echo date('d/m/Y H:i'); ?></small>
             </div>
 
-            <!-- ✅ STATISTICHE PRINCIPALI -->
+            <!-- ✅ STATISTICHE PRINCIPALI CORRETTE -->
             <div class="row g-4 mb-4">
                 <div class="col-sm-6 col-lg-3">
                     <div class="card stats-card text-center">
@@ -234,7 +346,8 @@ $conn->close();
                                 <i class="bi bi-people-fill text-primary fs-2"></i>
                             </div>
                             <h3 class="fw-bold text-primary"><?php echo number_format($stats['utenti_totali']); ?></h3>
-                            <p class="text-muted mb-0">Utenti Registrati</p>
+                            <p class="text-muted mb-0">Clienti Registrati</p>
+                            <small class="text-muted">Escl. staff interno</small>
                         </div>
                     </div>
                 </div>
@@ -247,6 +360,9 @@ $conn->close();
                             </div>
                             <h3 class="fw-bold text-success"><?php echo number_format($stats['ordini_oggi']); ?></h3>
                             <p class="text-muted mb-0">Ordini Oggi</p>
+                            <?php if ($stats['valore_medio_ordine'] > 0): ?>
+                                <small class="text-muted">Media: €<?php echo number_format($stats['valore_medio_ordine'], 2); ?></small>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -258,7 +374,8 @@ $conn->close();
                                 <i class="bi bi-currency-euro text-warning fs-2"></i>
                             </div>
                             <h3 class="fw-bold text-warning">€<?php echo number_format($stats['fatturato_mensile'], 2); ?></h3>
-                            <p class="text-muted mb-0">Fatturato Mensile</p>
+                            <p class="text-muted mb-0">Fatturato <?php echo date('M Y'); ?></p>
+                            <small class="text-muted">Solo ordini completati</small>
                         </div>
                     </div>
                 </div>
@@ -271,10 +388,44 @@ $conn->close();
                             </div>
                             <h3 class="fw-bold text-info"><?php echo number_format($stats['prodotti_attivi']); ?></h3>
                             <p class="text-muted mb-0">Prodotti Attivi</p>
+                            <small class="text-muted">Disponibili e prezzati</small>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Trend Vendite degli ultimi 7 giorni -->
+            <?php if (!empty($trend_vendite)): ?>
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card insight-card">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-graph-up me-2"></i>
+                                    Trend Vendite Ultimi 7 Giorni
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <canvas id="trendChart" class="trend-chart"></canvas>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6>Riepilogo 7 giorni:</h6>
+                                        <?php
+                                        $totale_ordini_7g = array_sum(array_column($trend_vendite, 'ordini'));
+                                        $totale_fatturato_7g = array_sum(array_column($trend_vendite, 'fatturato'));
+                                        ?>
+                                        <p class="mb-1"><strong><?php echo $totale_ordini_7g; ?></strong> ordini totali</p>
+                                        <p class="mb-1"><strong>€<?php echo number_format($totale_fatturato_7g, 2); ?></strong> fatturato</p>
+                                        <p class="mb-0 text-muted">Media: €<?php echo $totale_ordini_7g > 0 ? number_format($totale_fatturato_7g / $totale_ordini_7g, 2) : '0.00'; ?>/ordine</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <!-- ✅ AZIONI RAPIDE -->
             <h2 class="h4 mb-3">Azioni Rapide</h2>
@@ -315,16 +466,16 @@ $conn->close();
                 <div class="col-md-6 col-lg-3">
                     <div class="card action-card h-100">
                         <div class="card-body text-center">
-                            <i class="bi bi-shield-plus text-warning fs-1"></i>
-                            <h5 class="card-title mt-2">Nuovo Admin</h5>
-                            <p class="card-text">Crea nuovi amministratori</p>
-                            <a href="crea_admin.php" class="btn btn-warning">Vai</a>
+                            <i class="bi bi-pencil text-warning fs-1"></i>
+                            <h5 class="card-title mt-2">Contenuti</h5>
+                            <p class="card-text">Modifica testi del sito</p>
+                            <a href="gestione_contenuti.php" class="btn btn-warning">Vai</a>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ✅ SEZIONE ORDINI RECENTI E INFO SISTEMA -->
+            <!-- ✅ SEZIONE ORDINI RECENTI E PRODOTTI TOP -->
             <div class="row">
                 <div class="col-md-8">
                     <div class="card">
@@ -356,9 +507,10 @@ $conn->close();
                                                         <?php
                                                         $badge_class = match($ordine['stato_ordine']) {
                                                             0 => 'bg-warning',
-                                                            1 => 'bg-success',
-                                                            2 => 'bg-info',
+                                                            1 => 'bg-info',
+                                                            2 => 'bg-success',
                                                             3 => 'bg-danger',
+                                                            4 => 'bg-secondary',
                                                             default => 'bg-secondary'
                                                         };
                                                         ?>
@@ -383,9 +535,36 @@ $conn->close();
                 </div>
 
                 <div class="col-md-4">
+                    <!-- Prodotti più venduti -->
+                    <?php if (!empty($prodotti_top)): ?>
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="bi bi-trophy"></i> Top Prodotti del Mese</h6>
+                            </div>
+                            <div class="card-body">
+                                <?php foreach ($prodotti_top as $index => $prodotto): ?>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div>
+                                            <div class="fw-bold"><?php echo ($index + 1); ?>. <?php echo htmlspecialchars($prodotto['nome_prodotto']); ?></div>
+                                            <small class="text-muted"><?php echo $prodotto['tipo']; ?></small>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="fw-bold"><?php echo $prodotto['vendite']; ?> vendite</div>
+                                            <small class="text-success">€<?php echo number_format($prodotto['ricavo_totale'], 2); ?></small>
+                                        </div>
+                                    </div>
+                                    <?php if ($index < count($prodotti_top) - 1): ?>
+                                        <hr class="my-2">
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- Info Sistema -->
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="mb-0"><i class="bi bi-info-circle"></i> Info Sistema</h5>
+                            <h6 class="mb-0"><i class="bi bi-info-circle"></i> Info Sistema</h6>
                         </div>
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -439,6 +618,8 @@ $conn->close();
     </div>
 </footer>
 
+<!-- Chart.js per il grafico del trend -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- Bootstrap JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -449,15 +630,113 @@ $conn->close();
         const statsCards = document.querySelectorAll('.stats-card');
         statsCards.forEach((card, index) => {
             card.style.animationDelay = `${index * 0.1}s`;
-            card.classList.add('animate__animated', 'animate__fadeInUp');
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
         });
+
+        // Grafico trend vendite se i dati sono disponibili
+        <?php if (!empty($trend_vendite)): ?>
+        const ctx = document.getElementById('trendChart');
+        if (ctx) {
+            const trendData = <?php echo json_encode($trend_vendite); ?>;
+            const labels = Object.keys(trendData);
+            const ordiniData = labels.map(label => trendData[label].ordini);
+            const fatturatoData = labels.map(label => trendData[label].fatturato);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Ordini',
+                            data: ordiniData,
+                            borderColor: 'rgb(75, 192, 192)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            tension: 0.4,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Fatturato (€)',
+                            data: fatturatoData,
+                            borderColor: 'rgb(255, 99, 132)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            tension: 0.4,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: false
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Data'
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Ordini',
+                                color: 'rgb(75, 192, 192)'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Fatturato (€)',
+                                color: 'rgb(255, 99, 132)'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                        }
+                    }
+                }
+            });
+        }
+        <?php endif; ?>
 
         // Aggiorna ora ogni minuto
         setInterval(function() {
             const now = new Date();
             const timeString = now.toLocaleString('it-IT');
-            document.querySelector('small.text-muted').textContent = `Ultimo accesso: ${timeString}`;
+            const timeElement = document.querySelector('small.text-muted');
+            if (timeElement) {
+                timeElement.textContent = `Ultimo accesso: ${timeString}`;
+            }
         }, 60000);
+
+        // Refresh automatico delle statistiche ogni 5 minuti
+        setInterval(function() {
+            // Aggiorna solo se la pagina è visibile
+            if (!document.hidden) {
+                window.location.reload();
+            }
+        }, 300000); // 5 minuti
     });
 </script>
 
