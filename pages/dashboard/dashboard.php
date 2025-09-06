@@ -326,6 +326,41 @@ $conn->close();
                             <i class="bi bi-pencil-fill"></i> Gestisci contenuti
                         </a>
                     </li>
+                    <!-- AGGIUNGI questa voce nella sidebar del tuo dashboard.php -->
+
+<li class="nav-item">
+    <a class="nav-link" href="gestione_supporto.php">
+        <i class="bi bi-headset"></i> Supporto Clienti
+        <?php
+        // Mostra il numero di richieste aperte - con connessione separata
+        try {
+            $db_config = $config['dbms']['localhost'];
+            $conn_sidebar = new mysqli(
+                $db_config['host'],
+                $db_config['user'],
+                $db_config['passwd'],
+                $db_config['dbname']
+            );
+            
+            if (!$conn_sidebar->connect_error) {
+                $stmt = $conn_sidebar->prepare("SELECT COUNT(*) as count FROM richieste_supporto WHERE stato IN ('aperta', 'in_corso')");
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $open_requests = $result->fetch_assoc()['count'];
+                $stmt->close();
+                $conn_sidebar->close();
+                
+                if ($open_requests > 0) {
+                    echo '<span class="badge bg-warning text-dark ms-2">' . $open_requests . '</span>';
+                }
+            }
+        } catch (Exception $e) {
+            // Ignora errori per non bloccare la dashboard
+            error_log("Errore conteggio richieste supporto: " . $e->getMessage());
+        }
+        ?>
+    </a>
+</li>
                 </ul>
             </div>
         </nav>
