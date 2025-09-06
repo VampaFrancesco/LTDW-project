@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:8889
--- Creato il: Set 05, 2025 alle 23:09
--- Versione del server: 8.0.40
--- Versione PHP: 8.3.14
+-- Host: 127.0.0.1
+-- Creato il: Set 06, 2025 alle 23:30
+-- Versione del server: 10.4.32-MariaDB
+-- Versione PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -62,11 +62,11 @@ DELIMITER ;
 --
 
 CREATE TABLE `admin` (
-  `id_admin` int NOT NULL,
-  `fk_utente` int NOT NULL,
-  `livello_admin` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'admin',
-  `data_creazione` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `creato_da` int DEFAULT NULL
+  `id_admin` int(11) NOT NULL,
+  `fk_utente` int(11) NOT NULL,
+  `livello_admin` varchar(50) NOT NULL DEFAULT 'admin',
+  `data_creazione` datetime NOT NULL DEFAULT current_timestamp(),
+  `creato_da` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -84,11 +84,11 @@ INSERT INTO `admin` (`id_admin`, `fk_utente`, `livello_admin`, `data_creazione`,
 --
 
 CREATE TABLE `box_oggetto` (
-  `fk_box` int NOT NULL,
-  `fk_oggetto` int NOT NULL,
+  `fk_box` int(11) NOT NULL,
+  `fk_oggetto` int(11) NOT NULL,
   `probabilita` float NOT NULL,
-  `quantita_min` int NOT NULL DEFAULT '1',
-  `quantita_max` int NOT NULL DEFAULT '1'
+  `quantita_min` int(11) NOT NULL DEFAULT 1,
+  `quantita_max` int(11) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -105,15 +105,15 @@ INSERT INTO `box_oggetto` (`fk_box`, `fk_oggetto`, `probabilita`, `quantita_min`
 --
 
 CREATE TABLE `carrello` (
-  `id_carrello` int NOT NULL,
-  `totale` decimal(10,2) NOT NULL DEFAULT '0.00',
-  `fk_utente` int NOT NULL,
-  `data_creazione` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `data_ultima_modifica` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `quantita` bigint NOT NULL,
-  `stato` enum('attivo','checkout','completato','abbandonato') COLLATE utf8mb4_unicode_ci DEFAULT 'attivo',
-  `fk_mystery_box` int DEFAULT NULL,
-  `fk_oggetto` int DEFAULT NULL
+  `id_carrello` int(11) NOT NULL,
+  `totale` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `fk_utente` int(11) NOT NULL,
+  `data_creazione` datetime NOT NULL DEFAULT current_timestamp(),
+  `data_ultima_modifica` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `quantita` bigint(20) NOT NULL,
+  `stato` enum('attivo','checkout','completato','abbandonato') DEFAULT 'attivo',
+  `fk_mystery_box` int(11) DEFAULT NULL,
+  `fk_oggetto` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -173,12 +173,12 @@ DELIMITER ;
 --
 
 CREATE TABLE `carrello_salvato` (
-  `id_salvato` int NOT NULL,
-  `fk_utente` int NOT NULL,
-  `fk_mystery_box` int DEFAULT NULL,
-  `fk_oggetto` int DEFAULT NULL,
-  `quantita` int NOT NULL DEFAULT '1',
-  `data_aggiunta` datetime DEFAULT CURRENT_TIMESTAMP
+  `id_salvato` int(11) NOT NULL,
+  `fk_utente` int(11) NOT NULL,
+  `fk_mystery_box` int(11) DEFAULT NULL,
+  `fk_oggetto` int(11) DEFAULT NULL,
+  `quantita` int(11) NOT NULL DEFAULT 1,
+  `data_aggiunta` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -188,9 +188,9 @@ CREATE TABLE `carrello_salvato` (
 --
 
 CREATE TABLE `carrello_utente` (
-  `fk_carrello` int NOT NULL,
-  `fk_utente` int NOT NULL,
-  `quantita` int NOT NULL DEFAULT '1'
+  `fk_carrello` int(11) NOT NULL,
+  `fk_utente` int(11) NOT NULL,
+  `quantita` int(11) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -200,9 +200,9 @@ CREATE TABLE `carrello_utente` (
 --
 
 CREATE TABLE `categoria_oggetto` (
-  `id_categoria` int NOT NULL,
-  `nome_categoria` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `tipo_oggetto` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
+  `id_categoria` int(11) NOT NULL,
+  `nome_categoria` varchar(50) NOT NULL,
+  `tipo_oggetto` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -229,10 +229,10 @@ INSERT INTO `categoria_oggetto` (`id_categoria`, `nome_categoria`, `tipo_oggetto
 --
 
 CREATE TABLE `classifica` (
-  `id_classifica` int NOT NULL,
-  `nome_classifica` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `tipo_classifica` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `desc_classifica` text COLLATE utf8mb4_unicode_ci NOT NULL
+  `id_classifica` int(11) NOT NULL,
+  `nome_classifica` varchar(100) NOT NULL,
+  `tipo_classifica` varchar(50) NOT NULL,
+  `desc_classifica` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -242,9 +242,9 @@ CREATE TABLE `classifica` (
 --
 
 CREATE TABLE `contenuti_modificabili` (
-  `id_contenuto` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `testo_contenuto` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `data_modifica` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id_contenuto` varchar(50) NOT NULL,
+  `testo_contenuto` mediumtext NOT NULL,
+  `data_modifica` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -252,17 +252,49 @@ CREATE TABLE `contenuti_modificabili` (
 --
 
 INSERT INTO `contenuti_modificabili` (`id_contenuto`, `testo_contenuto`, `data_modifica`) VALUES
-('avviso_promozioni', 'MUVTTTT COMBÀ', '2025-09-06 00:46:30'),
-('community_classifica_desc', 'Sfida gli altri collezionisti e scala la classifica per diventare il numero uno!', '2025-09-06 00:46:30'),
-('community_classifica_titolo', 'Classifica - [EVENTO IN CORSO]', '2025-09-06 00:46:30'),
-('community_collezione_desc', 'Gestisci e mostra le tue carte Pokémon e Yu-Gi-Oh! alla community.', '2025-09-06 00:46:30'),
-('community_collezione_titolo', 'La Mia Collezione, in una veste tutta nuova', '2025-09-06 00:46:30'),
-('community_scambi_desc', 'Scambia le tue carte doppie e completa la tua collezione con altri appassionati.', '2025-09-06 00:46:30'),
-('community_scambi_titolo', 'Scambi di Carte - [PUNTI DOPPI]', '2025-09-06 00:46:30'),
-('testo_benvenuto', 'BOX OMNIA!', '2025-09-06 00:46:30'),
-('titolo_community', 'La Community di BoxOmnia', '2025-09-06 00:46:30'),
-('titolo_funko_pop', 'Novità Funko POP', '2025-09-06 00:46:30'),
-('titolo_mystery_box', 'Nuove Mystery Box', '2025-09-06 00:46:30');
+('about_community_testo', 'Non siamo solo un negozio, siamo una comunità di collezionisti. Crediamo che la passione per gli oggetti di collezionismo sia ancora più bella quando viene condivisa. Per questo, abbiamo creato una sezione dove puoi portare il tuo hobby a un livello completamente nuovo. E ricorda: crescere insieme è bello, ma farlo con <em>rispetto</em> è fondamentale!', '2025-09-06 15:56:04'),
+('about_community_titolo', 'COMMUNITY', '2025-09-06 15:56:04'),
+('about_cosa_troverai_testo', '<em>Mystery Box</em> con oggetti esclusivi e limitati, accessori di alta qualità per fan e collezionisti, <em>Funko POP</em> ufficiali e selezionati con cura. Ogni box è una sorpresa che racconta una storia unica nel mondo del collezionismo. Inoltre non perdere la sezione <em>Community</em>: gestisci le tue carte, scambia e sfida gli altri collezionisti!', '2025-09-06 15:56:04'),
+('about_cosa_troverai_titolo', 'COSA TROVERAI', '2025-09-06 15:56:04'),
+('about_paragrafo_intro', 'Benvenuto nel mondo delle <strong>Mystery Box</strong>, degli accessori e dei <strong>Funko POP</strong> esclusivi! Siamo appassionati di sorprese, collezionismo e momenti indimenticabili. La nostra missione è trasformare ogni acquisto in un\'esperienza unica!', '2025-09-06 15:56:04'),
+('about_storia_testo', 'Tutto è iniziato con la passione per il collezionismo e la voglia di condividere la gioia della sorpresa e gli oggetti trovati. Da allora, abbiamo creato un assortimento di <em>Mystery Box</em>, <em>Funko POP</em> e accessori ispirati a fumetti, anime, videogiochi e cultura pop.', '2025-09-06 15:56:04'),
+('about_storia_titolo', 'LA NOSTRA STORIA', '2025-09-06 15:56:04'),
+('about_titolo_principale', 'Chi Siamo', '2025-09-06 15:56:04'),
+('about_valori_testo', 'Offriamo solo prodotti originali, con attenzione alla qualità, alla sicurezza e al servizio clienti. Crediamo che ogni box debba raccontare una storia… e che la <em>sorpresa</em> sia metà del divertimento!', '2025-09-06 15:56:04'),
+('about_valori_titolo', 'I NOSTRI VALORI', '2025-09-06 15:56:04'),
+('avviso_promozioni', 'È possibile visionare e approfittare degli sconti solamente nelle novità essendo promozioni a tempo limitate', '2025-09-06 16:20:31'),
+('community_classifica_desc', 'Sfida gli altri collezionisti e scala la classifica per diventare il numero uno!', '2025-09-06 16:20:31'),
+('community_classifica_titolo', 'Classifica', '2025-09-06 16:20:31'),
+('community_collezione_desc', 'Gestisci e mostra le tue carte Pokémon e Yu-Gi-Oh! alla community.', '2025-09-06 16:20:31'),
+('community_collezione_titolo', 'La Mia Collezione', '2025-09-06 16:20:31'),
+('community_scambi_desc', 'Scambia le tue carte doppie e completa la tua collezione con altri appassionati.', '2025-09-06 16:20:31'),
+('community_scambi_titolo', 'Scambi di Carte', '2025-09-06 16:20:31'),
+('faq_a1', '<strong>Assolutamente sì!</strong> La sicurezza dei tuoi dati è la nostra priorità assoluta. Non memorizziamo mai i dati delle tue carte di credito sui nostri server. Tutti i pagamenti vengono elaborati tramite gateway sicuri certificati PCI DSS con crittografia SSL 256-bit. Inoltre, utilizziamo tecnologie di protezione antifrode e monitoraggio 24/7 per garantire la massima sicurezza delle transazioni.', '2025-09-06 15:56:04'),
+('faq_a2', 'Una volta confermato l\'ordine e processato il pagamento, <strong>non è possibile modificare il metodo di pagamento</strong>. Tuttavia, se l\'ordine è ancora in fase di elaborazione (entro 30 minuti dall\'acquisto), puoi contattare immediatamente il nostro supporto clienti che valuterà la possibilità di assistenza. Per ordini futuri, assicurati di selezionare il metodo di pagamento preferito prima di confermare l\'acquisto.', '2025-09-06 15:56:04'),
+('faq_a3', 'In caso di pagamento non riuscito, <strong>riceverai una notifica immediata</strong> via email con i dettagli dell\'errore. Il tuo ordine rimarrà in sospeso per 24 ore, durante le quali potrai accedere al tuo account e riprovare il pagamento con lo stesso o un diverso metodo. Se il problema persiste, verifica i dati della carta, il saldo disponibile o contatta la tua banca. Il nostro supporto è sempre disponibile per assistenza.', '2025-09-06 15:56:04'),
+('faq_a4', 'Attualmente <strong>non offriamo pagamenti rateali diretti</strong> sul nostro sito. Tuttavia, puoi utilizzare servizi esterni come <strong>PayPal Pay in 4</strong> (se disponibile al checkout), oppure le funzioni di rateizzazione della tua carta di credito offerte dalla tua banca. Molte banche permettono di convertire gli acquisti in rate direttamente dall\'app o dal sito della banca dopo l\'acquisto.', '2025-09-06 15:56:04'),
+('faq_a5', 'I tempi di elaborazione variano per metodo:<ul style=\"margin: 10px 0; padding-left: 20px;\"><li><strong>Carte di credito/debito:</strong> Immediato (max 2-3 minuti)</li><li><strong>PayPal:</strong> Immediato</li><li><strong>Stripe:</strong> Immediato</li><li><strong>Bonifico bancario:</strong> 1-3 giorni lavorativi</li></ul><p>Una volta elaborato il pagamento, riceverai immediatamente una conferma via email e l\'ordine entrerà in preparazione.</p>', '2025-09-06 15:56:04'),
+('faq_a6', '<strong>No, tutti i nostri metodi di pagamento sono gratuiti!</strong> Non applichiamo commissioni aggiuntive su nessun metodo di pagamento accettato. Il prezzo che vedi al checkout è quello finale che pagherai. Eventuali commissioni potrebbero essere applicate dalla tua banca o dal fornitore della carta, ma non dipendono da noi.', '2025-09-06 15:56:04'),
+('faq_a7', '<strong>Sì, accettiamo carte prepagate</strong> Visa, Mastercard e American Express, purché siano abilitate per acquisti online e abbiano credito sufficiente per coprire l\'importo dell\'ordine. Assicurati che la carta prepagata sia registrata con i tuoi dati corretti e che sia abilitata per transazioni internazionali se necessario.', '2025-09-06 15:56:04'),
+('faq_a8', 'Per richiedere un rimborso, contatta il nostro <strong>servizio clienti entro 14 giorni</strong> dall\'acquisto. I rimborsi vengono elaborati utilizzando lo stesso metodo di pagamento utilizzato per l\'acquisto:<ul style=\"margin: 10px 0; padding-left: 20px;\"><li><strong>Carte di credito/debito:</strong> 3-5 giorni lavorativi</li><li><strong>PayPal:</strong> 1-2 giorni lavorativi</li><li><strong>Bonifico bancario:</strong> 3-7 giorni lavorativi</li></ul><p>Riceverai una conferma via email quando il rimborso sarà stato elaborato.</p>', '2025-09-06 15:56:04'),
+('faq_contatti_testo', 'Il nostro team di supporto è disponibile 7 giorni su 7 per aiutarti con qualsiasi domanda sui pagamenti.', '2025-09-06 15:56:04'),
+('faq_contatti_titolo', 'Non hai trovato la risposta che cercavi?', '2025-09-06 15:56:04'),
+('faq_intro_testo', 'Trova le risposte alle domande più comuni sui nostri metodi di pagamento. Se non trovi quello che cerchi, contatta il nostro supporto clienti.', '2025-09-06 15:56:04'),
+('faq_intro_titolo', 'Centro Assistenza Pagamenti', '2025-09-06 15:56:04'),
+('faq_q1', 'I miei dati di pagamento sono sicuri?', '2025-09-06 15:56:04'),
+('faq_q2', 'Posso modificare il metodo di pagamento dopo aver effettuato l\'ordine?', '2025-09-06 15:56:04'),
+('faq_q3', 'Cosa succede se il pagamento non va a buon fine?', '2025-09-06 15:56:04'),
+('faq_q4', 'Accettate pagamenti rateali?', '2025-09-06 15:56:04'),
+('faq_q5', 'Quanto tempo ci vuole per elaborare il pagamento?', '2025-09-06 15:56:04'),
+('faq_q6', 'Ci sono commissioni aggiuntive sui pagamenti?', '2025-09-06 15:56:04'),
+('faq_q7', 'Posso pagare con carte prepagate?', '2025-09-06 15:56:04'),
+('faq_q8', 'Come posso richiedere un rimborso?', '2025-09-06 15:56:04'),
+('faq_sottotitolo_pagina', 'Domande Frequenti sui Metodi di Pagamento', '2025-09-06 15:56:04'),
+('faq_titolo_pagina', 'FAQ Pagamenti', '2025-09-06 15:56:04'),
+('testo_benvenuto', 'Esplora l\'universo delle Mystery Box, Funko Pop e Carte da Collezione. Trova il tuo prossimo tesoro e unisciti alla community più appassionata del web.', '2025-09-06 16:20:31'),
+('titolo_community', '🤝 La Community di BoxOmnia', '2025-09-06 16:20:31'),
+('titolo_funko_pop', '🎉 Novità Funko POP', '2025-09-06 16:20:31'),
+('titolo_mystery_box', '✨ Nuove Mystery Box', '2025-09-06 16:20:31');
 
 -- --------------------------------------------------------
 
@@ -271,11 +303,11 @@ INSERT INTO `contenuti_modificabili` (`id_contenuto`, `testo_contenuto`, `data_m
 --
 
 CREATE TABLE `fattura` (
-  `id_fattura` int NOT NULL,
-  `tipo` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id_fattura` int(11) NOT NULL,
+  `tipo` varchar(100) NOT NULL,
   `totale_fattura` decimal(10,2) NOT NULL,
   `data_emissione` datetime NOT NULL,
-  `fk_utente` int NOT NULL
+  `fk_utente` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -285,12 +317,12 @@ CREATE TABLE `fattura` (
 --
 
 CREATE TABLE `immagine` (
-  `id_immagine` int NOT NULL,
-  `nome_img` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `descrizione_img` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dimensione` int DEFAULT NULL,
-  `fk_oggetto` int DEFAULT NULL,
-  `fk_mystery_box` int DEFAULT NULL
+  `id_immagine` int(11) NOT NULL,
+  `nome_img` varchar(100) DEFAULT NULL,
+  `descrizione_img` varchar(100) DEFAULT NULL,
+  `dimensione` int(11) DEFAULT NULL,
+  `fk_oggetto` int(11) DEFAULT NULL,
+  `fk_mystery_box` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -422,14 +454,14 @@ INSERT INTO `immagine` (`id_immagine`, `nome_img`, `descrizione_img`, `dimension
 --
 
 CREATE TABLE `indirizzo_spedizione` (
-  `id_indirizzo` int NOT NULL,
-  `via` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `civico` bigint NOT NULL,
-  `cap` bigint NOT NULL,
-  `citta` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `nazione` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `provincia` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `fk_utente` int NOT NULL
+  `id_indirizzo` int(11) NOT NULL,
+  `via` varchar(100) NOT NULL,
+  `civico` bigint(20) NOT NULL,
+  `cap` bigint(20) NOT NULL,
+  `citta` varchar(100) NOT NULL,
+  `nazione` varchar(100) NOT NULL,
+  `provincia` varchar(100) NOT NULL,
+  `fk_utente` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -446,13 +478,13 @@ INSERT INTO `indirizzo_spedizione` (`id_indirizzo`, `via`, `civico`, `cap`, `cit
 --
 
 CREATE TABLE `info_ordine` (
-  `id_info_ordine` int NOT NULL,
-  `fk_ordine` int NOT NULL,
-  `fk_box` int DEFAULT NULL,
-  `fk_oggetto` int DEFAULT NULL,
-  `quantita_ordine` int NOT NULL,
+  `id_info_ordine` int(11) NOT NULL,
+  `fk_ordine` int(11) NOT NULL,
+  `fk_box` int(11) DEFAULT NULL,
+  `fk_oggetto` int(11) DEFAULT NULL,
+  `quantita_ordine` int(11) NOT NULL,
   `totale_ordine` decimal(10,2) NOT NULL,
-  `note_ordine` text COLLATE utf8mb4_unicode_ci
+  `note_ordine` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -472,13 +504,13 @@ INSERT INTO `info_ordine` (`id_info_ordine`, `fk_ordine`, `fk_box`, `fk_oggetto`
 --
 
 CREATE TABLE `mystery_box` (
-  `id_box` int NOT NULL,
-  `nome_box` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `desc_box` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id_box` int(11) NOT NULL,
+  `nome_box` varchar(100) NOT NULL,
+  `desc_box` text NOT NULL,
   `prezzo_box` decimal(10,2) NOT NULL,
-  `quantita_box` int NOT NULL,
-  `fk_rarita` int NOT NULL,
-  `fk_categoria_oggetto` int NOT NULL
+  `quantita_box` int(11) NOT NULL,
+  `fk_rarita` int(11) NOT NULL,
+  `fk_categoria_oggetto` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -502,13 +534,37 @@ INSERT INTO `mystery_box` (`id_box`, `nome_box`, `desc_box`, `prezzo_box`, `quan
 -- --------------------------------------------------------
 
 --
+-- Struttura della tabella `notifiche_utente`
+--
+
+CREATE TABLE `notifiche_utente` (
+  `id_notifica` int(11) NOT NULL,
+  `fk_utente` int(11) NOT NULL,
+  `fk_richiesta` int(11) NOT NULL,
+  `titolo` varchar(255) NOT NULL,
+  `messaggio` text NOT NULL,
+  `letta` tinyint(1) DEFAULT 0,
+  `data_notifica` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dump dei dati per la tabella `notifiche_utente`
+--
+
+INSERT INTO `notifiche_utente` (`id_notifica`, `fk_utente`, `fk_richiesta`, `titolo`, `messaggio`, `letta`, `data_notifica`) VALUES
+(1, 1, 1, 'Risposta ricevuta: Richiesta di supporto da Davide Blasioli', 'Hai ricevuto una risposta alla tua richiesta di supporto da Francesco', 1, '2025-09-06 20:31:28'),
+(2, 1, 2, 'Risposta ricevuta: Richiesta di supporto da Davide Blasioli', 'Hai ricevuto una risposta alla tua richiesta di supporto da Francesco', 1, '2025-09-06 21:18:24');
+
+-- --------------------------------------------------------
+
+--
 -- Struttura della tabella `novita_box`
 --
 
 CREATE TABLE `novita_box` (
-  `fk_mystery_box` int NOT NULL,
+  `fk_mystery_box` int(11) NOT NULL,
   `data_novita` datetime NOT NULL,
-  `desc_novita` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `desc_novita` varchar(100) DEFAULT NULL,
   `sconto_novita` decimal(10,0) DEFAULT NULL,
   `fine_novita` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -532,9 +588,9 @@ INSERT INTO `novita_box` (`fk_mystery_box`, `data_novita`, `desc_novita`, `scont
 --
 
 CREATE TABLE `novita_oggetto` (
-  `fk_oggetto` int NOT NULL,
+  `fk_oggetto` int(11) NOT NULL,
   `novita_data` datetime NOT NULL,
-  `novita_desc` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `novita_desc` varchar(100) DEFAULT NULL,
   `novita_sconto` decimal(10,0) DEFAULT NULL,
   `novita_fine` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -561,14 +617,14 @@ INSERT INTO `novita_oggetto` (`fk_oggetto`, `novita_data`, `novita_desc`, `novit
 --
 
 CREATE TABLE `oggetto` (
-  `id_oggetto` int NOT NULL,
-  `nome_oggetto` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `desc_oggetto` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id_oggetto` int(11) NOT NULL,
+  `nome_oggetto` varchar(100) NOT NULL,
+  `desc_oggetto` text NOT NULL,
   `prezzo_oggetto` decimal(10,2) DEFAULT NULL,
-  `quant_oggetto` int DEFAULT NULL,
-  `punto` int DEFAULT NULL,
-  `fk_categoria_oggetto` int NOT NULL,
-  `fk_rarita` int DEFAULT NULL
+  `quant_oggetto` int(11) DEFAULT NULL,
+  `punto` int(11) DEFAULT NULL,
+  `fk_categoria_oggetto` int(11) NOT NULL,
+  `fk_rarita` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -614,7 +670,7 @@ INSERT INTO `oggetto` (`id_oggetto`, `nome_oggetto`, `desc_oggetto`, `prezzo_ogg
 (36, 'Funko POP: Espeon', 'Funko POP da collezione di Espeon, elegante Pokémon Psico, apprezzato per la sua grazia e le abilità predittive straordinarie. Dimensione: 9,5cm', 15.50, 5, NULL, 9, NULL),
 (37, 'Funko POP: Gardevoir', 'Funko POP da collezione di Gardevoir, elegante Pokémon di tipo Psichico/Folletto, noto per la sua grazia e capacità di proteggere il proprio allenatore con poteri psichici potenti. Dimensione: 9,5cm', 15.00, 5, NULL, 9, NULL),
 (38, 'Funko POP: Luxray', 'Funko POP da collezione di Luxray, Pokémon di tipo Elettro, simile a una grossa tigre dai occhi penetranti, famoso per la sua vista acutissima e la forza elettrica che usa in battaglia. Dimensione: 9,5cm', 15.50, 5, NULL, 9, NULL),
-(39, 'Funko POP: Alakazam', 'Funko POP da collezione di Alakazam, Pokémon di tipo Psichico, famoso per il suo intelletto straordinario e i potenti poteri psichici, rappresentato con cucchiai per amplificare la telecinesi. Dimensione: 9,5cm', 15.00, 5, NULL, 9, NULL),
+(39, 'Funko POP: Alakazam', 'Funko POP da collezione di Alakazam, Pokémon di tipo Psichico, famoso per il suo intelletto e i potenti poteri psichici, rappresentato con cucchiai per amplificare la telecinesi. Dimensione: 9,5cm', 15.00, 5, NULL, 9, NULL),
 (40, 'Funko POP: Sylveon', 'Funko POP da collezione di Sylveon, Pokémon di tipo Folletto, noto per il suo aspetto dolce e i nastri che usa per calmare e proteggere gli altri con poteri magici. Dimensione: 9,5cm', 15.50, 5, NULL, 9, NULL),
 (41, 'Funko POP: Horsea', 'Funko POP da collezione di Horsea, Pokémon di tipo Acqua, simile a un piccolo cavalluccio marino, capace di spruzzare getti d\'acqua ad alta pressione per difendersi. Dimensione: 9,5cm', 14.50, 5, NULL, 9, NULL),
 (42, 'Funko POP: Blaziken', 'Funko POP da collezione di Blaziken, Pokémon di tipo Fuoco/Lotta, famoso per la sua forza esplosiva e le potenti tecniche di arti marziali che combina con fiamme avvolgenti. Dimensione: 9,5cm', 14.99, 5, NULL, 9, NULL),
@@ -677,7 +733,7 @@ INSERT INTO `oggetto` (`id_oggetto`, `nome_oggetto`, `desc_oggetto`, `prezzo_ogg
 (99, 'Funko POP: Joey Wheeler', 'Funko Pop da collezione di Joey Wheeler, il leale e coraggioso duellante di Yu-Gi-Oh!, raffigurato con i capelli biondi, la giacca verde e lo sguardo da vero amico di Yugi. Dimensione: 9,5cm.\n', 15.00, 5, NULL, 10, NULL),
 (100, 'Funko POP: Zane Truesdale', 'Funko Pop da collezione di Zane Truesdale, il talentuoso e strategico duellante di Yu-Gi-Oh! GX, raffigurato con la divisa chiara della Duel Academy e lo sguardo concentrato. Dimensione: 9,5cm.\n', 15.00, 5, NULL, 10, NULL),
 (101, 'Funko POP: Ojama Yellow', 'Funko Pop da collezione di Ojama Yellow, il buffo e divertente mostriciattolo di Yu-Gi-Oh!, raffigurato con il corpo giallo, le espressioni comiche e il suo caratteristico sorriso. Dimensione: 9,5cm.\r\n', 15.00, 5, NULL, 10, NULL),
-(102, 'Funko POP: Harpie Lady 3', 'Funko Pop da collezione di Harpie Lady 3, l’elegante guerriera alata di Yu-Gi-Oh!, raffigurata con le piume viola, il costume caratteristico e lo sguardo determinato da duellante temibile. Dimensione: 9,5cm.\r\n', 23.00, 5, NULL, 10, NULL),
+(102, 'Funko POP: Harpie Lady 3', 'Funko Pop da collezione di Harpie Lady 3, guerriera alata di Yu-Gi-Oh!, raffigurata con le piume viola, il costume caratteristico e lo sguardo determinato da duellante temibile. Dimensione: 9,5cm.\n', 23.00, 5, NULL, 10, NULL),
 (103, 'Funko POP: Avian', 'Funko Pop da collezione di Avian, il maestoso mostro alato di Yu-Gi-Oh!, raffigurato con le ali spiegate e il corpo verde pronto al duello. Dimensione: 9,5cm.\n', 35.00, 2, NULL, 10, NULL),
 (104, 'Funko POP: Jinzo e Time Wizard', 'Funko Pop da collezione di Jinzo, il potente duellante meccanico di Yu-Gi-Oh! e Time Wizard, il piccolo ma potente incantatore di Yu-Gi-Oh!. Dimensione: 9,5cm.', 40.00, 3, NULL, 10, NULL),
 (105, 'Funko POP: Harpie\'s Pet Dragon', 'Funko Pop da collezione di Harpie’s Pet Dragon, il drago alato di Yu-Gi-Oh!, raffigurato con le ali, il corpo sinuoso e lo sguardo feroce pronto al duello. Dimensione: 9,5cm.\r\n', 25.00, 5, NULL, 10, NULL);
@@ -689,8 +745,8 @@ INSERT INTO `oggetto` (`id_oggetto`, `nome_oggetto`, `desc_oggetto`, `prezzo_ogg
 --
 
 CREATE TABLE `oggetto_collezione` (
-  `fk_oggetto` int NOT NULL,
-  `numero_carta` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fk_oggetto` int(11) NOT NULL,
+  `numero_carta` varchar(100) NOT NULL,
   `valore_stimato` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -749,9 +805,9 @@ INSERT INTO `oggetto_collezione` (`fk_oggetto`, `numero_carta`, `valore_stimato`
 --
 
 CREATE TABLE `oggetto_utente` (
-  `fk_utente` int NOT NULL,
-  `fk_oggetto` int NOT NULL,
-  `quantita_ogg` int NOT NULL DEFAULT '1'
+  `fk_utente` int(11) NOT NULL,
+  `fk_oggetto` int(11) NOT NULL,
+  `quantita_ogg` int(11) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -760,16 +816,17 @@ CREATE TABLE `oggetto_utente` (
 
 INSERT INTO `oggetto_utente` (`fk_utente`, `fk_oggetto`, `quantita_ogg`) VALUES
 (1, 1, 7),
-(1, 2, 7),
+(1, 2, 6),
 (1, 48, 6),
 (1, 53, 1),
+(1, 65, 25),
 (1, 85, 1),
 (1, 86, 1),
 (7, 1, 4),
-(7, 2, 4),
+(7, 2, 5),
 (7, 48, 1),
 (7, 53, 3),
-(7, 65, 100),
+(7, 65, 75),
 (7, 66, 50),
 (7, 67, 1),
 (7, 76, 1),
@@ -782,13 +839,13 @@ INSERT INTO `oggetto_utente` (`fk_utente`, `fk_oggetto`, `quantita_ogg`) VALUES
 --
 
 CREATE TABLE `ordine` (
-  `id_ordine` int NOT NULL,
-  `data_ordine` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `tracking` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `id_ordine` int(11) NOT NULL,
+  `data_ordine` datetime NOT NULL DEFAULT current_timestamp(),
+  `tracking` varchar(100) DEFAULT NULL,
   `stato_ordine` tinyint(1) NOT NULL,
-  `fk_utente` int NOT NULL,
-  `fk_indirizzo` int NOT NULL,
-  `fk_carrello` int DEFAULT NULL
+  `fk_utente` int(11) NOT NULL,
+  `fk_indirizzo` int(11) NOT NULL,
+  `fk_carrello` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -806,13 +863,13 @@ INSERT INTO `ordine` (`id_ordine`, `data_ordine`, `tracking`, `stato_ordine`, `f
 --
 
 CREATE TABLE `ordine_log` (
-  `id_log` int NOT NULL,
-  `fk_ordine` int NOT NULL,
+  `id_log` int(11) NOT NULL,
+  `fk_ordine` int(11) NOT NULL,
   `stato_precedente` tinyint(1) DEFAULT NULL,
   `stato_nuovo` tinyint(1) NOT NULL,
-  `note` text COLLATE utf8mb4_unicode_ci,
-  `modificato_da` int DEFAULT NULL,
-  `data_modifica` datetime DEFAULT CURRENT_TIMESTAMP
+  `note` text DEFAULT NULL,
+  `modificato_da` int(11) DEFAULT NULL,
+  `data_modifica` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -830,11 +887,11 @@ INSERT INTO `ordine_log` (`id_log`, `fk_ordine`, `stato_precedente`, `stato_nuov
 --
 
 CREATE TABLE `proposta_dettagli` (
-  `id_dettaglio` int NOT NULL,
-  `fk_proposta` int NOT NULL,
-  `fk_oggetto` int NOT NULL,
-  `quantita` int NOT NULL,
-  `tipo_azione` enum('offerta','richiesta') COLLATE utf8mb4_unicode_ci NOT NULL
+  `id_dettaglio` int(11) NOT NULL,
+  `fk_proposta` int(11) NOT NULL,
+  `fk_oggetto` int(11) NOT NULL,
+  `quantita` int(11) NOT NULL,
+  `tipo_azione` enum('offerta','richiesta') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -844,10 +901,10 @@ CREATE TABLE `proposta_dettagli` (
 --
 
 CREATE TABLE `rarita` (
-  `id_rarita` int NOT NULL,
-  `nome_rarita` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `colore` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `ordine` int DEFAULT NULL,
+  `id_rarita` int(11) NOT NULL,
+  `nome_rarita` varchar(100) NOT NULL,
+  `colore` varchar(100) DEFAULT NULL,
+  `ordine` int(11) DEFAULT NULL,
   `probabilita` float DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -866,16 +923,63 @@ INSERT INTO `rarita` (`id_rarita`, `nome_rarita`, `colore`, `ordine`, `probabili
 -- --------------------------------------------------------
 
 --
+-- Struttura della tabella `richieste_supporto`
+--
+
+CREATE TABLE `richieste_supporto` (
+  `id_richiesta` int(11) NOT NULL,
+  `fk_utente` int(11) NOT NULL,
+  `oggetto` varchar(255) NOT NULL,
+  `messaggio` text NOT NULL,
+  `stato` enum('aperta','in_corso','chiusa') DEFAULT 'aperta',
+  `data_creazione` timestamp NOT NULL DEFAULT current_timestamp(),
+  `data_aggiornamento` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `priorita` enum('bassa','normale','alta') DEFAULT 'normale'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dump dei dati per la tabella `richieste_supporto`
+--
+
+INSERT INTO `richieste_supporto` (`id_richiesta`, `fk_utente`, `oggetto`, `messaggio`, `stato`, `data_creazione`, `data_aggiornamento`, `priorita`) VALUES
+(1, 1, 'Richiesta di supporto da Davide Blasioli', 'Nome: Davide Blasioli\nEmail: db@gmail.com\n\nMessaggio:\nHo un problema con un pagamento', 'chiusa', '2025-09-06 20:26:44', '2025-09-06 20:31:28', 'normale'),
+(2, 1, 'Richiesta di supporto da Davide Blasioli', 'Nome: Davide Blasioli\nEmail: db@gmail.com\n\nMessaggio:\nSecondo problema', 'chiusa', '2025-09-06 21:17:46', '2025-09-06 21:18:24', 'normale');
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `risposte_supporto`
+--
+
+CREATE TABLE `risposte_supporto` (
+  `id_risposta` int(11) NOT NULL,
+  `fk_richiesta` int(11) NOT NULL,
+  `fk_admin` int(11) NOT NULL,
+  `messaggio` text NOT NULL,
+  `data_risposta` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dump dei dati per la tabella `risposte_supporto`
+--
+
+INSERT INTO `risposte_supporto` (`id_risposta`, `fk_richiesta`, `fk_admin`, `messaggio`, `data_risposta`) VALUES
+(1, 1, 2, 'Problema risolto!', '2025-09-06 20:31:28'),
+(2, 2, 2, 'Secondo problema risolto!', '2025-09-06 21:18:24');
+
+-- --------------------------------------------------------
+
+--
 -- Struttura della tabella `scambi`
 --
 
 CREATE TABLE `scambi` (
-  `id_scambio` int NOT NULL,
-  `fk_utente_richiedente` int NOT NULL,
-  `fk_utente_offerente` int DEFAULT NULL,
-  `stato_scambio` enum('in_corso','in_attesa','concluso','annullato') COLLATE utf8mb4_unicode_ci DEFAULT 'in_corso',
-  `data_creazione` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `data_modifica` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id_scambio` int(11) NOT NULL,
+  `fk_utente_richiedente` int(11) NOT NULL,
+  `fk_utente_offerente` int(11) DEFAULT NULL,
+  `stato_scambio` enum('in_corso','in_attesa','concluso','annullato') DEFAULT 'in_corso',
+  `data_creazione` timestamp NOT NULL DEFAULT current_timestamp(),
+  `data_modifica` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -896,7 +1000,11 @@ INSERT INTO `scambi` (`id_scambio`, `fk_utente_richiedente`, `fk_utente_offerent
 (11, 1, NULL, 'concluso', '2025-09-05 08:12:32', '2025-09-05 08:13:39'),
 (12, 7, NULL, 'in_corso', '2025-09-05 12:20:24', '2025-09-05 12:20:24'),
 (13, 7, NULL, 'in_corso', '2025-09-05 12:23:23', '2025-09-05 12:23:23'),
-(14, 7, NULL, 'in_corso', '2025-09-05 21:01:46', '2025-09-05 21:01:46');
+(14, 7, NULL, 'in_corso', '2025-09-05 21:01:46', '2025-09-05 21:01:46'),
+(15, 1, NULL, 'in_corso', '2025-09-06 13:50:46', '2025-09-06 13:50:46'),
+(16, 7, NULL, 'in_corso', '2025-09-06 14:06:01', '2025-09-06 14:06:01'),
+(17, 7, NULL, 'concluso', '2025-09-06 14:07:15', '2025-09-06 14:07:47'),
+(18, 1, NULL, 'in_corso', '2025-09-06 14:09:41', '2025-09-06 14:09:41');
 
 -- --------------------------------------------------------
 
@@ -905,11 +1013,11 @@ INSERT INTO `scambi` (`id_scambio`, `fk_utente_richiedente`, `fk_utente_offerent
 --
 
 CREATE TABLE `scambio_offerte` (
-  `id_offerta` int NOT NULL,
-  `fk_scambio` int NOT NULL,
-  `fk_oggetto` int NOT NULL,
-  `quantita_offerta` int NOT NULL,
-  `fk_utente_offerente` int NOT NULL
+  `id_offerta` int(11) NOT NULL,
+  `fk_scambio` int(11) NOT NULL,
+  `fk_oggetto` int(11) NOT NULL,
+  `quantita_offerta` int(11) NOT NULL,
+  `fk_utente_offerente` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -930,7 +1038,11 @@ INSERT INTO `scambio_offerte` (`id_offerta`, `fk_scambio`, `fk_oggetto`, `quanti
 (11, 11, 48, 1, 1),
 (12, 12, 48, 1, 7),
 (13, 13, 48, 1, 7),
-(14, 14, 66, 1, 7);
+(14, 14, 66, 1, 7),
+(15, 15, 48, 1, 1),
+(16, 16, 66, 25, 7),
+(17, 17, 65, 25, 7),
+(18, 18, 48, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -939,11 +1051,11 @@ INSERT INTO `scambio_offerte` (`id_offerta`, `fk_scambio`, `fk_oggetto`, `quanti
 --
 
 CREATE TABLE `scambio_proposte` (
-  `id_proposta` int NOT NULL,
-  `fk_scambio` int NOT NULL,
-  `fk_utente_proponente` int NOT NULL,
-  `stato_proposta` enum('in_attesa','accettata','rifiutata') COLLATE utf8mb4_unicode_ci DEFAULT 'in_attesa',
-  `data_proposta` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `id_proposta` int(11) NOT NULL,
+  `fk_scambio` int(11) NOT NULL,
+  `fk_utente_proponente` int(11) NOT NULL,
+  `stato_proposta` enum('in_attesa','accettata','rifiutata') DEFAULT 'in_attesa',
+  `data_proposta` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -953,10 +1065,10 @@ CREATE TABLE `scambio_proposte` (
 --
 
 CREATE TABLE `scambio_richieste` (
-  `id_richiesta` int NOT NULL,
-  `fk_scambio` int NOT NULL,
-  `fk_oggetto` int NOT NULL,
-  `quantita_richiesta` int NOT NULL
+  `id_richiesta` int(11) NOT NULL,
+  `fk_scambio` int(11) NOT NULL,
+  `fk_oggetto` int(11) NOT NULL,
+  `quantita_richiesta` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -977,7 +1089,11 @@ INSERT INTO `scambio_richieste` (`id_richiesta`, `fk_scambio`, `fk_oggetto`, `qu
 (11, 11, 86, 1),
 (12, 12, 63, 1),
 (13, 13, 63, 1),
-(14, 14, 63, 1);
+(14, 14, 63, 1),
+(15, 15, 68, 1),
+(16, 16, 68, 1),
+(17, 17, 2, 1),
+(18, 18, 48, 1);
 
 -- --------------------------------------------------------
 
@@ -986,9 +1102,9 @@ INSERT INTO `scambio_richieste` (`id_richiesta`, `fk_scambio`, `fk_oggetto`, `qu
 --
 
 CREATE TABLE `titolo` (
-  `id_titolo` int NOT NULL,
-  `nome_titolo` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `descrizione_titolo` text COLLATE utf8mb4_unicode_ci NOT NULL
+  `id_titolo` int(11) NOT NULL,
+  `nome_titolo` varchar(100) NOT NULL,
+  `descrizione_titolo` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -998,8 +1114,8 @@ CREATE TABLE `titolo` (
 --
 
 CREATE TABLE `titolo_utente` (
-  `fk_titolo` int NOT NULL,
-  `fk_utente` int NOT NULL
+  `fk_titolo` int(11) NOT NULL,
+  `fk_utente` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -1009,12 +1125,12 @@ CREATE TABLE `titolo_utente` (
 --
 
 CREATE TABLE `utente` (
-  `id_utente` int NOT NULL,
-  `nome` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `cognome` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `telefono` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `password` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
+  `id_utente` int(11) NOT NULL,
+  `nome` varchar(100) NOT NULL,
+  `cognome` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `telefono` varchar(20) DEFAULT NULL,
+  `password` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -1035,17 +1151,17 @@ INSERT INTO `utente` (`id_utente`, `nome`, `cognome`, `email`, `telefono`, `pass
 -- (Vedi sotto per la vista effettiva)
 --
 CREATE TABLE `vista_ordini_completi` (
-`id_ordine` int
+`id_ordine` int(11)
 ,`data_ordine` datetime
 ,`tracking` varchar(100)
 ,`stato_ordine` tinyint(1)
 ,`stato_nome` varchar(15)
-,`id_utente` int
+,`id_utente` int(11)
 ,`cliente_nome` varchar(201)
 ,`cliente_email` varchar(100)
 ,`cliente_telefono` varchar(20)
 ,`totale_ordine` decimal(10,2)
-,`quantita_articoli` bigint
+,`quantita_articoli` bigint(20)
 ,`stato_carrello` enum('attivo','checkout','completato','abbandonato')
 ,`indirizzo_completo` varchar(351)
 ,`nazione` varchar(100)
@@ -1058,14 +1174,14 @@ CREATE TABLE `vista_ordini_completi` (
 -- (Vedi sotto per la vista effettiva)
 --
 CREATE TABLE `vista_statistiche_dashboard` (
-`utenti_totali` bigint
-,`ordini_oggi` bigint
-,`ordini_in_elaborazione` bigint
+`utenti_totali` bigint(21)
+,`ordini_oggi` bigint(21)
+,`ordini_in_elaborazione` bigint(21)
 ,`fatturato_mese` decimal(32,2)
-,`carrelli_attivi` bigint
+,`carrelli_attivi` bigint(21)
 ,`valore_carrelli_attivi` decimal(32,2)
-,`mystery_box_disponibili` bigint
-,`oggetti_disponibili` bigint
+,`mystery_box_disponibili` bigint(21)
+,`oggetti_disponibili` bigint(21)
 );
 
 -- --------------------------------------------------------
@@ -1075,11 +1191,11 @@ CREATE TABLE `vista_statistiche_dashboard` (
 --
 
 CREATE TABLE `wishlist` (
-  `id_wishlist` int NOT NULL,
-  `fk_utente` int NOT NULL,
-  `fk_oggetto` int DEFAULT NULL,
-  `fk_box` int DEFAULT NULL,
-  `data_aggiunta` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+  `id_wishlist` int(11) NOT NULL,
+  `fk_utente` int(11) NOT NULL,
+  `fk_oggetto` int(11) DEFAULT NULL,
+  `fk_box` int(11) DEFAULT NULL,
+  `data_aggiunta` timestamp NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -1089,7 +1205,7 @@ CREATE TABLE `wishlist` (
 --
 DROP TABLE IF EXISTS `vista_ordini_completi`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_ordini_completi`  AS SELECT `o`.`id_ordine` AS `id_ordine`, `o`.`data_ordine` AS `data_ordine`, `o`.`tracking` AS `tracking`, `o`.`stato_ordine` AS `stato_ordine`, (case when (`o`.`stato_ordine` = 0) then 'In elaborazione' when (`o`.`stato_ordine` = 1) then 'Spedito' when (`o`.`stato_ordine` = 2) then 'Consegnato' when (`o`.`stato_ordine` = 3) then 'Annullato' when (`o`.`stato_ordine` = 4) then 'Rimborsato' else 'Sconosciuto' end) AS `stato_nome`, `u`.`id_utente` AS `id_utente`, concat(`u`.`nome`,' ',`u`.`cognome`) AS `cliente_nome`, `u`.`email` AS `cliente_email`, `u`.`telefono` AS `cliente_telefono`, `c`.`totale` AS `totale_ordine`, `c`.`quantita` AS `quantita_articoli`, `c`.`stato` AS `stato_carrello`, concat('Via ',`i`.`via`,' ',`i`.`civico`,', ',`i`.`cap`,' ',`i`.`citta`,' (',`i`.`provincia`,')') AS `indirizzo_completo`, `i`.`nazione` AS `nazione` FROM (((`ordine` `o` join `utente` `u` on((`o`.`fk_utente` = `u`.`id_utente`))) left join `carrello` `c` on((`o`.`fk_carrello` = `c`.`id_carrello`))) join `indirizzo_spedizione` `i` on((`o`.`fk_indirizzo` = `i`.`id_indirizzo`))) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_ordini_completi`  AS SELECT `o`.`id_ordine` AS `id_ordine`, `o`.`data_ordine` AS `data_ordine`, `o`.`tracking` AS `tracking`, `o`.`stato_ordine` AS `stato_ordine`, CASE WHEN `o`.`stato_ordine` = 0 THEN 'In elaborazione' WHEN `o`.`stato_ordine` = 1 THEN 'Spedito' WHEN `o`.`stato_ordine` = 2 THEN 'Consegnato' WHEN `o`.`stato_ordine` = 3 THEN 'Annullato' WHEN `o`.`stato_ordine` = 4 THEN 'Rimborsato' ELSE 'Sconosciuto' END AS `stato_nome`, `u`.`id_utente` AS `id_utente`, concat(`u`.`nome`,' ',`u`.`cognome`) AS `cliente_nome`, `u`.`email` AS `cliente_email`, `u`.`telefono` AS `cliente_telefono`, `c`.`totale` AS `totale_ordine`, `c`.`quantita` AS `quantita_articoli`, `c`.`stato` AS `stato_carrello`, concat('Via ',`i`.`via`,' ',`i`.`civico`,', ',`i`.`cap`,' ',`i`.`citta`,' (',`i`.`provincia`,')') AS `indirizzo_completo`, `i`.`nazione` AS `nazione` FROM (((`ordine` `o` join `utente` `u` on(`o`.`fk_utente` = `u`.`id_utente`)) left join `carrello` `c` on(`o`.`fk_carrello` = `c`.`id_carrello`)) join `indirizzo_spedizione` `i` on(`o`.`fk_indirizzo` = `i`.`id_indirizzo`)) ;
 
 -- --------------------------------------------------------
 
@@ -1098,7 +1214,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `vista_statistiche_dashboard`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_statistiche_dashboard`  AS SELECT (select count(0) from `utente`) AS `utenti_totali`, (select count(0) from `ordine` where (cast(`ordine`.`data_ordine` as date) = curdate())) AS `ordini_oggi`, (select count(0) from `ordine` where (`ordine`.`stato_ordine` = 0)) AS `ordini_in_elaborazione`, (select ifnull(sum(`c`.`totale`),0) from (`ordine` `o` left join `carrello` `c` on((`o`.`fk_carrello` = `c`.`id_carrello`))) where (date_format(`o`.`data_ordine`,'%Y-%m') = date_format(now(),'%Y-%m'))) AS `fatturato_mese`, (select count(0) from `carrello` where (`carrello`.`stato` = 'attivo')) AS `carrelli_attivi`, (select ifnull(sum(`carrello`.`totale`),0) from `carrello` where (`carrello`.`stato` = 'attivo')) AS `valore_carrelli_attivi`, (select count(0) from `mystery_box` where (`mystery_box`.`quantita_box` > 0)) AS `mystery_box_disponibili`, (select count(0) from `oggetto` where ((`oggetto`.`quant_oggetto` > 0) or (`oggetto`.`quant_oggetto` is null))) AS `oggetti_disponibili` ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_statistiche_dashboard`  AS SELECT (select count(0) from `utente`) AS `utenti_totali`, (select count(0) from `ordine` where cast(`ordine`.`data_ordine` as date) = curdate()) AS `ordini_oggi`, (select count(0) from `ordine` where `ordine`.`stato_ordine` = 0) AS `ordini_in_elaborazione`, (select ifnull(sum(`c`.`totale`),0) from (`ordine` `o` left join `carrello` `c` on(`o`.`fk_carrello` = `c`.`id_carrello`)) where date_format(`o`.`data_ordine`,'%Y-%m') = date_format(current_timestamp(),'%Y-%m')) AS `fatturato_mese`, (select count(0) from `carrello` where `carrello`.`stato` = 'attivo') AS `carrelli_attivi`, (select ifnull(sum(`carrello`.`totale`),0) from `carrello` where `carrello`.`stato` = 'attivo') AS `valore_carrelli_attivi`, (select count(0) from `mystery_box` where `mystery_box`.`quantita_box` > 0) AS `mystery_box_disponibili`, (select count(0) from `oggetto` where `oggetto`.`quant_oggetto` > 0 or `oggetto`.`quant_oggetto` is null) AS `oggetti_disponibili` ;
 
 --
 -- Indici per le tabelle scaricate
@@ -1207,6 +1323,15 @@ ALTER TABLE `mystery_box`
   ADD KEY `fk_categoria_oggetto_mystery_box` (`fk_categoria_oggetto`);
 
 --
+-- Indici per le tabelle `notifiche_utente`
+--
+ALTER TABLE `notifiche_utente`
+  ADD PRIMARY KEY (`id_notifica`),
+  ADD KEY `fk_richiesta` (`fk_richiesta`),
+  ADD KEY `idx_utente_letta` (`fk_utente`,`letta`),
+  ADD KEY `idx_data` (`data_notifica`);
+
+--
 -- Indici per le tabelle `novita_box`
 --
 ALTER TABLE `novita_box`
@@ -1269,6 +1394,24 @@ ALTER TABLE `proposta_dettagli`
 --
 ALTER TABLE `rarita`
   ADD PRIMARY KEY (`id_rarita`);
+
+--
+-- Indici per le tabelle `richieste_supporto`
+--
+ALTER TABLE `richieste_supporto`
+  ADD PRIMARY KEY (`id_richiesta`),
+  ADD KEY `idx_utente` (`fk_utente`),
+  ADD KEY `idx_stato` (`stato`),
+  ADD KEY `idx_data` (`data_creazione`);
+
+--
+-- Indici per le tabelle `risposte_supporto`
+--
+ALTER TABLE `risposte_supporto`
+  ADD PRIMARY KEY (`id_risposta`),
+  ADD KEY `idx_richiesta` (`fk_richiesta`),
+  ADD KEY `idx_admin` (`fk_admin`),
+  ADD KEY `idx_data` (`data_risposta`);
 
 --
 -- Indici per le tabelle `scambi`
@@ -1340,133 +1483,151 @@ ALTER TABLE `wishlist`
 -- AUTO_INCREMENT per la tabella `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `id_admin` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_admin` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT per la tabella `carrello`
 --
 ALTER TABLE `carrello`
-  MODIFY `id_carrello` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `id_carrello` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT per la tabella `carrello_salvato`
 --
 ALTER TABLE `carrello_salvato`
-  MODIFY `id_salvato` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id_salvato` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT per la tabella `categoria_oggetto`
 --
 ALTER TABLE `categoria_oggetto`
-  MODIFY `id_categoria` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT per la tabella `classifica`
 --
 ALTER TABLE `classifica`
-  MODIFY `id_classifica` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id_classifica` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT per la tabella `fattura`
 --
 ALTER TABLE `fattura`
-  MODIFY `id_fattura` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id_fattura` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT per la tabella `immagine`
 --
 ALTER TABLE `immagine`
-  MODIFY `id_immagine` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=158;
+  MODIFY `id_immagine` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=158;
 
 --
 -- AUTO_INCREMENT per la tabella `indirizzo_spedizione`
 --
 ALTER TABLE `indirizzo_spedizione`
-  MODIFY `id_indirizzo` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_indirizzo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT per la tabella `info_ordine`
 --
 ALTER TABLE `info_ordine`
-  MODIFY `id_info_ordine` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id_info_ordine` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT per la tabella `mystery_box`
 --
 ALTER TABLE `mystery_box`
-  MODIFY `id_box` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id_box` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT per la tabella `notifiche_utente`
+--
+ALTER TABLE `notifiche_utente`
+  MODIFY `id_notifica` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT per la tabella `oggetto`
 --
 ALTER TABLE `oggetto`
-  MODIFY `id_oggetto` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=106;
+  MODIFY `id_oggetto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=106;
 
 --
 -- AUTO_INCREMENT per la tabella `ordine`
 --
 ALTER TABLE `ordine`
-  MODIFY `id_ordine` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id_ordine` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT per la tabella `ordine_log`
 --
 ALTER TABLE `ordine_log`
-  MODIFY `id_log` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT per la tabella `proposta_dettagli`
 --
 ALTER TABLE `proposta_dettagli`
-  MODIFY `id_dettaglio` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id_dettaglio` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT per la tabella `rarita`
 --
 ALTER TABLE `rarita`
-  MODIFY `id_rarita` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_rarita` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT per la tabella `richieste_supporto`
+--
+ALTER TABLE `richieste_supporto`
+  MODIFY `id_richiesta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT per la tabella `risposte_supporto`
+--
+ALTER TABLE `risposte_supporto`
+  MODIFY `id_risposta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT per la tabella `scambi`
 --
 ALTER TABLE `scambi`
-  MODIFY `id_scambio` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id_scambio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT per la tabella `scambio_offerte`
 --
 ALTER TABLE `scambio_offerte`
-  MODIFY `id_offerta` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id_offerta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT per la tabella `scambio_proposte`
 --
 ALTER TABLE `scambio_proposte`
-  MODIFY `id_proposta` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id_proposta` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT per la tabella `scambio_richieste`
 --
 ALTER TABLE `scambio_richieste`
-  MODIFY `id_richiesta` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id_richiesta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT per la tabella `titolo`
 --
 ALTER TABLE `titolo`
-  MODIFY `id_titolo` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id_titolo` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT per la tabella `utente`
 --
 ALTER TABLE `utente`
-  MODIFY `id_utente` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_utente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT per la tabella `wishlist`
 --
 ALTER TABLE `wishlist`
-  MODIFY `id_wishlist` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id_wishlist` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Limiti per le tabelle scaricate
@@ -1544,6 +1705,13 @@ ALTER TABLE `mystery_box`
   ADD CONSTRAINT `fk_rarita_mystery_box` FOREIGN KEY (`fk_rarita`) REFERENCES `rarita` (`id_rarita`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Limiti per la tabella `notifiche_utente`
+--
+ALTER TABLE `notifiche_utente`
+  ADD CONSTRAINT `notifiche_utente_ibfk_1` FOREIGN KEY (`fk_utente`) REFERENCES `utente` (`id_utente`) ON DELETE CASCADE,
+  ADD CONSTRAINT `notifiche_utente_ibfk_2` FOREIGN KEY (`fk_richiesta`) REFERENCES `richieste_supporto` (`id_richiesta`) ON DELETE CASCADE;
+
+--
 -- Limiti per la tabella `novita_box`
 --
 ALTER TABLE `novita_box`
@@ -1596,6 +1764,19 @@ ALTER TABLE `ordine_log`
 ALTER TABLE `proposta_dettagli`
   ADD CONSTRAINT `proposta_dettagli_ibfk_1` FOREIGN KEY (`fk_proposta`) REFERENCES `scambio_proposte` (`id_proposta`) ON DELETE CASCADE,
   ADD CONSTRAINT `proposta_dettagli_ibfk_2` FOREIGN KEY (`fk_oggetto`) REFERENCES `oggetto` (`id_oggetto`);
+
+--
+-- Limiti per la tabella `richieste_supporto`
+--
+ALTER TABLE `richieste_supporto`
+  ADD CONSTRAINT `richieste_supporto_ibfk_1` FOREIGN KEY (`fk_utente`) REFERENCES `utente` (`id_utente`) ON DELETE CASCADE;
+
+--
+-- Limiti per la tabella `risposte_supporto`
+--
+ALTER TABLE `risposte_supporto`
+  ADD CONSTRAINT `risposte_supporto_ibfk_1` FOREIGN KEY (`fk_richiesta`) REFERENCES `richieste_supporto` (`id_richiesta`) ON DELETE CASCADE,
+  ADD CONSTRAINT `risposte_supporto_ibfk_2` FOREIGN KEY (`fk_admin`) REFERENCES `utente` (`id_utente`) ON DELETE CASCADE;
 
 --
 -- Limiti per la tabella `scambi`
