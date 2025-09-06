@@ -182,8 +182,8 @@ $query = "
         CONCAT(u.nome, ' ', u.cognome) as cliente_nome,
         u.email as cliente_email,
         u.telefono as cliente_telefono,
-        IFNULL(c.totale, 0) as totale,
-        IFNULL(c.quantita, 0) as quantita_articoli,
+        COALESCE(c.totale, 0) as totale,
+        COALESCE(c.quantita, 0) as quantita_articoli,
         CONCAT('Via ', i.via, ' ', i.civico, ', ', i.cap, ' ', i.citta, ' (', i.provincia, ')') as indirizzo,
         CASE 
             WHEN o.stato_ordine = 0 THEN 'In elaborazione'
@@ -215,28 +215,45 @@ while ($row = $result->fetch_assoc()) {
     $ordini[] = $row;
 }
 
-// Statistiche
+// Statistiche CORRETTE
 $stats = [];
+
+// 1. Ordini in elaborazione
 $result = $conn->query("SELECT COUNT(*) as total FROM ordine WHERE stato_ordine = 0");
 $stats['in_elaborazione'] = $result->fetch_assoc()['total'];
 
+// 2. Ordini di oggi
 $result = $conn->query("SELECT COUNT(*) as total FROM ordine WHERE DATE(data_ordine) = CURDATE()");
 $stats['ordini_oggi'] = $result->fetch_assoc()['total'];
 
+// 3. Fatturato mensile REALE (da carrelli completati)
+$currentMonth = date('Y-m');
 $result = $conn->query("
-    SELECT COALESCE(SUM(totale_fattura), 0) as total 
-    FROM fattura 
-    WHERE DATE_FORMAT(data_emissione, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
+    SELECT COALESCE(SUM(c.totale), 0) as total 
+    FROM carrello c
+    JOIN ordine o ON c.id_carrello = o.fk_carrello
+    WHERE c.stato IN ('completato', 'checkout')
+    AND DATE_FORMAT(o.data_ordine, '%Y-%m') = '$currentMonth'
+    AND o.stato_ordine NOT IN (3, 4)
 ");
-$fatturato_centesimi = $result->fetch_assoc()['total'];
-$stats['fatturato_mese'] = $fatturato_centesimi;
+$stats['fatturato_mese'] = $result->fetch_assoc()['total'];
 
-// Statistiche carrelli per stato
+// 4. Fallback su fatture se carrelli non collegati
+if ($stats['fatturato_mese'] <= 0) {
+    $result = $conn->query("
+        SELECT COALESCE(SUM(totale_fattura), 0) as total 
+        FROM fattura 
+        WHERE DATE_FORMAT(data_emissione, '%Y-%m') = '$currentMonth'
+    ");
+    $stats['fatturato_mese'] = $result->fetch_assoc()['total'];
+}
+
+// 5. Statistiche carrelli per stato
 $result = $conn->query("
     SELECT 
         stato,
         COUNT(*) as count,
-        SUM(totale) as totale
+        COALESCE(SUM(totale), 0) as totale
     FROM carrello 
     WHERE stato IS NOT NULL
     GROUP BY stato
@@ -248,6 +265,21 @@ while ($row = $result->fetch_assoc()) {
             'totale' => $row['totale']
     ];
 }
+
+// 6. Statistiche aggiuntive
+$result = $conn->query("
+    SELECT 
+        COUNT(DISTINCT o.id_ordine) as ordini_totali,
+        COALESCE(AVG(c.totale), 0) as valore_medio,
+        MAX(c.totale) as ordine_massimo,
+        COUNT(DISTINCT o.fk_utente) as clienti_unici
+    FROM ordine o
+    LEFT JOIN carrello c ON o.fk_carrello = c.id_carrello
+    WHERE DATE_FORMAT(o.data_ordine, '%Y-%m') = '$currentMonth'
+    AND o.stato_ordine NOT IN (3, 4)
+");
+$extra_stats = $result->fetch_assoc();
+$stats = array_merge($stats, $extra_stats);
 
 // Dettaglio ordine se richiesto
 $dettaglio_ordine = null;
@@ -262,8 +294,8 @@ if ($action === 'detail' && $orderId > 0) {
             u.email as cliente_email,
             u.telefono as cliente_telefono,
             u.id_utente,
-            IFNULL(c.totale, 0) as totale,
-            IFNULL(c.quantita, 0) as quantita_totale,
+            COALESCE(c.totale, 0) as totale,
+            COALESCE(c.quantita, 0) as quantita_totale,
             CONCAT('Via ', i.via, ' ', i.civico, ', ', i.cap, ' ', i.citta, ' (', i.provincia, ') - ', i.nazione) as indirizzo_completo
         FROM ordine o
         JOIN utente u ON o.fk_utente = u.id_utente
@@ -372,6 +404,18 @@ $conn->close();
         .status-2 { background-color: #28a745; color: #fff; }
         .status-3 { background-color: #dc3545; color: #fff; }
         .status-4 { background-color: #6c757d; color: #fff; }
+
+        .stats-card-enhanced {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stats-card-enhanced:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
     </style>
 </head>
 <body>
@@ -390,7 +434,7 @@ $conn->close();
             </nav>
         </div>
         <div class="col-md-4 text-end">
-            <?php if ($stats['carrelli_per_stato']['attivo']['count'] ?? 0 > 0): ?>
+            <?php if (($stats['carrelli_per_stato']['attivo']['count'] ?? 0) > 0): ?>
                 <div class="dropdown">
                     <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
                         <i class="bi bi-gear"></i> Azioni
@@ -422,42 +466,97 @@ $conn->close();
         </div>
     <?php endif; ?>
 
-    <!-- Statistiche -->
+    <!-- Statistiche CORRETTE -->
     <div class="row mb-4">
         <div class="col-md-3">
-            <div class="card text-center">
+            <div class="card stats-card-enhanced text-center">
                 <div class="card-body">
-                    <h5 class="card-title">In Elaborazione</h5>
-                    <p class="card-text display-6"><?php echo $stats['in_elaborazione']; ?></p>
+                    <div class="d-flex align-items-center justify-content-center mb-2">
+                        <i class="bi bi-hourglass-split text-warning fs-2 me-2"></i>
+                        <div>
+                            <h4 class="fw-bold mb-0"><?php echo $stats['in_elaborazione']; ?></h4>
+                            <small class="text-muted">In Elaborazione</small>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card text-center">
+            <div class="card stats-card-enhanced text-center">
                 <div class="card-body">
-                    <h5 class="card-title">Ordini Oggi</h5>
-                    <p class="card-text display-6"><?php echo $stats['ordini_oggi']; ?></p>
+                    <div class="d-flex align-items-center justify-content-center mb-2">
+                        <i class="bi bi-calendar-check text-success fs-2 me-2"></i>
+                        <div>
+                            <h4 class="fw-bold mb-0"><?php echo $stats['ordini_oggi']; ?></h4>
+                            <small class="text-muted">Ordini Oggi</small>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card text-center">
+            <div class="card stats-card-enhanced text-center">
                 <div class="card-body">
-                    <h5 class="card-title">Fatturato Mese</h5>
-                    <p class="card-text display-6">€<?php echo number_format($stats['fatturato_mese'], 2); ?></p>
+                    <div class="d-flex align-items-center justify-content-center mb-2">
+                        <i class="bi bi-currency-euro text-primary fs-2 me-2"></i>
+                        <div>
+                            <h4 class="fw-bold mb-0">€<?php echo number_format($stats['fatturato_mese'], 2); ?></h4>
+                            <small class="text-muted">Fatturato <?php echo date('M Y'); ?></small>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card text-center">
+            <div class="card stats-card-enhanced text-center">
                 <div class="card-body">
-                    <h5 class="card-title">Carrelli Attivi</h5>
-                    <p class="card-text display-6">
-                        <?php echo $stats['carrelli_per_stato']['attivo']['count'] ?? 0; ?>
-                    </p>
-                    <small class="text-muted">
-                        €<?php echo number_format($stats['carrelli_per_stato']['attivo']['totale'] ?? 0, 2); ?>
-                    </small>
+                    <div class="d-flex align-items-center justify-content-center mb-2">
+                        <i class="bi bi-people text-info fs-2 me-2"></i>
+                        <div>
+                            <h4 class="fw-bold mb-0"><?php echo $stats['clienti_unici'] ?? 0; ?></h4>
+                            <small class="text-muted">Clienti Unici</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiche aggiuntive -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-graph-up me-2"></i>
+                        Riepilogo Mensile - <?php echo date('F Y'); ?>
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="border-end">
+                                <h5 class="text-primary mb-1"><?php echo $stats['ordini_totali'] ?? 0; ?></h5>
+                                <small class="text-muted">Ordini Totali</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="border-end">
+                                <h5 class="text-success mb-1">€<?php echo number_format($stats['valore_medio'] ?? 0, 2); ?></h5>
+                                <small class="text-muted">Valore Medio Ordine</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="border-end">
+                                <h5 class="text-warning mb-1">€<?php echo number_format($stats['ordine_massimo'] ?? 0, 2); ?></h5>
+                                <small class="text-muted">Ordine Massimo</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <h5 class="text-info mb-1"><?php echo ($stats['carrelli_per_stato']['attivo']['count'] ?? 0); ?></h5>
+                            <small class="text-muted">Carrelli Attivi</small>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

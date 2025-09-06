@@ -73,7 +73,6 @@ body {
 #crud-operations h2 {
     color: var(--dark-text);
 }
-
 .crud-card {
     transition: transform .2s, box-shadow .2s;
 }

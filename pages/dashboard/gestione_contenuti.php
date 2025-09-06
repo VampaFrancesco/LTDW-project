@@ -449,7 +449,7 @@ $sezioni = getSezioniConfig($sezione_corrente);
 
         <nav aria-label="breadcrumb" class="mt-2">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="../dashboard/">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
                 <li class="breadcrumb-item"><a href="./gestione_contenuti.php">Gestione Contenuti</a></li>
                 <li class="breadcrumb-item active" aria-current="page"><?= ucfirst($sezione_corrente); ?></li>
             </ol>
