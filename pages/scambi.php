@@ -308,6 +308,9 @@ function getScambiDisponibili($conn, $user_id) {
 // Query per ottenere i propri scambi
 function getMieiScambi($conn, $user_id) {
     $sql = "SELECT s.*, 
+                   u.nome,
+                   u.email,
+                   u.telefono,
                    GROUP_CONCAT(CONCAT(o.nome_oggetto, ' (', sr.quantita_richiesta, ')') SEPARATOR ', ') as richieste,
                    GROUP_CONCAT(CONCAT(o2.nome_oggetto, ' (', so.quantita_offerta, ')') SEPARATOR ', ') as offerte
             FROM scambi s
@@ -315,12 +318,13 @@ function getMieiScambi($conn, $user_id) {
             LEFT JOIN oggetto o ON sr.fk_oggetto = o.id_oggetto
             LEFT JOIN scambio_offerte so ON s.id_scambio = so.fk_scambio
             LEFT JOIN oggetto o2 ON so.fk_oggetto = o2.id_oggetto
+            JOIN utente u ON u.id_utente = CASE WHEN s.fk_utente_richiedente = ? THEN COALESCE(s.fk_utente_offerente, -1) ELSE s.fk_utente_richiedente END
             WHERE s.fk_utente_richiedente = ? OR s.fk_utente_offerente = ?
             GROUP BY s.id_scambio
             ORDER BY s.data_creazione DESC";
     
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ii", $user_id, $user_id);
+    $stmt->bind_param("iii", $user_id, $user_id, $user_id);
     $stmt->execute();
     $result = $stmt->get_result();
     return $result->fetch_all(MYSQLI_ASSOC);
@@ -355,7 +359,7 @@ $conn->close();
             <!-- Sezione Crea Scambio -->
             <div class="scambi-section-card mb-5">
                 <div class="scambi-section-header">
-                    <h2><i class="fas fa-plus-circle me-2"></i>Crea Scambio</h2>
+                    <h2><i class="bi bi-plus-circle me-2"></i>Crea Scambio</h2>
                 </div>
                 
                 <form method="POST" class="scambi-form">
@@ -461,7 +465,7 @@ $conn->close();
                     
                     <div class="text-center">
                         <button type="submit" class="btn btn-primary btn-lg scambi-custom-btn">
-                            <i class="fas fa-handshake me-2"></i>Crea Scambio
+                            <i class="bi bi-handshake me-2"></i>Crea Scambio
                         </button>
                     </div>
                 </form>
@@ -470,7 +474,7 @@ $conn->close();
             <!-- Sezione Scambi Disponibili -->
             <div class="scambi-section-card mb-5">
                 <div class="scambi-section-header">
-                    <h2><i class="fas fa-store me-2"></i>Scambi Disponibili</h2>
+                    <h2><i class="bi bi-store me-2"></i>Scambi Disponibili</h2>
                 </div>
                 
                 <div class="scambi-grid">
@@ -505,7 +509,7 @@ $conn->close();
                                     <input type="hidden" name="action" value="accetta_scambio">
                                     <input type="hidden" name="id_scambio" value="<?= $scambio['id_scambio'] ?>">
                                     <button type="submit" class="btn btn-success btn-sm">
-                                        <i class="fas fa-check me-1"></i>Accetta
+                                        <i class="bi bi-check me-1"></i>Accetta
                                     </button>
                                 </form>
                             </div>
@@ -514,41 +518,47 @@ $conn->close();
                 </div>
             </div>
             
-            <!-- Sezione I Miei Scambi -->
             <div class="scambi-section-card">
-                <div class="scambi-section-header">
-                    <h2><i class="fas fa-user-tie me-2"></i>I Miei Scambi</h2>
+    <div class="scambi-section-header">
+        <h2><i class="bi bi-user-tie me-2"></i>I Miei Scambi</h2>
+    </div>
+    
+    <div class="scambi-grid">
+        <?php foreach ($miei_scambi as $scambio): ?>
+            <div class="scambi-card scambi-mio-scambio">
+                <div class="scambi-header">
+                    <div class="scambi-stato-badge scambi-stato-<?= $scambio['stato_scambio'] ?>">
+                        <?= ucfirst(str_replace('_', ' ', $scambio['stato_scambio'])) ?>
+                    </div>
+                    <div class="scambi-data-scambio">
+                        <?= date('d/m/Y H:i', strtotime($scambio['data_creazione'])) ?>
+                    </div>
                 </div>
                 
-                <div class="scambi-grid">
-                    <?php foreach ($miei_scambi as $scambio): ?>
-                        <div class="scambi-card scambi-mio-scambio">
-                            <div class="scambi-header">
-                                <div class="scambi-stato-badge scambi-stato-<?= $scambio['stato_scambio'] ?>">
-                                    <?= ucfirst(str_replace('_', ' ', $scambio['stato_scambio'])) ?>
-                                </div>
-                                <div class="scambi-data-scambio">
-                                    <?= date('d/m/Y H:i', strtotime($scambio['data_creazione'])) ?>
-                                </div>
-                            </div>
-                            
-                            <div class="scambi-dettagli">
-                                <?php if (!empty($scambio['richieste'])): ?>
-                                    <div class="mb-2">
-                                        <strong>Richieste:</strong> <?= htmlspecialchars($scambio['richieste']) ?>
-                                    </div>
-                                <?php endif; ?>
-                                
-                                <?php if (!empty($scambio['offerte'])): ?>
-                                    <div class="mb-2">
-                                        <strong>Offerte:</strong> <?= htmlspecialchars($scambio['offerte']) ?>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
+                <div class="scambi-contatti my-2">
+                    <strong>Controparte:</strong> <?= htmlspecialchars($scambio['nome']) ?>
+                    <div><i class="bi bi-envelope me-1"></i> Email: <?= htmlspecialchars($scambio['email']) ?></div>
+                    <?php if (!empty($scambio['telefono'])): ?>
+                        <div><i class="bi bi-phone me-1"></i> Telefono: <?= htmlspecialchars($scambio['telefono']) ?></div>
+                    <?php endif; ?>
+                </div>
+                <div class="scambi-dettagli">
+                    <?php if (!empty($scambio['richieste'])): ?>
+                        <div class="mb-2">
+                            <strong>Richieste:</strong> <?= htmlspecialchars($scambio['richieste']) ?>
                         </div>
-                    <?php endforeach; ?>
+                    <?php endif; ?>
+                    
+                    <?php if (!empty($scambio['offerte'])): ?>
+                        <div class="mb-2">
+                            <strong>Offerte:</strong> <?= htmlspecialchars($scambio['offerte']) ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
+        <?php endforeach; ?>
+    </div>
+</div>
         </div>
     </div>
 </main>
@@ -653,7 +663,7 @@ $conn->close();
             if (submitBtn) {
                 submitBtn.classList.add('scambi-loading');
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creando scambio...';
+                submitBtn.innerHTML = '<i class="bi bi-spinner fa-spin me-2"></i>Creando scambio...';
             }
         });
     }
@@ -665,7 +675,7 @@ $conn->close();
         const alert = document.createElement('div');
         alert.className = `alert alert-${tipo} scambi-alert-custom fade show`;
         alert.innerHTML = `
-            <i class="fas fa-${getIconaAlert(tipo)} me-2"></i>
+            <i class="bi bi-${getIconaAlert(tipo)} me-2"></i>
             ${escHtml(messaggio)}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         `;
