@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Set 06, 2025 alle 23:30
+-- Creato il: Set 07, 2025 alle 12:16
 -- Versione del server: 10.4.32-MariaDB
 -- Versione PHP: 8.2.12
 
@@ -75,7 +75,8 @@ CREATE TABLE `admin` (
 
 INSERT INTO `admin` (`id_admin`, `fk_utente`, `livello_admin`, `data_creazione`, `creato_da`) VALUES
 (2, 2, 'super_admin', '2025-08-06 17:11:58', 2),
-(3, 6, 'super_admin', '2025-08-06 17:33:24', NULL);
+(3, 6, 'super_admin', '2025-08-06 17:33:24', NULL),
+(4, 9, 'super_admin', '2025-09-07 12:13:46', 2);
 
 -- --------------------------------------------------------
 
@@ -165,21 +166,6 @@ CREATE TRIGGER `carrello_before_update` BEFORE UPDATE ON `carrello` FOR EACH ROW
 END
 $$
 DELIMITER ;
-
--- --------------------------------------------------------
-
---
--- Struttura della tabella `carrello_salvato`
---
-
-CREATE TABLE `carrello_salvato` (
-  `id_salvato` int(11) NOT NULL,
-  `fk_utente` int(11) NOT NULL,
-  `fk_mystery_box` int(11) DEFAULT NULL,
-  `fk_oggetto` int(11) DEFAULT NULL,
-  `quantita` int(11) NOT NULL DEFAULT 1,
-  `data_aggiunta` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -295,20 +281,6 @@ INSERT INTO `contenuti_modificabili` (`id_contenuto`, `testo_contenuto`, `data_m
 ('titolo_community', '🤝 La Community di BoxOmnia', '2025-09-06 16:20:31'),
 ('titolo_funko_pop', '🎉 Novità Funko POP', '2025-09-06 16:20:31'),
 ('titolo_mystery_box', '✨ Nuove Mystery Box', '2025-09-06 16:20:31');
-
--- --------------------------------------------------------
-
---
--- Struttura della tabella `fattura`
---
-
-CREATE TABLE `fattura` (
-  `id_fattura` int(11) NOT NULL,
-  `tipo` varchar(100) NOT NULL,
-  `totale_fattura` decimal(10,2) NOT NULL,
-  `data_emissione` datetime NOT NULL,
-  `fk_utente` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -553,7 +525,8 @@ CREATE TABLE `notifiche_utente` (
 
 INSERT INTO `notifiche_utente` (`id_notifica`, `fk_utente`, `fk_richiesta`, `titolo`, `messaggio`, `letta`, `data_notifica`) VALUES
 (1, 1, 1, 'Risposta ricevuta: Richiesta di supporto da Davide Blasioli', 'Hai ricevuto una risposta alla tua richiesta di supporto da Francesco', 1, '2025-09-06 20:31:28'),
-(2, 1, 2, 'Risposta ricevuta: Richiesta di supporto da Davide Blasioli', 'Hai ricevuto una risposta alla tua richiesta di supporto da Francesco', 1, '2025-09-06 21:18:24');
+(2, 1, 2, 'Risposta ricevuta: Richiesta di supporto da Davide Blasioli', 'Hai ricevuto una risposta alla tua richiesta di supporto da Francesco', 1, '2025-09-06 21:18:24'),
+(3, 1, 3, 'Risposta ricevuta: Richiesta di supporto da Davide Blasioli', 'Hai ricevuto una risposta alla tua richiesta di supporto da Davide', 1, '2025-09-07 10:15:03');
 
 -- --------------------------------------------------------
 
@@ -883,20 +856,6 @@ INSERT INTO `ordine_log` (`id_log`, `fk_ordine`, `stato_precedente`, `stato_nuov
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `proposta_dettagli`
---
-
-CREATE TABLE `proposta_dettagli` (
-  `id_dettaglio` int(11) NOT NULL,
-  `fk_proposta` int(11) NOT NULL,
-  `fk_oggetto` int(11) NOT NULL,
-  `quantita` int(11) NOT NULL,
-  `tipo_azione` enum('offerta','richiesta') NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
 -- Struttura della tabella `rarita`
 --
 
@@ -943,7 +902,8 @@ CREATE TABLE `richieste_supporto` (
 
 INSERT INTO `richieste_supporto` (`id_richiesta`, `fk_utente`, `oggetto`, `messaggio`, `stato`, `data_creazione`, `data_aggiornamento`, `priorita`) VALUES
 (1, 1, 'Richiesta di supporto da Davide Blasioli', 'Nome: Davide Blasioli\nEmail: db@gmail.com\n\nMessaggio:\nHo un problema con un pagamento', 'chiusa', '2025-09-06 20:26:44', '2025-09-06 20:31:28', 'normale'),
-(2, 1, 'Richiesta di supporto da Davide Blasioli', 'Nome: Davide Blasioli\nEmail: db@gmail.com\n\nMessaggio:\nSecondo problema', 'chiusa', '2025-09-06 21:17:46', '2025-09-06 21:18:24', 'normale');
+(2, 1, 'Richiesta di supporto da Davide Blasioli', 'Nome: Davide Blasioli\nEmail: db@gmail.com\n\nMessaggio:\nSecondo problema', 'chiusa', '2025-09-06 21:17:46', '2025-09-06 21:18:24', 'normale'),
+(3, 1, 'Richiesta di supporto da Davide Blasioli', 'Nome: Davide Blasioli\nEmail: db@gmail.com\n\nMessaggio:\nTerzo problema!', 'chiusa', '2025-09-07 10:14:38', '2025-09-07 10:15:03', 'normale');
 
 -- --------------------------------------------------------
 
@@ -965,7 +925,8 @@ CREATE TABLE `risposte_supporto` (
 
 INSERT INTO `risposte_supporto` (`id_risposta`, `fk_richiesta`, `fk_admin`, `messaggio`, `data_risposta`) VALUES
 (1, 1, 2, 'Problema risolto!', '2025-09-06 20:31:28'),
-(2, 2, 2, 'Secondo problema risolto!', '2025-09-06 21:18:24');
+(2, 2, 2, 'Secondo problema risolto!', '2025-09-06 21:18:24'),
+(3, 3, 9, 'Problema risolto!', '2025-09-07 10:15:03');
 
 -- --------------------------------------------------------
 
@@ -1047,20 +1008,6 @@ INSERT INTO `scambio_offerte` (`id_offerta`, `fk_scambio`, `fk_oggetto`, `quanti
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `scambio_proposte`
---
-
-CREATE TABLE `scambio_proposte` (
-  `id_proposta` int(11) NOT NULL,
-  `fk_scambio` int(11) NOT NULL,
-  `fk_utente_proponente` int(11) NOT NULL,
-  `stato_proposta` enum('in_attesa','accettata','rifiutata') DEFAULT 'in_attesa',
-  `data_proposta` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
 -- Struttura della tabella `scambio_richieste`
 --
 
@@ -1098,29 +1045,6 @@ INSERT INTO `scambio_richieste` (`id_richiesta`, `fk_scambio`, `fk_oggetto`, `qu
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `titolo`
---
-
-CREATE TABLE `titolo` (
-  `id_titolo` int(11) NOT NULL,
-  `nome_titolo` varchar(100) NOT NULL,
-  `descrizione_titolo` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Struttura della tabella `titolo_utente`
---
-
-CREATE TABLE `titolo_utente` (
-  `fk_titolo` int(11) NOT NULL,
-  `fk_utente` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
 -- Struttura della tabella `utente`
 --
 
@@ -1142,7 +1066,8 @@ INSERT INTO `utente` (`id_utente`, `nome`, `cognome`, `email`, `telefono`, `pass
 (2, 'Francesco', 'Vampa', 'fv@boxomnia.it', NULL, '$2y$10$NXPIRLr5x50X6Do73ySyNuX/JkeMiGkfM2r24MPkovCvCV64WfRWi'),
 (6, 'Admin', 'Box Omnia', 'admin@boxomnia.it', NULL, '$2y$10$GcEqvT2f6DNgRx39AKAfxOZhHVhPsHfu827tVcun2E7DT38XL4H4K'),
 (7, 'Francesco', 'Vampa', 'fv@gmail.com', NULL, '$2y$10$jnyMvJzqLNgYpDiTsjS30uKgnlxjevXomBIgSzv88BdmkTMacuk2e'),
-(8, 'Miriam', 'De Vincentiis', 'md@gmail.com', NULL, '$2y$10$y3mqDs1zMhL/Vq7anyGt6O5L7PWY1cqliPs8aCi04akzjqvoTXQYO');
+(8, 'Miriam', 'De Vincentiis', 'md@gmail.com', NULL, '$2y$10$y3mqDs1zMhL/Vq7anyGt6O5L7PWY1cqliPs8aCi04akzjqvoTXQYO'),
+(9, 'Davide', 'Blasioli', 'db@boxomnia.it', NULL, '$2y$10$MfqKLsQrTmapI2DNPcb00OQRvmcDRCW6Ko4qWow3k1qxEwDLGOk/G');
 
 -- --------------------------------------------------------
 
@@ -1247,15 +1172,6 @@ ALTER TABLE `carrello`
   ADD KEY `idx_utente_stato` (`fk_utente`,`stato`);
 
 --
--- Indici per le tabelle `carrello_salvato`
---
-ALTER TABLE `carrello_salvato`
-  ADD PRIMARY KEY (`id_salvato`),
-  ADD KEY `fk_utente_salvato` (`fk_utente`),
-  ADD KEY `fk_mystery_box_salvato` (`fk_mystery_box`),
-  ADD KEY `fk_oggetto_salvato` (`fk_oggetto`);
-
---
 -- Indici per le tabelle `carrello_utente`
 --
 ALTER TABLE `carrello_utente`
@@ -1279,13 +1195,6 @@ ALTER TABLE `classifica`
 --
 ALTER TABLE `contenuti_modificabili`
   ADD PRIMARY KEY (`id_contenuto`);
-
---
--- Indici per le tabelle `fattura`
---
-ALTER TABLE `fattura`
-  ADD PRIMARY KEY (`id_fattura`),
-  ADD KEY `fk_utente_fatture` (`fk_utente`);
 
 --
 -- Indici per le tabelle `immagine`
@@ -1382,14 +1291,6 @@ ALTER TABLE `ordine_log`
   ADD KEY `fk_admin_log` (`modificato_da`);
 
 --
--- Indici per le tabelle `proposta_dettagli`
---
-ALTER TABLE `proposta_dettagli`
-  ADD PRIMARY KEY (`id_dettaglio`),
-  ADD KEY `fk_proposta` (`fk_proposta`),
-  ADD KEY `fk_oggetto` (`fk_oggetto`);
-
---
 -- Indici per le tabelle `rarita`
 --
 ALTER TABLE `rarita`
@@ -1431,33 +1332,12 @@ ALTER TABLE `scambio_offerte`
   ADD KEY `fk_utente_offerente` (`fk_utente_offerente`);
 
 --
--- Indici per le tabelle `scambio_proposte`
---
-ALTER TABLE `scambio_proposte`
-  ADD PRIMARY KEY (`id_proposta`),
-  ADD KEY `fk_scambio` (`fk_scambio`),
-  ADD KEY `fk_utente_proponente` (`fk_utente_proponente`);
-
---
 -- Indici per le tabelle `scambio_richieste`
 --
 ALTER TABLE `scambio_richieste`
   ADD PRIMARY KEY (`id_richiesta`),
   ADD KEY `fk_scambio` (`fk_scambio`),
   ADD KEY `fk_oggetto` (`fk_oggetto`);
-
---
--- Indici per le tabelle `titolo`
---
-ALTER TABLE `titolo`
-  ADD PRIMARY KEY (`id_titolo`);
-
---
--- Indici per le tabelle `titolo_utente`
---
-ALTER TABLE `titolo_utente`
-  ADD PRIMARY KEY (`fk_titolo`,`fk_utente`),
-  ADD KEY `fk_utente_titolo_utente` (`fk_utente`);
 
 --
 -- Indici per le tabelle `utente`
@@ -1483,19 +1363,13 @@ ALTER TABLE `wishlist`
 -- AUTO_INCREMENT per la tabella `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `id_admin` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_admin` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT per la tabella `carrello`
 --
 ALTER TABLE `carrello`
   MODIFY `id_carrello` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
-
---
--- AUTO_INCREMENT per la tabella `carrello_salvato`
---
-ALTER TABLE `carrello_salvato`
-  MODIFY `id_salvato` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT per la tabella `categoria_oggetto`
@@ -1508,12 +1382,6 @@ ALTER TABLE `categoria_oggetto`
 --
 ALTER TABLE `classifica`
   MODIFY `id_classifica` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT per la tabella `fattura`
---
-ALTER TABLE `fattura`
-  MODIFY `id_fattura` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT per la tabella `immagine`
@@ -1543,7 +1411,7 @@ ALTER TABLE `mystery_box`
 -- AUTO_INCREMENT per la tabella `notifiche_utente`
 --
 ALTER TABLE `notifiche_utente`
-  MODIFY `id_notifica` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_notifica` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT per la tabella `oggetto`
@@ -1564,12 +1432,6 @@ ALTER TABLE `ordine_log`
   MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
--- AUTO_INCREMENT per la tabella `proposta_dettagli`
---
-ALTER TABLE `proposta_dettagli`
-  MODIFY `id_dettaglio` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT per la tabella `rarita`
 --
 ALTER TABLE `rarita`
@@ -1579,13 +1441,13 @@ ALTER TABLE `rarita`
 -- AUTO_INCREMENT per la tabella `richieste_supporto`
 --
 ALTER TABLE `richieste_supporto`
-  MODIFY `id_richiesta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_richiesta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT per la tabella `risposte_supporto`
 --
 ALTER TABLE `risposte_supporto`
-  MODIFY `id_risposta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_risposta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT per la tabella `scambi`
@@ -1600,28 +1462,16 @@ ALTER TABLE `scambio_offerte`
   MODIFY `id_offerta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
--- AUTO_INCREMENT per la tabella `scambio_proposte`
---
-ALTER TABLE `scambio_proposte`
-  MODIFY `id_proposta` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT per la tabella `scambio_richieste`
 --
 ALTER TABLE `scambio_richieste`
   MODIFY `id_richiesta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
--- AUTO_INCREMENT per la tabella `titolo`
---
-ALTER TABLE `titolo`
-  MODIFY `id_titolo` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT per la tabella `utente`
 --
 ALTER TABLE `utente`
-  MODIFY `id_utente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_utente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT per la tabella `wishlist`
@@ -1656,25 +1506,11 @@ ALTER TABLE `carrello`
   ADD CONSTRAINT `fk_utente_carrello` FOREIGN KEY (`fk_utente`) REFERENCES `utente` (`id_utente`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Limiti per la tabella `carrello_salvato`
---
-ALTER TABLE `carrello_salvato`
-  ADD CONSTRAINT `fk_mystery_box_carrello_salvato` FOREIGN KEY (`fk_mystery_box`) REFERENCES `mystery_box` (`id_box`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_oggetto_carrello_salvato` FOREIGN KEY (`fk_oggetto`) REFERENCES `oggetto` (`id_oggetto`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_utente_carrello_salvato` FOREIGN KEY (`fk_utente`) REFERENCES `utente` (`id_utente`) ON DELETE CASCADE;
-
---
 -- Limiti per la tabella `carrello_utente`
 --
 ALTER TABLE `carrello_utente`
   ADD CONSTRAINT `fk_carrello_carrello_box` FOREIGN KEY (`fk_carrello`) REFERENCES `carrello` (`id_carrello`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_mystery_box` FOREIGN KEY (`fk_utente`) REFERENCES `utente` (`id_utente`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Limiti per la tabella `fattura`
---
-ALTER TABLE `fattura`
-  ADD CONSTRAINT `fk_utente_fatture` FOREIGN KEY (`fk_utente`) REFERENCES `utente` (`id_utente`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Limiti per la tabella `immagine`
@@ -1759,13 +1595,6 @@ ALTER TABLE `ordine_log`
   ADD CONSTRAINT `fk_ordine_ordine_log` FOREIGN KEY (`fk_ordine`) REFERENCES `ordine` (`id_ordine`) ON DELETE CASCADE;
 
 --
--- Limiti per la tabella `proposta_dettagli`
---
-ALTER TABLE `proposta_dettagli`
-  ADD CONSTRAINT `proposta_dettagli_ibfk_1` FOREIGN KEY (`fk_proposta`) REFERENCES `scambio_proposte` (`id_proposta`) ON DELETE CASCADE,
-  ADD CONSTRAINT `proposta_dettagli_ibfk_2` FOREIGN KEY (`fk_oggetto`) REFERENCES `oggetto` (`id_oggetto`);
-
---
 -- Limiti per la tabella `richieste_supporto`
 --
 ALTER TABLE `richieste_supporto`
@@ -1794,25 +1623,11 @@ ALTER TABLE `scambio_offerte`
   ADD CONSTRAINT `scambio_offerte_ibfk_3` FOREIGN KEY (`fk_utente_offerente`) REFERENCES `utente` (`id_utente`);
 
 --
--- Limiti per la tabella `scambio_proposte`
---
-ALTER TABLE `scambio_proposte`
-  ADD CONSTRAINT `scambio_proposte_ibfk_1` FOREIGN KEY (`fk_scambio`) REFERENCES `scambi` (`id_scambio`) ON DELETE CASCADE,
-  ADD CONSTRAINT `scambio_proposte_ibfk_2` FOREIGN KEY (`fk_utente_proponente`) REFERENCES `utente` (`id_utente`);
-
---
 -- Limiti per la tabella `scambio_richieste`
 --
 ALTER TABLE `scambio_richieste`
   ADD CONSTRAINT `scambio_richieste_ibfk_1` FOREIGN KEY (`fk_scambio`) REFERENCES `scambi` (`id_scambio`) ON DELETE CASCADE,
   ADD CONSTRAINT `scambio_richieste_ibfk_2` FOREIGN KEY (`fk_oggetto`) REFERENCES `oggetto` (`id_oggetto`);
-
---
--- Limiti per la tabella `titolo_utente`
---
-ALTER TABLE `titolo_utente`
-  ADD CONSTRAINT `fk_titolo_titolo_utente` FOREIGN KEY (`fk_titolo`) REFERENCES `titolo` (`id_titolo`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_utente_titolo_utente` FOREIGN KEY (`fk_utente`) REFERENCES `utente` (`id_utente`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Limiti per la tabella `wishlist`
