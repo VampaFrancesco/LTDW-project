@@ -347,7 +347,7 @@ $conn->close();
     <div>
         <div class="container">
             <div class="scambi-collection-header">
-                <h1 class="fashion_taverage">Centro Scambi</h1>
+                <h1 class="fashion_taital mb-5">Centro Scambi</h1>
             </div>
 
             <?php if (isset($_GET['add_status'])): ?>

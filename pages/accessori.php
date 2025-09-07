@@ -43,7 +43,7 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 // Query per recuperare tutti gli accessori
 $accessori_by_type = [];
-$accessory_types = ['Proteggicarte', 'Porta mazzi', 'Scatole porta carte', 'Plance di gioco'];
+$accessory_types = ['Porta mazzi', 'Scatole porta carte', 'Proteggicarte', 'Plance di gioco'];
 
 foreach ($accessory_types as $type) {
     $sql_accessories = "
@@ -92,7 +92,7 @@ $conn->close();
 
 <main class="background-custom filter-container accessory-section">
     <div class="container">
-        <h1 class="fashion_taital mt-1 mb-5 text-center">Accessori</h1>
+        <h1 class="fashion_taital mt-1 mb-1 text-center">Accessori</h1>
         
         <div class="d-flex justify-content-start align-items-start mb-4">
             <div class="d-flex flex-column align-items-end ms-auto">
