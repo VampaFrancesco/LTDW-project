@@ -395,9 +395,14 @@ $conn->close();
                             </div>
                             <h3 class="fw-bold text-success"><?php echo number_format($stats['ordini_oggi']); ?></h3>
                             <p class="text-muted mb-0">Ordini Oggi</p>
-                            <?php if ($stats['valore_medio_ordine'] > 0): ?>
-                                <small class="text-muted">Media: €<?php echo number_format($stats['valore_medio_ordine'], 2); ?></small>
-                            <?php endif; ?>
+                            <!-- Assicuriamo che ci sia sempre un piccolo testo -->
+                            <small class="text-muted">
+                                <?php if ($stats['valore_medio_ordine'] > 0): ?>
+                                    Media: €<?php echo number_format($stats['valore_medio_ordine'], 2); ?>
+                                <?php else: ?>
+                                    Nessuna media disponibile
+                                <?php endif; ?>
+                            </small>
                         </div>
                     </div>
                 </div>

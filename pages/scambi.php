@@ -295,9 +295,9 @@ function getScambiDisponibili($conn, $user_id) {
                 WHERE sr2.fk_scambio = s.id_scambio
                 AND (ou.quantita_ogg IS NULL OR ou.quantita_ogg < sr2.quantita_richiesta)
             )
-            GROUP BY s.id_scambio
+            GROUP BY s.id_scambio, s.fk_utente_richiedente, s.fk_utente_offerente, s.stato_scambio, s.data_creazione, u.nome, u.email, u.telefono
             ORDER BY s.data_creazione DESC";
-    
+
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ii", $user_id, $user_id);
     $stmt->execute();
@@ -306,23 +306,27 @@ function getScambiDisponibili($conn, $user_id) {
 }
 
 // Query per ottenere i propri scambi
+// Query per ottenere i propri scambi
 function getMieiScambi($conn, $user_id) {
     $sql = "SELECT s.*, 
                    u.nome,
                    u.email,
                    u.telefono,
-                   GROUP_CONCAT(CONCAT(o.nome_oggetto, ' (', sr.quantita_richiesta, ')') SEPARATOR ', ') as richieste,
-                   GROUP_CONCAT(CONCAT(o2.nome_oggetto, ' (', so.quantita_offerta, ')') SEPARATOR ', ') as offerte
+                   GROUP_CONCAT(DISTINCT CONCAT(o.nome_oggetto, ' (', sr.quantita_richiesta, ')') SEPARATOR ', ') as richieste,
+                   GROUP_CONCAT(DISTINCT CONCAT(o2.nome_oggetto, ' (', so.quantita_offerta, ')') SEPARATOR ', ') as offerte
             FROM scambi s
             LEFT JOIN scambio_richieste sr ON s.id_scambio = sr.fk_scambio
             LEFT JOIN oggetto o ON sr.fk_oggetto = o.id_oggetto
             LEFT JOIN scambio_offerte so ON s.id_scambio = so.fk_scambio
             LEFT JOIN oggetto o2 ON so.fk_oggetto = o2.id_oggetto
-            JOIN utente u ON u.id_utente = CASE WHEN s.fk_utente_richiedente = ? THEN COALESCE(s.fk_utente_offerente, -1) ELSE s.fk_utente_richiedente END
+            JOIN utente u ON u.id_utente = CASE 
+                WHEN s.fk_utente_richiedente = ? THEN COALESCE(s.fk_utente_offerente, -1) 
+                ELSE s.fk_utente_richiedente 
+            END
             WHERE s.fk_utente_richiedente = ? OR s.fk_utente_offerente = ?
-            GROUP BY s.id_scambio
+            GROUP BY s.id_scambio, s.fk_utente_richiedente, s.fk_utente_offerente, s.stato_scambio, s.data_creazione, u.nome, u.email, u.telefono
             ORDER BY s.data_creazione DESC";
-    
+
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("iii", $user_id, $user_id, $user_id);
     $stmt->execute();

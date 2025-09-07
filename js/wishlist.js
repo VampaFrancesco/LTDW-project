@@ -82,6 +82,11 @@ function initWishlistPageActions() {
     container.addEventListener('click', function(e) {
         const removeButton = e.target.closest('.btn-remove-wishlist');
         if (removeButton) {
+            // Previeni doppio click immediato
+            if (removeButton.dataset.processing === 'true') {
+                e.preventDefault();
+                return;
+            }
             handleRemoveFromWishlistPage(removeButton);
         }
 
@@ -146,37 +151,92 @@ async function toggleWishlist(button) {
  */
 function handleRemoveFromWishlistPage(button) {
     const wishlistId = button.dataset.wishlistId;
-    const card = button.closest('.col-lg-4'); // Seleziona l'intera colonna per una rimozione pulita
+    const card = button.closest('.col-lg-4');
 
-    if (!wishlistId || !card) return;
+    if (!wishlistId || !card) {
+        console.error('Dati mancanti:', { wishlistId, card });
+        return;
+    }
+
+    // PREVENZIONE DOPPIO CLICK - marca il bottone come in elaborazione
+    if (button.dataset.processing === 'true') {
+        return;
+    }
+    button.dataset.processing = 'true';
+
+    // Disabilita il bottone
+    button.disabled = true;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="spinner-border spinner-border-sm"></i> Rimozione...';
+
+    // PREVENZIONE DOPPIO CLICK - disabilita tutti i bottoni rimuovi nella card
+    const allRemoveButtons = card.querySelectorAll('.btn-remove-wishlist');
+    allRemoveButtons.forEach(btn => {
+        btn.disabled = true;
+        btn.dataset.processing = 'true';
+    });
 
     fetch(`${window.BASE_URL || ''}/action/wishlist_action.php`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
         body: `action=remove&wishlist_id=${wishlistId}`
     })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
-            if (data.success) {
+            if (data.success === true) {
                 showNotification('Prodotto rimosso con successo!', 'success');
 
-                // Animazione di scomparsa e rimozione della card
+                // Rimuovi immediatamente la card dal DOM per prevenire altri click
                 card.style.transition = 'opacity 0.5s, transform 0.5s';
                 card.style.opacity = '0';
                 card.style.transform = 'scale(0.8)';
+                card.style.pointerEvents = 'none'; // Disabilita tutti gli eventi sulla card
+
                 setTimeout(() => {
                     card.remove();
                     updateWishlistCounter(data.wishlist_count);
+
+                    // Controlla se la wishlist è vuota
                     if (document.querySelectorAll('.wishlist-item-card').length === 0) {
-                        location.reload(); // Ricarica per mostrare il messaggio di wishlist vuota
+                        location.reload();
                     }
                 }, 500);
             } else {
+                console.error('Server returned success=false:', data);
                 showNotification(data.message || 'Errore nella rimozione', 'danger');
+
+                // Ripristina il bottone solo in caso di errore reale
+                button.disabled = false;
+                button.innerHTML = originalText;
+                button.dataset.processing = 'false';
+
+                allRemoveButtons.forEach(btn => {
+                    btn.disabled = false;
+                    btn.dataset.processing = 'false';
+                });
             }
         })
         .catch(error => {
+            console.error('Network error:', error);
             showNotification('Errore di rete', 'danger');
+
+            // Ripristina il bottone
+            button.disabled = false;
+            button.innerHTML = originalText;
+            button.dataset.processing = 'false';
+
+            allRemoveButtons.forEach(btn => {
+                btn.disabled = false;
+                btn.dataset.processing = 'false';
+            });
         });
 }
 

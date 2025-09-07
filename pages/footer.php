@@ -36,9 +36,6 @@
 </footer>
 
 <!-- JS -->
-<script src="<>/js/jquery.min.js" defer></script>
-<script src="<>/js/popper.min.js" defer></script>
-<script src="<>/js/bootstrap.bundle.min.js" defer></script>
 <script src="<?= BASE_URL ?>/js/slider-setting.js" defer></script>
 <script src="<?= BASE_URL ?>/js/custom.js" defer></script>
 <script src="<?= BASE_URL ?>/js/register.js" defer></script>
