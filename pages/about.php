@@ -74,9 +74,9 @@ function getContenuto($chiave, $contenuti) {
             <div class="about-content">
 
                 <div class="about-image-section">
-                    <img src="../images/boxomnia_368.png"
+                    <img src="../images/about1.webp"
                          alt="Mystery Box">
-                    <img src="../images/about2.webp"
+                    <img src="../images/about2.jpg"
                          alt="Seconda immagine">
                 </div>
 
