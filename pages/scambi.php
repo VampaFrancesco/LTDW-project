@@ -110,13 +110,13 @@ function accettaScambio(mysqli $conn, int $scambio_id, int $user_id) {
         $richiedente = (int)$scambio['fk_utente_richiedente'];
         $ultimo_proponente = (int)$scambio['ultimo_proponente'];
         
-        // Determina chi Ã¨ il proponente e chi la controparte
+        // Determina chi è il proponente e chi la controparte
         if ($ultimo_proponente === $richiedente) {
-            // Il richiedente originale Ã¨ l'ultimo proponente
+            // Il richiedente originale è l'ultimo proponente
             $proponente = $richiedente;
             $controparte = $user_id; // Chi accetta
         } else {
-            // Qualcun altro Ã¨ diventato proponente
+            // Qualcun altro è diventato proponente
             $proponente = $ultimo_proponente;
             $controparte = ($user_id === $richiedente) ? $richiedente : $ultimo_proponente;
         }
@@ -129,7 +129,7 @@ function accettaScambio(mysqli $conn, int $scambio_id, int $user_id) {
             throw new Exception("Lo scambio non contiene elementi.");
         }
 
-        // Validazioni: solo Carte Singole + disponibilitÃ  sufficiente
+        // Validazioni: solo Carte Singole + disponibilità sufficiente
         foreach ($offerte as $o) {
             validaCartaSingola($conn, (int)$o['fk_oggetto']);
             assertDisponibilita($conn, $proponente, (int)$o['fk_oggetto'], (int)$o['quantita_offerta'], 
@@ -158,9 +158,9 @@ function accettaScambio(mysqli $conn, int $scambio_id, int $user_id) {
             deltaOggettoUtente($conn, $controparte, (int)$r['fk_oggetto'], -(int)$r['quantita_richiesta']);
         }
 
-        // Concludo scambio
-        $stmt = $conn->prepare("UPDATE scambi SET stato_scambio = 'concluso' WHERE id_scambio = ?");
-        $stmt->bind_param("i", $scambio_id);
+        // AGGIUNTA CRUCIALE: Aggiorna fk_utente_offerente e concludi scambio
+        $stmt = $conn->prepare("UPDATE scambi SET stato_scambio = 'concluso', fk_utente_offerente = ? WHERE id_scambio = ?");
+        $stmt->bind_param("ii", $controparte, $scambio_id);
         $stmt->execute();
 
         $conn->commit();
@@ -306,25 +306,38 @@ function getScambiDisponibili($conn, $user_id) {
 }
 
 // Query per ottenere i propri scambi
+// Query per ottenere i propri scambi - VERSIONE DEFINITIVA CORRETTA
 function getMieiScambi($conn, $user_id) {
     $sql = "SELECT s.*, 
                    u.nome,
                    u.email,
                    u.telefono,
-                   GROUP_CONCAT(CONCAT(o.nome_oggetto, ' (', sr.quantita_richiesta, ')') SEPARATOR ', ') as richieste,
-                   GROUP_CONCAT(CONCAT(o2.nome_oggetto, ' (', so.quantita_offerta, ')') SEPARATOR ', ') as offerte
+                   GROUP_CONCAT(DISTINCT CONCAT(o.nome_oggetto, ' (', sr.quantita_richiesta, ')') SEPARATOR ', ') as richieste,
+                   GROUP_CONCAT(DISTINCT CONCAT(o2.nome_oggetto, ' (', so.quantita_offerta, ')') SEPARATOR ', ') as offerte,
+                   CASE 
+                       WHEN s.fk_utente_richiedente = ? AND s.fk_utente_offerente IS NULL THEN 'creatore_in_attesa'
+                       WHEN s.fk_utente_richiedente = ? AND s.fk_utente_offerente IS NOT NULL THEN 'richiedente_con_offerente'
+                       ELSE 'partecipante_offerente'
+                   END as ruolo_utente
             FROM scambi s
             LEFT JOIN scambio_richieste sr ON s.id_scambio = sr.fk_scambio
             LEFT JOIN oggetto o ON sr.fk_oggetto = o.id_oggetto
             LEFT JOIN scambio_offerte so ON s.id_scambio = so.fk_scambio
             LEFT JOIN oggetto o2 ON so.fk_oggetto = o2.id_oggetto
-            JOIN utente u ON u.id_utente = CASE WHEN s.fk_utente_richiedente = ? THEN COALESCE(s.fk_utente_offerente, -1) ELSE s.fk_utente_richiedente END
+            LEFT JOIN utente u ON u.id_utente = CASE 
+                -- Se sono il richiedente e c'è un offerente, mostro l'offerente
+                WHEN s.fk_utente_richiedente = ? AND s.fk_utente_offerente IS NOT NULL THEN s.fk_utente_offerente
+                -- Se sono l'offerente, mostro il richiedente
+                WHEN s.fk_utente_offerente = ? THEN s.fk_utente_richiedente
+                -- Altrimenti NULL (caso creatore_in_attesa)
+                ELSE NULL
+            END
             WHERE s.fk_utente_richiedente = ? OR s.fk_utente_offerente = ?
-            GROUP BY s.id_scambio
+            GROUP BY s.id_scambio, u.id_utente, u.nome, u.email, u.telefono
             ORDER BY s.data_creazione DESC";
     
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("iii", $user_id, $user_id, $user_id);
+    $stmt->bind_param("iiiiii", $user_id, $user_id, $user_id, $user_id, $user_id, $user_id);
     $stmt->execute();
     $result = $stmt->get_result();
     return $result->fetch_all(MYSQLI_ASSOC);
@@ -567,14 +580,12 @@ $conn->close();
 
 <!-- Bootstrap JavaScript necessario per i modal -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
     // Serializzo in JS le liste lato server
     const MIE_CARTE_YGO = <?php echo json_encode($carte_yugioh_utente, JSON_UNESCAPED_UNICODE); ?>;
     const MIE_CARTE_PKM = <?php echo json_encode($carte_pokemon_utente, JSON_UNESCAPED_UNICODE); ?>;
     const TUTTE_YGO = <?php echo json_encode($tutte_carte_yugioh, JSON_UNESCAPED_UNICODE); ?>;
     const TUTTE_PKM = <?php echo json_encode($tutte_carte_pokemon, JSON_UNESCAPED_UNICODE); ?>;
-
     // helper per escape HTML
     function escHtml(s) {
         return String(s === undefined ? '' : s)
@@ -584,7 +595,6 @@ $conn->close();
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
     }
-
     // Funzioni per filtrare le carte
     function filtraCarteOffrire(tipo, searchTerm) {
         const container = document.getElementById(`carte-offrire-${tipo}`);
@@ -603,7 +613,6 @@ $conn->close();
         container.style.opacity = '0.7';
         setTimeout(() => container.style.opacity = '1', 200);
     }
-
     function filtraCarteRicevere(tipo, searchTerm) {
         const container = document.getElementById(`carte-ricevere-${tipo}`);
         if (!container) return;
@@ -621,7 +630,6 @@ $conn->close();
         container.style.opacity = '0.7';
         setTimeout(() => container.style.opacity = '1', 200);
     }
-
     // Funzione per evidenziare carte selezionate
     function evidenziaCarteSelezionate(root = document) {
         const inputs = root.querySelectorAll('.scambi-carta-input:not([data-scambi-bound])');
@@ -642,7 +650,6 @@ $conn->close();
             });
         });
     }
-
     // Funzione per validare il form principale
     function validaFormScambio() {
         const form = document.querySelector('.scambi-form');
@@ -667,7 +674,6 @@ $conn->close();
             }
         });
     }
-
     // Funzione per mostrare alert personalizzati
     function mostrarAlert(messaggio, tipo = 'info') {
         const alertPrecedente = document.querySelector('.scambi-alert-custom');
@@ -698,7 +704,6 @@ $conn->close();
             }
         }, 5000);
     }
-
     function getIconaAlert(tipo) {
         const icone = {
             'success': 'check-circle',
@@ -708,7 +713,6 @@ $conn->close();
         };
         return icone[tipo] || 'info-circle';
     }
-
     // Funzioni di utilitÃ 
     function animaContatori() {
         const contatori = document.querySelectorAll('.scambi-carta-quantita');
@@ -727,7 +731,6 @@ $conn->close();
         });
         contatori.forEach(contatore => observer.observe(contatore));
     }
-
     function animaNumero(elemento, inizio, fine, durata) {
         const incremento = (fine - inizio) / (durata / 16);
         let corrente = inizio;
@@ -741,7 +744,6 @@ $conn->close();
             elemento.textContent = testoOriginale.replace(/\d+/, Math.floor(corrente));
         }, 16);
     }
-
     function aggiungiEffettiHover() {
         const cards = document.querySelectorAll('.scambi-carta-item, .scambi-card');
         cards.forEach(card => {
@@ -753,7 +755,6 @@ $conn->close();
             });
         });
     }
-
     function salvataggiAutomatico() {
         const inputs = document.querySelectorAll('.scambi-carta-input');
         inputs.forEach(input => {
@@ -767,7 +768,6 @@ $conn->close();
             });
         });
     }
-
     function gestisciTabResponsive() {
         const tabs = document.querySelectorAll('.scambi-custom-tabs');
         function checkResponsive() {
@@ -785,7 +785,6 @@ $conn->close();
         window.addEventListener('resize', checkResponsive);
         checkResponsive();
     }
-
     // Inizializzazione
     document.addEventListener('DOMContentLoaded', function() {
         evidenziaCarteSelezionate();

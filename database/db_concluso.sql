@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Set 07, 2025 alle 12:16
+-- Creato il: Set 07, 2025 alle 14:16
 -- Versione del server: 10.4.32-MariaDB
 -- Versione PHP: 8.2.12
 
@@ -954,18 +954,15 @@ INSERT INTO `scambi` (`id_scambio`, `fk_utente_richiedente`, `fk_utente_offerent
 (4, 1, 7, 'concluso', '2025-09-04 20:49:07', '2025-09-04 20:50:05'),
 (5, 1, 7, 'concluso', '2025-09-04 20:55:04', '2025-09-04 20:55:55'),
 (6, 7, 1, 'concluso', '2025-09-04 21:01:35', '2025-09-04 21:02:31'),
-(7, 1, NULL, 'concluso', '2025-09-04 21:40:31', '2025-09-04 21:40:53'),
-(8, 7, NULL, 'concluso', '2025-09-04 21:43:24', '2025-09-04 21:43:40'),
-(9, 7, NULL, 'concluso', '2025-09-04 21:45:28', '2025-09-05 13:40:02'),
-(10, 1, NULL, 'in_corso', '2025-09-05 08:12:22', '2025-09-05 08:12:22'),
-(11, 1, NULL, 'concluso', '2025-09-05 08:12:32', '2025-09-05 08:13:39'),
-(12, 7, NULL, 'in_corso', '2025-09-05 12:20:24', '2025-09-05 12:20:24'),
-(13, 7, NULL, 'in_corso', '2025-09-05 12:23:23', '2025-09-05 12:23:23'),
-(14, 7, NULL, 'in_corso', '2025-09-05 21:01:46', '2025-09-05 21:01:46'),
-(15, 1, NULL, 'in_corso', '2025-09-06 13:50:46', '2025-09-06 13:50:46'),
-(16, 7, NULL, 'in_corso', '2025-09-06 14:06:01', '2025-09-06 14:06:01'),
-(17, 7, NULL, 'concluso', '2025-09-06 14:07:15', '2025-09-06 14:07:47'),
-(18, 1, NULL, 'in_corso', '2025-09-06 14:09:41', '2025-09-06 14:09:41');
+(7, 1, 7, 'concluso', '2025-09-04 21:40:31', '2025-09-07 12:14:50'),
+(8, 7, 1, 'concluso', '2025-09-04 21:43:24', '2025-09-07 12:14:53'),
+(9, 7, 1, 'concluso', '2025-09-04 21:45:28', '2025-09-07 12:14:56'),
+(11, 1, 7, 'concluso', '2025-09-05 08:12:32', '2025-09-07 12:15:01'),
+(17, 7, 1, 'concluso', '2025-09-06 14:07:15', '2025-09-07 12:15:14'),
+(18, 1, 7, 'concluso', '2025-09-06 14:09:41', '2025-09-07 12:15:16'),
+(19, 1, 7, 'concluso', '2025-09-07 10:37:21', '2025-09-07 12:15:18'),
+(20, 1, 7, 'concluso', '2025-09-07 12:06:50', '2025-09-07 12:15:20'),
+(21, 1, 7, 'concluso', '2025-09-07 12:12:16', '2025-09-07 12:14:14');
 
 -- --------------------------------------------------------
 
@@ -995,15 +992,12 @@ INSERT INTO `scambio_offerte` (`id_offerta`, `fk_scambio`, `fk_oggetto`, `quanti
 (7, 7, 48, 1, 1),
 (8, 8, 1, 1, 7),
 (9, 9, 48, 1, 7),
-(10, 10, 48, 1, 1),
 (11, 11, 48, 1, 1),
-(12, 12, 48, 1, 7),
-(13, 13, 48, 1, 7),
-(14, 14, 66, 1, 7),
-(15, 15, 48, 1, 1),
-(16, 16, 66, 25, 7),
 (17, 17, 65, 25, 7),
-(18, 18, 48, 1, 1);
+(18, 18, 48, 1, 1),
+(19, 19, 48, 1, 1),
+(20, 20, 48, 1, 1),
+(21, 21, 48, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -1032,15 +1026,12 @@ INSERT INTO `scambio_richieste` (`id_richiesta`, `fk_scambio`, `fk_oggetto`, `qu
 (7, 7, 53, 1),
 (8, 8, 2, 1),
 (9, 9, 2, 1),
-(10, 10, 86, 1),
 (11, 11, 86, 1),
-(12, 12, 63, 1),
-(13, 13, 63, 1),
-(14, 14, 63, 1),
-(15, 15, 68, 1),
-(16, 16, 68, 1),
 (17, 17, 2, 1),
-(18, 18, 48, 1);
+(18, 18, 48, 1),
+(19, 19, 48, 1),
+(20, 20, 48, 1),
+(21, 21, 48, 1);
 
 -- --------------------------------------------------------
 
@@ -1369,7 +1360,7 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT per la tabella `carrello`
 --
 ALTER TABLE `carrello`
-  MODIFY `id_carrello` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `id_carrello` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
 
 --
 -- AUTO_INCREMENT per la tabella `categoria_oggetto`
@@ -1453,19 +1444,19 @@ ALTER TABLE `risposte_supporto`
 -- AUTO_INCREMENT per la tabella `scambi`
 --
 ALTER TABLE `scambi`
-  MODIFY `id_scambio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id_scambio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT per la tabella `scambio_offerte`
 --
 ALTER TABLE `scambio_offerte`
-  MODIFY `id_offerta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id_offerta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT per la tabella `scambio_richieste`
 --
 ALTER TABLE `scambio_richieste`
-  MODIFY `id_richiesta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id_richiesta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT per la tabella `utente`
@@ -1477,7 +1468,7 @@ ALTER TABLE `utente`
 -- AUTO_INCREMENT per la tabella `wishlist`
 --
 ALTER TABLE `wishlist`
-  MODIFY `id_wishlist` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id_wishlist` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Limiti per le tabelle scaricate

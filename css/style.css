@@ -5293,6 +5293,69 @@ body {
 }
 }
 
+/* Stili per i diversi stati degli scambi */
+.scambi-stato-in_corso {
+    background-color: #ffc107;
+    color: #000;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.scambi-stato-concluso {
+    background-color: #28a745;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.scambi-stato-annullato {
+    background-color: #dc3545;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+/* Stile specifico per scambi creati dall'utente in attesa */
+.scambi-mio-scambio .alert-info {
+    background-color: rgba(13, 202, 240, 0.1);
+    border: 1px solid rgba(13, 202, 240, 0.3);
+    border-radius: 10px;
+    font-size: 0.9em;
+}
+
+/* Animazione per scambi in attesa */
+.scambi-stato-in_corso {
+    animation: scambi-pulse 2s infinite;
+}
+
+@keyframes scambi-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(255, 193, 7, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+    }
+}
+
+/* Bordo diverso per scambi propri */
+.scambi-mio-scambio {
+    border-left: 4px solid var(--secondary-color);
+}
+
+.scambi-mio-scambio:hover {
+    border-left-color: var(--accent-color);
+    transform: translateX(5px);
+}
+
 /* =================================
    CLASSIFICA STYLES
    ================================= */
