@@ -129,7 +129,7 @@ foreach ($available_cards as $card_id => $card) {
         <div class="container">
             <!-- NUOVO LAYOUT: Header unificato con titolo e navigazione -->
             <div class="collection-header">
-                <h1 class="fashion_taverage">Le mie Collezioni</h1>
+                <h1 class="fashion_taital">Le mie Collezioni</h1>
                 <div class="category-nav-filter-container">
                     <a href="#yu-gi-oh-collection" class="btn btn-filter-nav">Yu-Gi-Oh!</a>
                     <a href="#pokemon-collection" class="btn btn-filter-nav">Pokémon</a>

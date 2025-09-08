@@ -30,7 +30,6 @@ try {
 // Contenuti di default (fallback)
 $contenuti_default = [
         'faq_titolo_pagina' => 'FAQ Pagamenti',
-        'faq_sottotitolo_pagina' => 'Domande Frequenti sui Metodi di Pagamento',
         'faq_intro_titolo' => 'Centro Assistenza Pagamenti',
         'faq_intro_testo' => 'Trova le risposte alle domande più comuni sui nostri metodi di pagamento. Se non trovi quello che cerchi, contatta il nostro supporto clienti.',
         'faq_q1' => 'I miei dati di pagamento sono sicuri?',
@@ -70,8 +69,7 @@ function getContenuto($chiave, $contenuti) {
 
             <!-- Header -->
             <div class="page-header">
-                <h1 class="page-title"><?= getContenuto('faq_titolo_pagina', $contenuti); ?></h1>
-                <p class="page-subtitle"><?= getContenuto('faq_sottotitolo_pagina', $contenuti); ?></p>
+                <h1 class="fashion-taital mb-5"><?= getContenuto('faq_titolo_pagina', $contenuti); ?></h1>
             </div>
 
             <!-- FAQ Container -->
@@ -80,7 +78,7 @@ function getContenuto($chiave, $contenuti) {
                 <!-- Intro -->
                 <div class="faq-intro">
                     <div class="faq-intro-icon">❓</div>
-                    <h2 class="faq-intro-title"><?= getContenuto('faq_intro_titolo', $contenuti); ?></h2>
+                    <h1 class="fashion-taital mb-5"><?= getContenuto('faq_intro_titolo', $contenuti); ?></h1>
                     <p class="faq-intro-text">
                         <?= getContenuto('faq_intro_testo', $contenuti); ?>
                     </p>
