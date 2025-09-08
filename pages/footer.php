@@ -36,6 +36,7 @@
 </footer>
 
 <!-- JS -->
+ <script src="<?= BASE_URL ?>/js/slider-setting.js" defer></script>
 <script src="<?= BASE_URL ?>/js/custom.js" defer></script>
 <script src="<?= BASE_URL ?>/js/register.js" defer></script>
 <script src="<?= BASE_URL ?>/js/session_manager.js" defer></script>
