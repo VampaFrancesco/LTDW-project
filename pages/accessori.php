@@ -92,7 +92,7 @@ $conn->close();
 
 <main class="background-custom filter-container accessory-section">
     <div class="container">
-        <h1 class="fashion_taital mt-1 mb-1 text-center">Accessori</h1>
+        <h1 class="fashion_taital mb-5">Accessori</h1>
         
         <div class="d-flex justify-content-start align-items-start mb-4">
             <div class="d-flex flex-column align-items-end ms-auto">
