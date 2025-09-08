@@ -99,7 +99,7 @@ function accettaScambio(mysqli $conn, int $scambio_id, int $user_id) {
     $conn->begin_transaction();
     try {
         // Lock riga scambio
-        $stmt = $conn->prepare("SELECT id_scambio, fk_utente_richiedente, COALESCE(fk_utente_offerente, fk_utente_richiedente) AS ultimo_proponente, stato_scambio
+        $stmt = $conn->prepare("SELECT id_scambio, fk_utente_richiedente, fk_utente_offerente, stato_scambio
                                 FROM scambi WHERE id_scambio = ? FOR UPDATE");
         $stmt->bind_param("i", $scambio_id);
         $stmt->execute();
@@ -108,18 +108,15 @@ function accettaScambio(mysqli $conn, int $scambio_id, int $user_id) {
         if ($scambio['stato_scambio'] !== 'in_corso') throw new Exception("Scambio non accettabile nello stato attuale.");
 
         $richiedente = (int)$scambio['fk_utente_richiedente'];
-        $ultimo_proponente = (int)$scambio['ultimo_proponente'];
         
-        // Determina chi Ã¨ il proponente e chi la controparte
-        if ($ultimo_proponente === $richiedente) {
-            // Il richiedente originale Ã¨ l'ultimo proponente
-            $proponente = $richiedente;
-            $controparte = $user_id; // Chi accetta
-        } else {
-            // Qualcun altro Ã¨ diventato proponente
-            $proponente = $ultimo_proponente;
-            $controparte = ($user_id === $richiedente) ? $richiedente : $ultimo_proponente;
-        }
+        // IMPORTANTE: Aggiorna sempre fk_utente_offerente con chi accetta lo scambio
+        $stmt = $conn->prepare("UPDATE scambi SET fk_utente_offerente = ? WHERE id_scambio = ?");
+        $stmt->bind_param("ii", $user_id, $scambio_id);
+        $stmt->execute();
+        
+        // Determina chi è il proponente e chi la controparte
+        $proponente = $richiedente;  // Chi ha creato lo scambio
+        $controparte = $user_id;     // Chi lo accetta
 
         // Carico liste
         $offerte = fetchOfferte($conn, $scambio_id);   
@@ -129,7 +126,7 @@ function accettaScambio(mysqli $conn, int $scambio_id, int $user_id) {
             throw new Exception("Lo scambio non contiene elementi.");
         }
 
-        // Validazioni: solo Carte Singole + disponibilitÃ  sufficiente
+        // Validazioni: solo Carte Singole + disponibilità sufficiente
         foreach ($offerte as $o) {
             validaCartaSingola($conn, (int)$o['fk_oggetto']);
             assertDisponibilita($conn, $proponente, (int)$o['fk_oggetto'], (int)$o['quantita_offerta'], 
@@ -344,8 +341,6 @@ $miei_scambi = getMieiScambi($conn, $user_id);
 
 $conn->close();
 ?>
-
-<link rel="stylesheet" href="scambi.css">
 
 <main class="background-custom">
     <div>
@@ -568,9 +563,6 @@ $conn->close();
 </main>
 
 <?php include __DIR__ . '/footer.php'; ?>
-
-<!-- Bootstrap JavaScript necessario per i modal -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
     // Serializzo in JS le liste lato server

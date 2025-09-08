@@ -3069,7 +3069,6 @@ img {
 /* Header della pagina */
 .page-header {
     text-align: center;
-    color: white;
     margin-bottom: 40px;
 }
 
@@ -3239,7 +3238,6 @@ img {
     position: relative;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     background-clip: text;
     animation: titleGlow 3s ease-in-out infinite;
 }
@@ -3873,7 +3871,6 @@ img {
     position: relative;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 
@@ -4219,7 +4216,6 @@ img {
     font-weight: 700;
     background: linear-gradient(135deg, var(--scambi-primary-color), var(--scambi-secondary-color));
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     background-clip: text;
     text-shadow: var(--scambi-shadow-light);
     margin-bottom: 2rem;
