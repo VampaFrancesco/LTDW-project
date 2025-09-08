@@ -336,9 +336,6 @@ $conn->close();
                             <i class="bi bi-pencil-fill"></i> Gestisci contenuti
                         </a>
                     </li>
-<li class="nav-item">
-    <a class="nav-link" href="gestione_supporto.php">
-        <i class="bi bi-headset"></i> Supporto Clienti
         <?php
         // Mostra il numero di richieste aperte - con connessione separata
         try {
@@ -368,7 +365,6 @@ $conn->close();
         }
         ?>
     </a>
-</li>
                 </ul>
             </div>
         </nav>
