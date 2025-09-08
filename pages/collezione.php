@@ -281,7 +281,7 @@ foreach ($available_cards as $card_id => $card) {
             </div>
 
             <div class="add-card-section mb-5" id="add-card-section">
-                <h2 class="category-title mb-4">Aggiungi una Nuova Carta</h2>
+                <h2 class="category-title_collezione">Aggiungi una Nuova Carta</h2>
                 <div class="add-card-form-container">
                     <form id="addCardForm" action="<?php echo BASE_URL; ?>/action/agg_carta_collezione.php" method="post">
                         <div class="row">
