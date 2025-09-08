@@ -5,6 +5,11 @@ ob_start();
 require_once __DIR__ . '/../include/session_manager.php';
 require_once __DIR__ . '/../include/config.inc.php';
 
+// ✅ DEFINISCI BASE_URL COME IN LOGIN_ACTION
+if (!defined('BASE_URL')) {
+    define('BASE_URL', '/LTDW-project');
+}
+
 // Inizializza sessione
 SessionManager::startSecureSession();
 
@@ -58,8 +63,9 @@ if (!empty($errors)) {
     SessionManager::set('register_form_data', [
         'nome' => $nome,
         'cognome' => $cognome,
-        'email' => str_ends_with(strtolower($email), '@boxomnia.it') ? '' : $email // Pulisce email @boxomnia.it
+        'email' => str_ends_with(strtolower($email), '@boxomnia.it') ? '' : $email
     ]);
+    ob_end_clean(); // ✅ AGGIUNTO
     header('Location: ' . BASE_URL . '/pages/auth/register.php');
     exit();
 }
@@ -76,6 +82,7 @@ $conn = new mysqli(
 if ($conn->connect_error) {
     error_log("Register - Database connection error: " . $conn->connect_error);
     SessionManager::setFlashMessage('Errore di connessione al database. Riprova più tardi.', 'danger');
+    ob_end_clean(); // ✅ AGGIUNTO
     header('Location: ' . BASE_URL . '/pages/auth/register.php');
     exit();
 }
@@ -100,6 +107,7 @@ try {
         ]);
         $checkStmt->close();
         $conn->close();
+        ob_end_clean(); // ✅ AGGIUNTO
         header('Location: ' . BASE_URL . '/pages/auth/register.php');
         exit();
     }
@@ -123,11 +131,18 @@ try {
         // ✅ REGISTRAZIONE RIUSCITA
         error_log("New user registered successfully: ID $new_user_id, Email: $email");
 
+        // ✅ PULISCI COMPLETAMENTE LA SESSIONE DOPO REGISTRAZIONE
+        SessionManager::remove('register_form_data');
+
+        // ✅ RIGENERA ID SESSIONE PER SICUREZZA
+        session_regenerate_id(true);
+
         SessionManager::setFlashMessage('🎉 Registrazione completata con successo! Ora puoi accedere con le tue credenziali.', 'success');
 
         $stmt->close();
         $conn->close();
 
+        ob_end_clean(); // ✅ AGGIUNTO
         header('Location: ' . BASE_URL . '/pages/auth/login.php');
         exit();
 
@@ -148,6 +163,7 @@ try {
     if (isset($stmt)) $stmt->close();
     if (isset($conn)) $conn->close();
 
+    ob_end_clean(); // ✅ AGGIUNTO
     header('Location: ' . BASE_URL . '/pages/auth/register.php');
     exit();
 }
