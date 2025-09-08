@@ -75,69 +75,85 @@ class Cart {
     /**
      * Ottieni elementi dal database per utente loggato
      */
-    private function getItemsFromDatabase() {
-        $items = [];
+    /**
+ * Ottieni elementi dal database per utente loggato - VERSIONE CORRETTA CON IMMAGINI
+ */
+private function getItemsFromDatabase() {
+    $items = [];
 
-        $query = "
-            SELECT 
-                c.id_carrello,
-                c.quantita,
-                c.totale,
-                c.fk_mystery_box,
-                c.fk_oggetto,
-                CASE 
-                    WHEN c.fk_mystery_box IS NOT NULL THEN mb.nome_box
-                    WHEN c.fk_oggetto IS NOT NULL THEN o.nome_oggetto
-                    ELSE 'Prodotto Sconosciuto'
-                END as nome_prodotto,
-                CASE 
-                    WHEN c.fk_mystery_box IS NOT NULL THEN mb.prezzo_box
-                    WHEN c.fk_oggetto IS NOT NULL THEN o.prezzo_oggetto
-                    ELSE 0
-                END as prezzo_prodotto,
-                CASE 
-                    WHEN c.fk_mystery_box IS NOT NULL THEN mb.quantita_box
-                    WHEN c.fk_oggetto IS NOT NULL THEN o.quant_oggetto
-                    ELSE NULL
-                END as stock_disponibile
-            FROM carrello c
-            LEFT JOIN mystery_box mb ON c.fk_mystery_box = mb.id_box
-            LEFT JOIN oggetto o ON c.fk_oggetto = o.id_oggetto
-            WHERE c.fk_utente = ? 
-            AND c.stato = 'attivo'
-            ORDER BY c.data_creazione DESC
-        ";
+    $query = "
+        SELECT 
+            c.id_carrello,
+            c.quantita,
+            c.totale,
+            c.fk_mystery_box,
+            c.fk_oggetto,
+            CASE 
+                WHEN c.fk_mystery_box IS NOT NULL THEN mb.nome_box
+                WHEN c.fk_oggetto IS NOT NULL THEN o.nome_oggetto
+                ELSE 'Prodotto Sconosciuto'
+            END as nome_prodotto,
+            CASE 
+                WHEN c.fk_mystery_box IS NOT NULL THEN mb.prezzo_box
+                WHEN c.fk_oggetto IS NOT NULL THEN o.prezzo_oggetto
+                ELSE 0
+            END as prezzo_prodotto,
+            CASE 
+                WHEN c.fk_mystery_box IS NOT NULL THEN mb.quantita_box
+                WHEN c.fk_oggetto IS NOT NULL THEN o.quant_oggetto
+                ELSE NULL
+            END as stock_disponibile,
+            CASE 
+                WHEN c.fk_mystery_box IS NOT NULL THEN img_mb.nome_img
+                WHEN c.fk_oggetto IS NOT NULL THEN img_obj.nome_img
+                ELSE NULL
+            END as nome_img
+        FROM carrello c
+        LEFT JOIN mystery_box mb ON c.fk_mystery_box = mb.id_box
+        LEFT JOIN oggetto o ON c.fk_oggetto = o.id_oggetto
+        LEFT JOIN immagine img_mb ON mb.id_box = img_mb.fk_mystery_box
+        LEFT JOIN immagine img_obj ON o.id_oggetto = img_obj.fk_oggetto
+        WHERE c.fk_utente = ? 
+        AND c.stato = 'attivo'
+        ORDER BY c.data_creazione DESC
+    ";
 
-        $stmt = $this->conn->prepare($query);
-        if (!$stmt) {
-            throw new Exception("Errore preparazione query: " . $this->conn->error);
-        }
-
-        $stmt->bind_param("i", $this->user_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        while ($row = $result->fetch_assoc()) {
-            $tipo = $row['fk_mystery_box'] != null ? 'mystery_box' : 'oggetto';
-            $prodotto_id = $row['fk_mystery_box'] ?? $row['fk_oggetto'];
-
-            $items[] = [
-                'cart_key' => $tipo . '_' . $prodotto_id,
-                'id_carrello' => $row['id_carrello'],
-                'prodotto_id' => $prodotto_id,
-                'tipo' => $tipo,
-                'nome' => $row['nome_prodotto'] ?? 'Prodotto Sconosciuto',
-                'prezzo' => floatval($row['prezzo_prodotto'] ?? 0),
-                'quantita' => intval($row['quantita'] ?? 1),
-                'totale' => floatval($row['totale'] ?? 0),
-                'stock_disponibile' => $row['stock_disponibile'],
-                'image' => BASE_URL . '/images/default_product.png'
-            ];
-        }
-
-        $stmt->close();
-        return $items;
+    $stmt = $this->conn->prepare($query);
+    if (!$stmt) {
+        throw new Exception("Errore preparazione query: " . $this->conn->error);
     }
+
+    $stmt->bind_param("i", $this->user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    while ($row = $result->fetch_assoc()) {
+        $tipo = $row['fk_mystery_box'] != null ? 'mystery_box' : 'oggetto';
+        $prodotto_id = $row['fk_mystery_box'] ?? $row['fk_oggetto'];
+        
+        // Costruisci URL immagine
+        $image_url = BASE_URL . '/images/default_product1.jpg'; // Default
+        if (!empty($row['nome_img'])) {
+            $image_url = BASE_URL . '/images/' . $row['nome_img'];
+        }
+
+        $items[] = [
+            'cart_key' => $tipo . '_' . $prodotto_id,
+            'id_carrello' => $row['id_carrello'],
+            'prodotto_id' => $prodotto_id,
+            'tipo' => $tipo,
+            'nome' => $row['nome_prodotto'] ?? 'Prodotto Sconosciuto',
+            'prezzo' => floatval($row['prezzo_prodotto'] ?? 0),
+            'quantita' => intval($row['quantita'] ?? 1),
+            'totale' => floatval($row['totale'] ?? 0),
+            'stock_disponibile' => $row['stock_disponibile'],
+            'image' => $image_url
+        ];
+    }
+
+    $stmt->close();
+    return $items;
+}
 
     /**
      * Ottieni elementi dalla sessione per utente non loggato
