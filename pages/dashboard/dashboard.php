@@ -297,7 +297,7 @@ $conn->close();
             <div class="position-sticky pt-3">
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#">
+                        <a class="nav-link" href="dashboard.php">
                             <i class="bi bi-speedometer2"></i> Dashboard
                         </a>
                     </li>
@@ -312,8 +312,18 @@ $conn->close();
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link active" href="#">
+                            <i class="bi bi-tags"></i> Gestione Categorie
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="gestione_ordini.php">
                             <i class="bi bi-bag-check"></i> Gestione Ordini
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gestione_supporto.php">
+                            <i class="bi bi-headset"></i> Supporto Clienti
                         </a>
                     </li>
                     <li class="nav-item">
@@ -326,8 +336,6 @@ $conn->close();
                             <i class="bi bi-pencil-fill"></i> Gestisci contenuti
                         </a>
                     </li>
-                    <!-- AGGIUNGI questa voce nella sidebar del tuo dashboard.php -->
-
 <li class="nav-item">
     <a class="nav-link" href="gestione_supporto.php">
         <i class="bi bi-headset"></i> Supporto Clienti

@@ -194,7 +194,8 @@ $conn->close();
 <div class="container-fluid flex-grow-1">
     <div class="row">
         <!-- Sidebar -->
-        <nav class="col-12 col-md-3 col-lg-2 d-md-block bg-light sidebar">
+        <!-- Sidebar -->
+        <nav class="col-12 col-md-3 col-lg-2 d-md-block sidebar">
             <div class="position-sticky pt-3">
                 <ul class="nav flex-column">
                     <li class="nav-item">
@@ -208,13 +209,33 @@ $conn->close();
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="#">
+                        <a class="nav-link" href="gestione_prodotti.php">
                             <i class="bi bi-box"></i> Gestione Prodotti
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link active" href="#">
+                            <i class="bi bi-tags"></i> Gestione Categorie
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="gestione_ordini.php">
-                            <i class="bi bi-cart"></i> Gestione Ordini
+                            <i class="bi bi-bag-check"></i> Gestione Ordini
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gestione_supporto.php">
+                            <i class="bi bi-headset"></i> Supporto Clienti
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="crea_admin.php">
+                            <i class="bi bi-shield-plus"></i> Crea Admin
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gestione_contenuti.php">
+                            <i class="bi bi-pencil-fill"></i> Gestisci contenuti
                         </a>
                     </li>
                 </ul>
