@@ -220,8 +220,6 @@ $carouselImages = getCarouselImages();
                 </div>
             </section>
 
-            <hr>
-
             <section class="product-slider-section">
                 <h2 class="section-title"><?= htmlspecialchars($contenuti['titolo_funko_pop']); ?></h2>
                 <div class="carousel-container">
@@ -292,8 +290,6 @@ $carouselImages = getCarouselImages();
                     <p><strong>Attenzione:</strong> <?= htmlspecialchars($contenuti['avviso_promozioni']); ?></p>
                 </div>
             </section>
-
-            <hr>
 
             <section class="community-section">
                 <h2 class="section-title"><?= htmlspecialchars($contenuti['titolo_community']); ?></h2>
