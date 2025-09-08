@@ -1,11 +1,8 @@
 <?php
-// Configurazione percorsi
-$base_path = '/Applications/MAMP/htdocs/LTDW-project';
-$include_path = $base_path . '/include';
 
 // Include le configurazioni necessarie
-require_once $include_path . '/session_manager.php';
-require_once $include_path . '/config.inc.php';
+include __DIR__ . '/../../include/session_manager.php';
+include __DIR__ .  '/../../include/config.inc.php';
 
 // Verifica che sia un admin
 SessionManager::requireLogin();
@@ -316,485 +313,504 @@ $sezioni = getSezioniConfig($sezione_corrente);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestione Contenuti <?= ucfirst($sezione_corrente); ?> - BoxOmnia Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #f8f9fa;
+        .sidebar {
+            background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: calc(100vh - 56px);
         }
-
-        .admin-container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-
-        .card {
+        .content-card {
+            transition: transform 0.2s, box-shadow 0.2s;
             border: none;
-            border-radius: 15px;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-
-        .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px 15px 0 0 !important;
-            border: none;
+        .content-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         }
-
-        .section-card .card-header {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        .section-tabs .nav-link {
+            border-radius: 0.5rem;
+            margin-right: 0.5rem;
+            transition: all 0.3s ease;
         }
-
+        .section-tabs .nav-link.active {
+            background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+            border-color: #0d6efd;
+        }
+        .preview-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-left: 4px solid #0d6efd;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0.5rem;
+        }
         .form-control, .form-select {
-            border-radius: 8px;
+            border-radius: 0.5rem;
             border: 2px solid #e9ecef;
             transition: all 0.3s ease;
         }
-
         .form-control:focus, .form-select:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
         }
-
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
             border: none;
-            border-radius: 25px;
-            padding: 12px 30px;
+            border-radius: 0.5rem;
         }
-
-        .btn-secondary, .btn-outline-secondary, .btn-outline-warning {
-            border-radius: 25px;
-            padding: 10px 20px;
-        }
-
-        .admin-header {
-            background: white;
-            padding: 1.5rem 0;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid #e9ecef;
-        }
-
-        .breadcrumb {
-            background: none;
-            margin: 0;
-        }
-
         .textarea-count {
             font-size: 0.875rem;
             color: #6c757d;
             text-align: right;
             margin-top: 5px;
         }
-
         .sticky-save-bar {
             position: sticky;
             top: 20px;
             z-index: 1000;
             background: white;
-            border-radius: 15px;
+            border-radius: 0.75rem;
             padding: 1rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             margin-bottom: 2rem;
         }
-
-        .btn-sm {
-            padding: 8px 16px;
-            font-size: 0.875rem;
-        }
-
-        .section-tabs {
-            margin-bottom: 2rem;
-        }
-
-        .section-tabs .nav-link {
-            border-radius: 25px;
-            margin-right: 10px;
-            padding: 10px 20px;
-        }
-
-        .section-tabs .nav-link.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-color: #667eea;
-        }
-
-        .preview-section {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-left: 4px solid #667eea;
-            padding: 1.5rem;
-            margin: 1rem 0;
-            border-radius: 8px;
-        }
     </style>
 </head>
-<body>
-<!-- Header Admin -->
-<div class="admin-header">
+<body class="d-flex flex-column min-vh-100">
+
+<!-- Header -->
+<header class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <h3 class="mb-0">
-                    <i class="bi bi-gear-fill text-primary me-2"></i>
-                    Pannello Amministrazione BoxOmnia
-                </h3>
-            </div>
-            <div class="col-md-6 text-end">
-                    <span class="text-muted">
-                        <i class="bi bi-person-circle me-1"></i>
-                        Utente: <strong><?= htmlspecialchars(SessionManager::get('user_nome', 'Admin')); ?></strong>
-                    </span>
-            </div>
+        <a class="navbar-brand" href="dashboard.php">
+            <i class="bi bi-speedometer2"></i> Dashboard Admin
+        </a>
+        <div class="navbar-nav ms-auto">
+            <span class="nav-link">
+                <i class="bi bi-person-circle"></i> <?= htmlspecialchars(SessionManager::get('user_nome', 'Admin')); ?>
+            </span>
+            <a class="nav-link" href="<?php echo BASE_URL; ?>/pages/auth/logout.php">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
         </div>
+    </div>
+</header>
 
-        <nav aria-label="breadcrumb" class="mt-2">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="./gestione_contenuti.php">Gestione Contenuti</a></li>
-                <li class="breadcrumb-item active" aria-current="page"><?= ucfirst($sezione_corrente); ?></li>
-            </ol>
+<div class="container-fluid flex-grow-1">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-12 col-md-3 col-lg-2 d-md-block sidebar">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.php">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gestione_utenti.php">
+                            <i class="bi bi-people"></i> Gestione Utenti
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gestione_prodotti.php">
+                            <i class="bi bi-box"></i> Gestione Prodotti
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">
+                            <i class="bi bi-tags"></i> Gestione Categorie
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gestione_ordini.php">
+                            <i class="bi bi-bag-check"></i> Gestione Ordini
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gestione_supporto.php">
+                            <i class="bi bi-headset"></i> Supporto Clienti
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="crea_admin.php">
+                            <i class="bi bi-shield-plus"></i> Crea Admin
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gestione_contenuti.php">
+                            <i class="bi bi-pencil-fill"></i> Gestisci contenuti
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </nav>
-    </div>
-</div>
 
-<div class="admin-container">
-    <!-- Tab di selezione sezione -->
-    <div class="section-tabs">
-        <ul class="nav nav-pills">
-            <li class="nav-item">
-                <a class="nav-link <?= $sezione_corrente === 'homepage' ? 'active' : ''; ?>"
-                   href="?sezione=homepage">
-                    <i class="bi bi-house me-1"></i>Homepage
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link <?= $sezione_corrente === 'about' ? 'active' : ''; ?>"
-                   href="?sezione=about">
-                    <i class="bi bi-info-circle me-1"></i>About
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link <?= $sezione_corrente === 'faq' ? 'active' : ''; ?>"
-                   href="?sezione=faq">
-                    <i class="bi bi-question-circle me-1"></i>FAQ
-                </a>
-            </li>
-        </ul>
-    </div>
-
-    <form method="POST" action="?sezione=<?= $sezione_corrente; ?>">
-        <!-- Barra di salvataggio fissa -->
-        <div class="sticky-save-bar">
-            <div class="row align-items-center">
-                <div class="col-md-7">
-                    <?php if (!empty($messaggio)): ?>
-                        <div class="alert <?= $tipo_messaggio === 'success' ? 'alert-success' : 'alert-danger'; ?> mb-0" role="alert">
-                            <i class="bi <?= $tipo_messaggio === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'; ?> me-2"></i>
-                            <?= htmlspecialchars($messaggio); ?>
-                        </div>
-                    <?php else: ?>
-                        <div class="text-muted">
-                            <i class="bi bi-info-circle me-1"></i>
-                            <strong>Ultima modifica:</strong> <?= htmlspecialchars($ultima_modifica_text); ?>
-                        </div>
-                    <?php endif; ?>
-                </div>
-                <div class="col-md-5 text-end">
-                    <button type="button" class="btn btn-outline-warning btn-sm me-1" onclick="resetToDefaults()" title="Ripristina ai valori di fabbrica">
-                        <i class="bi bi-arrow-clockwise me-1"></i>Default
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary btn-sm me-2" onclick="resetAllForms()" title="Ripristina ai valori del database">
-                        <i class="bi bi-arrow-counterclockwise me-1"></i>Ripristina
-                    </button>
-                    <button type="submit" name="aggiorna_contenuti" class="btn btn-primary">
-                        <i class="bi bi-floppy me-1"></i>Salva Modifiche
-                    </button>
-                </div>
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">
+                    <i class="bi bi-pencil-fill me-2"></i>
+                    Gestione Contenuti - <?= ucfirst($sezione_corrente); ?>
+                </h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="./gestione_contenuti.php">Gestione Contenuti</a></li>
+                        <li class="breadcrumb-item active" aria-current="page"><?= ucfirst($sezione_corrente); ?></li>
+                    </ol>
+                </nav>
             </div>
-        </div>
 
-        <!-- Anteprima in base alla sezione -->
-        <?php if ($sezione_corrente === 'homepage'): ?>
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="mb-0">
-                        <i class="bi bi-eye me-2"></i>
-                        Anteprima Homepage
-                    </h4>
+            <!-- Tab di selezione sezione -->
+            <div class="section-tabs mb-4">
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                        <a class="nav-link <?= $sezione_corrente === 'homepage' ? 'active' : ''; ?>"
+                           href="?sezione=homepage">
+                            <i class="bi bi-house me-1"></i>Homepage
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?= $sezione_corrente === 'about' ? 'active' : ''; ?>"
+                           href="?sezione=about">
+                            <i class="bi bi-info-circle me-1"></i>About
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?= $sezione_corrente === 'faq' ? 'active' : ''; ?>"
+                           href="?sezione=faq">
+                            <i class="bi bi-question-circle me-1"></i>FAQ
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Messaggi di feedback -->
+            <?php if (!empty($messaggio)): ?>
+                <div class="alert <?= $tipo_messaggio === 'success' ? 'alert-success' : 'alert-danger'; ?> alert-dismissible fade show" role="alert">
+                    <i class="bi <?= $tipo_messaggio === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'; ?> me-2"></i>
+                    <?= htmlspecialchars($messaggio); ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
-                <div class="card-body">
-                    <div class="preview-section">
-                        <div class="text-center mb-4">
-                            <h3 class="text-primary mb-2">
-                                <i class="bi bi-person-check me-2"></i>
-                                Bentornato, [Nome Utente]!
-                            </h3>
-                            <p id="preview-testo-benvenuto" class="lead"><?= htmlspecialchars($contenuti_attuali['testo_benvenuto']); ?></p>
+            <?php endif; ?>
+
+            <form method="POST" action="?sezione=<?= $sezione_corrente; ?>">
+                <!-- Barra di salvataggio fissa -->
+                <div class="sticky-save-bar">
+                    <div class="row align-items-center">
+                        <div class="col-md-7">
+                            <?php if (empty($messaggio)): ?>
+                                <div class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    <strong>Ultima modifica:</strong> <?= htmlspecialchars($ultima_modifica_text); ?>
+                                </div>
+                            <?php endif; ?>
                         </div>
+                        <div class="col-md-5 text-end">
+                            <button type="button" class="btn btn-outline-warning btn-sm me-1" onclick="resetToDefaults()" title="Ripristina ai valori di fabbrica">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Default
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm me-2" onclick="resetAllForms()" title="Ripristina ai valori del database">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i>Ripristina
+                            </button>
+                            <button type="submit" name="aggiorna_contenuti" class="btn btn-primary">
+                                <i class="bi bi-floppy me-1"></i>Salva Modifiche
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-                        <hr class="my-4">
+                <!-- Anteprima in base alla sezione -->
+                <?php if ($sezione_corrente === 'homepage'): ?>
+                    <div class="card content-card mb-4">
+                        <div class="card-header">
+                            <h4 class="mb-0">
+                                <i class="bi bi-eye me-2"></i>
+                                Anteprima Homepage
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="preview-section">
+                                <div class="text-center mb-4">
+                                    <h3 class="text-primary mb-2">
+                                        <i class="bi bi-person-check me-2"></i>
+                                        Bentornato, [Nome Utente]!
+                                    </h3>
+                                    <p id="preview-testo-benvenuto" class="lead"><?= htmlspecialchars($contenuti_attuali['testo_benvenuto']); ?></p>
+                                </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h5 id="preview-titolo-mystery-box" class="text-secondary">
-                                    <?= htmlspecialchars($contenuti_attuali['titolo_mystery_box']); ?>
+                                <hr class="my-4">
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5 id="preview-titolo-mystery-box" class="text-secondary">
+                                            <?= htmlspecialchars($contenuti_attuali['titolo_mystery_box']); ?>
+                                        </h5>
+                                        <div class="alert alert-warning small">
+                                            <strong>Attenzione:</strong> <span id="preview-avviso-promozioni"><?= htmlspecialchars($contenuti_attuali['avviso_promozioni']); ?></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5 id="preview-titolo-funko-pop" class="text-secondary">
+                                            <?= htmlspecialchars($contenuti_attuali['titolo_funko_pop']); ?>
+                                        </h5>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <h5 id="preview-titolo-community" class="mb-3">
+                                    <?= htmlspecialchars($contenuti_attuali['titolo_community']); ?>
                                 </h5>
-                                <div class="alert alert-warning small">
-                                    <strong>Attenzione:</strong> <span id="preview-avviso-promozioni"><?= htmlspecialchars($contenuti_attuali['avviso_promozioni']); ?></span>
+
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="card text-center">
+                                            <div class="card-body">
+                                                <i class="bi bi-chart-line text-primary fs-1"></i>
+                                                <h6 id="preview-community-classifica-titolo" class="mt-2"><?= htmlspecialchars($contenuti_attuali['community_classifica_titolo']); ?></h6>
+                                                <p id="preview-community-classifica-desc" class="small text-muted"><?= htmlspecialchars($contenuti_attuali['community_classifica_desc']); ?></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card text-center">
+                                            <div class="card-body">
+                                                <i class="bi bi-exchange text-success fs-1"></i>
+                                                <h6 id="preview-community-scambi-titolo" class="mt-2"><?= htmlspecialchars($contenuti_attuali['community_scambi_titolo']); ?></h6>
+                                                <p id="preview-community-scambi-desc" class="small text-muted"><?= htmlspecialchars($contenuti_attuali['community_scambi_desc']); ?></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card text-center">
+                                            <div class="card-body">
+                                                <i class="bi bi-collection text-warning fs-1"></i>
+                                                <h6 id="preview-community-collezione-titolo" class="mt-2"><?= htmlspecialchars($contenuti_attuali['community_collezione_titolo']); ?></h6>
+                                                <p id="preview-community-collezione-desc" class="small text-muted"><?= htmlspecialchars($contenuti_attuali['community_collezione_desc']); ?></p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <h5 id="preview-titolo-funko-pop" class="text-secondary">
-                                    <?= htmlspecialchars($contenuti_attuali['titolo_funko_pop']); ?>
-                                </h5>
+                        </div>
+                    </div>
+                <?php elseif ($sezione_corrente === 'about'): ?>
+                    <div class="card content-card mb-4">
+                        <div class="card-header">
+                            <h4 class="mb-0">
+                                <i class="bi bi-eye me-2"></i>
+                                Anteprima Pagina About
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="preview-section">
+                                <h1 id="preview-about-titolo-principale" class="mb-4"><?= htmlspecialchars($contenuti_attuali['about_titolo_principale']); ?></h1>
+                                <p id="preview-about-paragrafo-intro" class="lead"><?= htmlspecialchars_decode($contenuti_attuali['about_paragrafo_intro']); ?></p>
+
+                                <hr class="my-4">
+
+                                <h2 id="preview-about-storia-titolo"><?= htmlspecialchars($contenuti_attuali['about_storia_titolo']); ?></h2>
+                                <p id="preview-about-storia-testo"><?= htmlspecialchars_decode($contenuti_attuali['about_storia_testo']); ?></p>
+
+                                <h2 id="preview-about-cosa-troverai-titolo"><?= htmlspecialchars($contenuti_attuali['about_cosa_troverai_titolo']); ?></h2>
+                                <p id="preview-about-cosa-troverai-testo"><?= htmlspecialchars_decode($contenuti_attuali['about_cosa_troverai_testo']); ?></p>
+
+                                <h2 id="preview-about-valori-titolo"><?= htmlspecialchars($contenuti_attuali['about_valori_titolo']); ?></h2>
+                                <p id="preview-about-valori-testo"><?= htmlspecialchars_decode($contenuti_attuali['about_valori_testo']); ?></p>
+
+                                <h2 id="preview-about-community-titolo"><?= htmlspecialchars($contenuti_attuali['about_community_titolo']); ?></h2>
+                                <p id="preview-about-community-testo"><?= htmlspecialchars_decode($contenuti_attuali['about_community_testo']); ?></p>
+                            </div>
+                        </div>
+                    </div>
+                <?php elseif ($sezione_corrente === 'faq'): ?>
+                    <div class="card content-card mb-4">
+                        <div class="card-header">
+                            <h4 class="mb-0">
+                                <i class="bi bi-eye me-2"></i>
+                                Anteprima Pagina FAQ
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="preview-section">
+                                <div class="text-center mb-4">
+                                    <h1 id="preview-faq-titolo-pagina"><?= htmlspecialchars($contenuti_attuali['faq_titolo_pagina']); ?></h1>
+                                    <p id="preview-faq-sottotitolo-pagina" class="lead"><?= htmlspecialchars($contenuti_attuali['faq_sottotitolo_pagina']); ?></p>
+                                </div>
+
+                                <div class="alert alert-info">
+                                    <h4 id="preview-faq-intro-titolo"><?= htmlspecialchars($contenuti_attuali['faq_intro_titolo']); ?></h4>
+                                    <p id="preview-faq-intro-testo"><?= htmlspecialchars($contenuti_attuali['faq_intro_testo']); ?></p>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header">
+                                                <h6 id="preview-faq-q1"><?= htmlspecialchars($contenuti_attuali['faq_q1']); ?></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <p id="preview-faq-a1" class="small"><?= htmlspecialchars_decode($contenuti_attuali['faq_a1']); ?></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header">
+                                                <h6 id="preview-faq-q2"><?= htmlspecialchars($contenuti_attuali['faq_q2']); ?></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <p id="preview-faq-a2" class="small"><?= htmlspecialchars_decode($contenuti_attuali['faq_a2']); ?></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-success text-center">
+                                    <h5 id="preview-faq-contatti-titolo"><?= htmlspecialchars($contenuti_attuali['faq_contatti_titolo']); ?></h5>
+                                    <p id="preview-faq-contatti-testo"><?= htmlspecialchars($contenuti_attuali['faq_contatti_testo']); ?></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Sezioni di Modifica -->
+                <?php foreach ($sezioni as $nome_sezione => $campi): ?>
+                    <div class="card content-card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="bi bi-pencil-square me-2"></i>
+                                <?= htmlspecialchars($nome_sezione); ?>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <?php foreach ($campi as $chiave => $config): ?>
+                                    <?php
+                                    list($label, $tipo, $max_length) = $config;
+                                    $valore_attuale = $contenuti_attuali[$chiave] ?? '';
+                                    $col_class = count($campi) > 2 ? 'col-md-6' : 'col-12';
+                                    ?>
+                                    <div class="<?= $col_class; ?> mb-3">
+                                        <label for="<?= $chiave; ?>" class="form-label">
+                                            <strong><?= htmlspecialchars($label); ?>:</strong>
+                                        </label>
+
+                                        <?php if ($tipo === 'textarea'): ?>
+                                            <textarea
+                                                    class="form-control"
+                                                    id="<?= $chiave; ?>"
+                                                    name="<?= $chiave; ?>"
+                                                    rows="<?= $max_length > 400 ? 5 : ($max_length > 200 ? 4 : 3); ?>"
+                                                    maxlength="<?= $max_length; ?>"
+                                                    oninput="updatePreview('<?= $chiave; ?>', this.value); updateCharCount('<?= $chiave; ?>', this.value, <?= $max_length; ?>)"
+                                                    required><?= htmlspecialchars($valore_attuale); ?></textarea>
+                                        <?php else: ?>
+                                            <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="<?= $chiave; ?>"
+                                                    name="<?= $chiave; ?>"
+                                                    maxlength="<?= $max_length; ?>"
+                                                    value="<?= htmlspecialchars($valore_attuale); ?>"
+                                                    oninput="updatePreview('<?= $chiave; ?>', this.value); updateCharCount('<?= $chiave; ?>', this.value, <?= $max_length; ?>)"
+                                                    required>
+                                        <?php endif; ?>
+
+                                        <div class="textarea-count">
+                                            <span id="count-<?= $chiave; ?>">0</span>/<?= $max_length; ?> caratteri
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+
+                <!-- Azioni finali -->
+                <div class="card content-card">
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <div class="border rounded p-3 h-100">
+                                    <i class="bi bi-info-circle text-info fs-2"></i>
+                                    <h6 class="mt-2">Informazioni</h6>
+                                    <ul class="small text-muted text-start">
+                                        <li>Le modifiche sono immediate</li>
+                                        <li>Tutti i campi sono obbligatori</li>
+                                        <li>Rispetta i limiti di caratteri</li>
+                                        <li>L'anteprima è in tempo reale</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="border rounded p-3 h-100">
+                                    <i class="bi bi-lightbulb text-warning fs-2"></i>
+                                    <h6 class="mt-2">Suggerimenti</h6>
+                                    <ul class="small text-muted text-start">
+                                        <li><?= $sezione_corrente === 'homepage' ? 'Usa emoji per rendere più accattivanti i titoli' : 'Mantieni il tono coerente con il brand'; ?></li>
+                                        <li>Mantieni messaggi concisi e chiari</li>
+                                        <li>Testa sempre l'anteprima prima di salvare</li>
+                                        <li>Considera l'esperienza mobile</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="border rounded p-3 h-100">
+                                    <i class="bi bi-shield-check text-success fs-2"></i>
+                                    <h6 class="mt-2">Sicurezza</h6>
+                                    <ul class="small text-muted text-start">
+                                        <li><?= $sezione_corrente === 'faq' ? 'Per le FAQ puoi usare HTML semplice' : 'Evita caratteri speciali non necessari'; ?></li>
+                                        <li><?= $sezione_corrente === 'about' ? 'Usa &lt;strong&gt; e &lt;em&gt; per enfasi' : 'Non inserire codice HTML'; ?></li>
+                                        <li>Mantieni backup dei contenuti</li>
+                                        <li>Verifica sempre le modifiche</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
 
                         <hr class="my-4">
 
-                        <h5 id="preview-titolo-community" class="mb-3">
-                            <?= htmlspecialchars($contenuti_attuali['titolo_community']); ?>
-                        </h5>
-
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="card text-center">
-                                    <div class="card-body">
-                                        <i class="bi bi-chart-line text-primary fs-1"></i>
-                                        <h6 id="preview-community-classifica-titolo" class="mt-2"><?= htmlspecialchars($contenuti_attuali['community_classifica_titolo']); ?></h6>
-                                        <p id="preview-community-classifica-desc" class="small text-muted"><?= htmlspecialchars($contenuti_attuali['community_classifica_desc']); ?></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card text-center">
-                                    <div class="card-body">
-                                        <i class="bi bi-exchange text-success fs-1"></i>
-                                        <h6 id="preview-community-scambi-titolo" class="mt-2"><?= htmlspecialchars($contenuti_attuali['community_scambi_titolo']); ?></h6>
-                                        <p id="preview-community-scambi-desc" class="small text-muted"><?= htmlspecialchars($contenuti_attuali['community_scambi_desc']); ?></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card text-center">
-                                    <div class="card-body">
-                                        <i class="bi bi-collection text-warning fs-1"></i>
-                                        <h6 id="preview-community-collezione-titolo" class="mt-2"><?= htmlspecialchars($contenuti_attuali['community_collezione_titolo']); ?></h6>
-                                        <p id="preview-community-collezione-desc" class="small text-muted"><?= htmlspecialchars($contenuti_attuali['community_collezione_desc']); ?></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        <?php elseif ($sezione_corrente === 'about'): ?>
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="mb-0">
-                        <i class="bi bi-eye me-2"></i>
-                        Anteprima Pagina About
-                    </h4>
-                </div>
-                <div class="card-body">
-                    <div class="preview-section">
-                        <h1 id="preview-about-titolo-principale" class="mb-4"><?= htmlspecialchars($contenuti_attuali['about_titolo_principale']); ?></h1>
-                        <p id="preview-about-paragrafo-intro" class="lead"><?= htmlspecialchars_decode($contenuti_attuali['about_paragrafo_intro']); ?></p>
-
-                        <hr class="my-4">
-
-                        <h2 id="preview-about-storia-titolo"><?= htmlspecialchars($contenuti_attuali['about_storia_titolo']); ?></h2>
-                        <p id="preview-about-storia-testo"><?= htmlspecialchars_decode($contenuti_attuali['about_storia_testo']); ?></p>
-
-                        <h2 id="preview-about-cosa-troverai-titolo"><?= htmlspecialchars($contenuti_attuali['about_cosa_troverai_titolo']); ?></h2>
-                        <p id="preview-about-cosa-troverai-testo"><?= htmlspecialchars_decode($contenuti_attuali['about_cosa_troverai_testo']); ?></p>
-
-                        <h2 id="preview-about-valori-titolo"><?= htmlspecialchars($contenuti_attuali['about_valori_titolo']); ?></h2>
-                        <p id="preview-about-valori-testo"><?= htmlspecialchars_decode($contenuti_attuali['about_valori_testo']); ?></p>
-
-                        <h2 id="preview-about-community-titolo"><?= htmlspecialchars($contenuti_attuali['about_community_titolo']); ?></h2>
-                        <p id="preview-about-community-testo"><?= htmlspecialchars_decode($contenuti_attuali['about_community_testo']); ?></p>
-                    </div>
-                </div>
-            </div>
-        <?php elseif ($sezione_corrente === 'faq'): ?>
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="mb-0">
-                        <i class="bi bi-eye me-2"></i>
-                        Anteprima Pagina FAQ
-                    </h4>
-                </div>
-                <div class="card-body">
-                    <div class="preview-section">
-                        <div class="text-center mb-4">
-                            <h1 id="preview-faq-titolo-pagina"><?= htmlspecialchars($contenuti_attuali['faq_titolo_pagina']); ?></h1>
-                            <p id="preview-faq-sottotitolo-pagina" class="lead"><?= htmlspecialchars($contenuti_attuali['faq_sottotitolo_pagina']); ?></p>
-                        </div>
-
-                        <div class="alert alert-info">
-                            <h4 id="preview-faq-intro-titolo"><?= htmlspecialchars($contenuti_attuali['faq_intro_titolo']); ?></h4>
-                            <p id="preview-faq-intro-testo"><?= htmlspecialchars($contenuti_attuali['faq_intro_testo']); ?></p>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="card mb-3">
-                                    <div class="card-header">
-                                        <h6 id="preview-faq-q1"><?= htmlspecialchars($contenuti_attuali['faq_q1']); ?></h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <p id="preview-faq-a1" class="small"><?= htmlspecialchars_decode($contenuti_attuali['faq_a1']); ?></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card mb-3">
-                                    <div class="card-header">
-                                        <h6 id="preview-faq-q2"><?= htmlspecialchars($contenuti_attuali['faq_q2']); ?></h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <p id="preview-faq-a2" class="small"><?= htmlspecialchars_decode($contenuti_attuali['faq_a2']); ?></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="alert alert-success text-center">
-                            <h5 id="preview-faq-contatti-titolo"><?= htmlspecialchars($contenuti_attuali['faq_contatti_titolo']); ?></h5>
-                            <p id="preview-faq-contatti-testo"><?= htmlspecialchars($contenuti_attuali['faq_contatti_testo']); ?></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        <?php endif; ?>
-
-        <!-- Sezioni di Modifica -->
-        <?php foreach ($sezioni as $nome_sezione => $campi): ?>
-            <div class="card section-card">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="bi bi-pencil-square me-2"></i>
-                        <?= htmlspecialchars($nome_sezione); ?>
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <?php foreach ($campi as $chiave => $config): ?>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="./gestione_contenuti.php" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i>Torna alla Gestione
+                            </a>
                             <?php
-                            list($label, $tipo, $max_length) = $config;
-                            $valore_attuale = $contenuti_attuali[$chiave] ?? '';
-                            $col_class = count($campi) > 2 ? 'col-md-6' : 'col-12';
+                            $link_anteprima = '';
+                            switch ($sezione_corrente) {
+                                case 'homepage':
+                                    $link_anteprima = '../pages/home_utente.php';
+                                    break;
+                                case 'about':
+                                    $link_anteprima = '../pages/about.php';
+                                    break;
+                                case 'faq':
+                                    $link_anteprima = '../pages/domande_frequenti.php';
+                                    break;
+                            }
                             ?>
-                            <div class="<?= $col_class; ?> mb-3">
-                                <label for="<?= $chiave; ?>" class="form-label">
-                                    <strong><?= htmlspecialchars($label); ?>:</strong>
-                                </label>
-
-                                <?php if ($tipo === 'textarea'): ?>
-                                    <textarea
-                                            class="form-control"
-                                            id="<?= $chiave; ?>"
-                                            name="<?= $chiave; ?>"
-                                            rows="<?= $max_length > 400 ? 5 : ($max_length > 200 ? 4 : 3); ?>"
-                                            maxlength="<?= $max_length; ?>"
-                                            oninput="updatePreview('<?= $chiave; ?>', this.value); updateCharCount('<?= $chiave; ?>', this.value, <?= $max_length; ?>)"
-                                            required><?= htmlspecialchars($valore_attuale); ?></textarea>
-                                <?php else: ?>
-                                    <input
-                                            type="text"
-                                            class="form-control"
-                                            id="<?= $chiave; ?>"
-                                            name="<?= $chiave; ?>"
-                                            maxlength="<?= $max_length; ?>"
-                                            value="<?= htmlspecialchars($valore_attuale); ?>"
-                                            oninput="updatePreview('<?= $chiave; ?>', this.value); updateCharCount('<?= $chiave; ?>', this.value, <?= $max_length; ?>)"
-                                            required>
-                                <?php endif; ?>
-
-                                <div class="textarea-count">
-                                    <span id="count-<?= $chiave; ?>">0</span>/<?= $max_length; ?> caratteri
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-            </div>
-        <?php endforeach; ?>
-
-        <!-- Azioni finali -->
-        <div class="card">
-            <div class="card-body text-center">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="border rounded p-3 h-100">
-                            <i class="bi bi-info-circle text-info fs-2"></i>
-                            <h6 class="mt-2">Informazioni</h6>
-                            <ul class="small text-muted text-start">
-                                <li>Le modifiche sono immediate</li>
-                                <li>Tutti i campi sono obbligatori</li>
-                                <li>Rispetta i limiti di caratteri</li>
-                                <li>L'anteprima è in tempo reale</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="border rounded p-3 h-100">
-                            <i class="bi bi-lightbulb text-warning fs-2"></i>
-                            <h6 class="mt-2">Suggerimenti</h6>
-                            <ul class="small text-muted text-start">
-                                <li><?= $sezione_corrente === 'homepage' ? 'Usa emoji per rendere più accattivanti i titoli' : 'Mantieni il tono coerente con il brand'; ?></li>
-                                <li>Mantieni messaggi concisi e chiari</li>
-                                <li>Testa sempre l'anteprima prima di salvare</li>
-                                <li>Considera l'esperienza mobile</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="border rounded p-3 h-100">
-                            <i class="bi bi-shield-check text-success fs-2"></i>
-                            <h6 class="mt-2">Sicurezza</h6>
-                            <ul class="small text-muted text-start">
-                                <li><?= $sezione_corrente === 'faq' ? 'Per le FAQ puoi usare HTML semplice' : 'Evita caratteri speciali non necessari'; ?></li>
-                                <li><?= $sezione_corrente === 'about' ? 'Usa &lt;strong&gt; e &lt;em&gt; per enfasi' : 'Non inserire codice HTML'; ?></li>
-                                <li>Mantieni backup dei contenuti</li>
-                                <li>Verifica sempre le modifiche</li>
-                            </ul>
+                            <a href="<?= $link_anteprima; ?>" class="btn btn-outline-primary" target="_blank">
+                                <i class="bi bi-eye me-1"></i>Visualizza Pagina Live
+                            </a>
+                            <button type="submit" name="aggiorna_contenuti" class="btn btn-primary">
+                                <i class="bi bi-floppy me-1"></i>Salva Tutte le Modifiche
+                            </button>
                         </div>
                     </div>
                 </div>
-
-                <hr class="my-4">
-
-                <div class="d-flex justify-content-center gap-3">
-                    <a href="./gestione_contenuti.php" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left me-1"></i>Torna alla Gestione
-                    </a>
-                    <?php
-                    $link_anteprima = '';
-                    switch ($sezione_corrente) {
-                        case 'homepage':
-                            $link_anteprima = '../pages/home_utente.php';
-                            break;
-                        case 'about':
-                            $link_anteprima = '../pages/about.php';
-                            break;
-                        case 'faq':
-                            $link_anteprima = '../pages/domande_frequenti.php';
-                            break;
-                    }
-                    ?>
-                    <a href="<?= $link_anteprima; ?>" class="btn btn-outline-primary" target="_blank">
-                        <i class="bi bi-eye me-1"></i>Visualizza Pagina Live
-                    </a>
-                    <button type="submit" name="aggiorna_contenuti" class="btn btn-primary">
-                        <i class="bi bi-floppy me-1"></i>Salva Tutte le Modifiche
-                    </button>
-                </div>
-            </div>
-        </div>
-    </form>
+            </form>
+        </main>
+    </div>
 </div>
+
+<!-- Footer -->
+<footer class="footer mt-auto py-3 bg-light">
+    <div class="container-fluid">
+        <span class="text-muted">&copy; <?php echo date('Y'); ?> BOX OMNIA - Dashboard Amministrativa</span>
+    </div>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -911,11 +927,11 @@ $sezioni = getSezioniConfig($sezione_corrente);
 
         // Auto-dismissione alert
         setTimeout(function() {
-            const alert = document.querySelector('.alert');
-            if (alert && !alert.classList.contains('alert-info') && !alert.classList.contains('alert-success')) {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
                 const bsAlert = new bootstrap.Alert(alert);
                 bsAlert.close();
-            }
+            });
         }, 5000);
     });
 </script>
