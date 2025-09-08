@@ -781,13 +781,13 @@ $sezioni = getSezioniConfig($sezione_corrente);
                             $link_anteprima = '';
                             switch ($sezione_corrente) {
                                 case 'homepage':
-                                    $link_anteprima = '../pages/home_utente.php';
+                                    $link_anteprima = '../home_utente.php';
                                     break;
                                 case 'about':
-                                    $link_anteprima = '../pages/about.php';
+                                    $link_anteprima = '../about.php';
                                     break;
                                 case 'faq':
-                                    $link_anteprima = '../pages/domande_frequenti.php';
+                                    $link_anteprima = '../domande_frequenti.php';
                                     break;
                             }
                             ?>
