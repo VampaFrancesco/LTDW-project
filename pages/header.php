@@ -215,13 +215,6 @@ SessionManager::set('notifications_count', $notifications_count);
                     <a href="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/pages/cart.php" class="mx-2"
                        title="Carrello">
                         <img src="<?php echo BASE_URL; ?>/images/svg/carrello.svg" alt="carrello">
-                        <?php
-                        // Mostra numero items nel carrello se presente
-                        $cart_items = SessionManager::get('cart_items_count', 0);
-                        if ($cart_items > 0):
-                            ?>
-                            <span class="badge bg-danger"><?php echo $cart_items; ?></span>
-                        <?php endif; ?>
                     </a>
                     
                     <?php if (SessionManager::isLoggedIn() && !SessionManager::get('user_is_admin', false)): ?>
