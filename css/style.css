@@ -2150,8 +2150,8 @@ img {
 }
 
 .product-img {
-    max-height: 261px;
-    max-width: 247px;
+    height: 260px;
+    width: 280px;
 }
 
 .product-info {
