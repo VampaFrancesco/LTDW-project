@@ -104,6 +104,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->close();
             }
             break;
+        case 'update_quantity':
+            $productType = $_POST['product_type'] ?? '';
+            $productId = $_POST['product_id'] ?? '';
+            $newQuantity = intval($_POST['new_quantity'] ?? 0);
+            $operation = $_POST['operation'] ?? 'set'; // 'set', 'add', 'subtract'
+
+            if ($productId && $productType && $newQuantity >= 0) {
+                $conn->begin_transaction();
+                try {
+                    if ($productType === 'oggetto') {
+                        if ($operation === 'set') {
+                            $stmt = $conn->prepare("UPDATE oggetto SET quant_oggetto = ? WHERE id_oggetto = ?");
+                            $stmt->bind_param("ii", $newQuantity, $productId);
+                        } elseif ($operation === 'add') {
+                            $stmt = $conn->prepare("UPDATE oggetto SET quant_oggetto = COALESCE(quant_oggetto, 0) + ? WHERE id_oggetto = ?");
+                            $stmt->bind_param("ii", $newQuantity, $productId);
+                        } elseif ($operation === 'subtract') {
+                            $stmt = $conn->prepare("UPDATE oggetto SET quant_oggetto = GREATEST(0, COALESCE(quant_oggetto, 0) - ?) WHERE id_oggetto = ?");
+                            $stmt->bind_param("ii", $newQuantity, $productId);
+                        }
+                    } else { // mystery_box
+                        if ($operation === 'set') {
+                            $stmt = $conn->prepare("UPDATE mystery_box SET quantita_box = ? WHERE id_box = ?");
+                            $stmt->bind_param("ii", $newQuantity, $productId);
+                        } elseif ($operation === 'add') {
+                            $stmt = $conn->prepare("UPDATE mystery_box SET quantita_box = quantita_box + ? WHERE id_box = ?");
+                            $stmt->bind_param("ii", $newQuantity, $productId);
+                        } elseif ($operation === 'subtract') {
+                            $stmt = $conn->prepare("UPDATE mystery_box SET quantita_box = GREATEST(0, quantita_box - ?) WHERE id_box = ?");
+                            $stmt->bind_param("ii", $newQuantity, $productId);
+                        }
+                    }
+
+                    if ($stmt->execute()) {
+                        // Log dell'operazione (opzionale)
+                        $logStmt = $conn->prepare("
+                            INSERT INTO inventory_log (product_type, product_id, operation_type, quantity_change, admin_id, timestamp) 
+                            VALUES (?, ?, ?, ?, ?, NOW())
+                        ");
+                        if ($logStmt) {
+                            $adminId = SessionManager::get('admin_id');
+                            $logStmt->bind_param("sisii", $productType, $productId, $operation, $newQuantity, $adminId);
+                            $logStmt->execute();
+                            $logStmt->close();
+                        }
+
+                        $conn->commit();
+                        SessionManager::setFlashMessage("Quantità aggiornata con successo!", 'success');
+                    } else {
+                        throw new Exception("Errore nell'aggiornamento della quantità");
+                    }
+                    $stmt->close();
+                } catch (Exception $e) {
+                    $conn->rollback();
+                    SessionManager::setFlashMessage('Errore: ' . $e->getMessage(), 'danger');
+                }
+            }
+            break;
     }
 
     header('Location: gestione_prodotti.php');

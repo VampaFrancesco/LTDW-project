@@ -19,7 +19,7 @@ if ($conn->connect_error) {
     die("Errore di connessione: " . $conn->connect_error);
 }
 
-// ✅ STATISTICHE CORRETTE E SICURE
+// STATISTICHE CORRETTE E SICURE - FATTURATO SOLO ORDINI CONSEGNATI
 try {
     // 1. Numero utenti registrati (escludendo admin interni)
     $result = $conn->query("
@@ -38,7 +38,7 @@ try {
     $stats['ordini_oggi'] = $result->fetch_assoc()['total'];
     $stmt->close();
 
-    // 3. Fatturato mensile REALE (da carrelli completati)
+    // 3. Fatturato mensile REALE - SOLO ORDINI CONSEGNATI (stato = 2)
     $currentMonth = date('Y-m');
     $stmt = $conn->prepare("
         SELECT COALESCE(SUM(c.totale), 0) as total 
@@ -46,7 +46,7 @@ try {
         JOIN ordine o ON c.id_carrello = o.fk_carrello
         WHERE c.stato IN ('completato', 'checkout')
         AND DATE_FORMAT(o.data_ordine, '%Y-%m') = ?
-        AND o.stato_ordine NOT IN (3, 4)
+        AND o.stato_ordine = 2
     ");
     $stmt->bind_param("s", $currentMonth);
     $stmt->execute();
@@ -54,12 +54,14 @@ try {
     $stats['fatturato_mensile'] = $result->fetch_assoc()['total'];
     $stmt->close();
 
-    // Fallback: se non ci sono carrelli collegati, calcola da fatture
+    // Fallback: se non ci sono carrelli collegati, calcola da fatture (solo ordini consegnati)
     if ($stats['fatturato_mensile'] <= 0) {
         $stmt = $conn->prepare("
-            SELECT COALESCE(SUM(totale_fattura), 0) as total 
-            FROM fattura 
-            WHERE DATE_FORMAT(data_emissione, '%Y-%m') = ?
+            SELECT COALESCE(SUM(f.totale_fattura), 0) as total 
+            FROM fattura f
+            JOIN ordine o ON f.fk_ordine = o.id_ordine
+            WHERE DATE_FORMAT(f.data_emissione, '%Y-%m') = ?
+            AND o.stato_ordine = 2
         ");
         $stmt->bind_param("s", $currentMonth);
         $stmt->execute();
@@ -99,7 +101,18 @@ try {
             o.data_ordine,
             o.stato_ordine,
             CONCAT(u.nome, ' ', u.cognome) as cliente_nome,
-            COALESCE(c.totale, 0) as totale,
+            COALESCE(
+                c.totale,
+                (SELECT SUM(c2.totale) 
+                 FROM carrello c2 
+                 WHERE c2.fk_utente = o.fk_utente 
+                 AND c2.stato IN ('checkout', 'completato')
+                 AND c2.data_creazione <= o.data_ordine
+                 ORDER BY c2.data_creazione DESC
+                 LIMIT 1
+                ),
+                0
+            ) as totale,
             CASE 
                 WHEN o.stato_ordine = 0 THEN 'In Elaborazione'
                 WHEN o.stato_ordine = 1 THEN 'Spedito'
@@ -123,18 +136,18 @@ try {
 
     // 7. Statistiche aggiuntive per insight migliori
 
-    // Valore medio ordine
+    // Valore medio ordine - SOLO ORDINI CONSEGNATI
     $result = $conn->query("
         SELECT COALESCE(AVG(c.totale), 0) as media
         FROM carrello c
         JOIN ordine o ON c.id_carrello = o.fk_carrello
         WHERE c.stato IN ('completato', 'checkout')
-        AND o.stato_ordine NOT IN (3, 4)
+        AND o.stato_ordine = 2
         AND DATE_FORMAT(o.data_ordine, '%Y-%m') = '$currentMonth'
     ");
     $stats['valore_medio_ordine'] = $result ? $result->fetch_assoc()['media'] : 0;
 
-    // Prodotti più venduti (top 3)
+    // Prodotti più venduti (top 3) - SOLO ORDINI CONSEGNATI
     $prodotti_top = [];
     $result = $conn->query("
         SELECT 
@@ -147,7 +160,7 @@ try {
         LEFT JOIN oggetto og ON c.fk_oggetto = og.id_oggetto
         JOIN ordine o ON c.id_carrello = o.fk_carrello
         WHERE c.stato IN ('completato', 'checkout')
-        AND o.stato_ordine NOT IN (3, 4)
+        AND o.stato_ordine = 2
         AND DATE_FORMAT(o.data_ordine, '%Y-%m') = '$currentMonth'
         GROUP BY COALESCE(mb.id_box, og.id_oggetto), nome_prodotto, tipo
         ORDER BY vendite DESC
@@ -159,22 +172,100 @@ try {
         }
     }
 
-    // Trend vendite ultimi 7 giorni
+    // Trend vendite ultimi 7 giorni - SOLO ORDINI CONSEGNATI
     $trend_vendite = [];
     for ($i = 6; $i >= 0; $i--) {
         $data = date('Y-m-d', strtotime("-$i days"));
         $result = $conn->query("
             SELECT 
                 COUNT(DISTINCT o.id_ordine) as ordini,
-                COALESCE(SUM(c.totale), 0) as fatturato
+                COALESCE(SUM(
+                    COALESCE(
+                        c.totale,
+                        (SELECT c2.totale 
+                         FROM carrello c2 
+                         WHERE c2.fk_utente = o.fk_utente 
+                         AND c2.stato IN ('checkout', 'completato')
+                         AND c2.data_creazione <= o.data_ordine
+                         ORDER BY c2.data_creazione DESC
+                         LIMIT 1
+                        ),
+                        0
+                    )
+                ), 0) as fatturato
             FROM ordine o
             LEFT JOIN carrello c ON o.fk_carrello = c.id_carrello
             WHERE DATE(o.data_ordine) = '$data'
-            AND o.stato_ordine NOT IN (3, 4)
+            AND o.stato_ordine = 2
         ");
         $trend_data = $result ? $result->fetch_assoc() : ['ordini' => 0, 'fatturato' => 0];
         $trend_vendite[date('d/m', strtotime($data))] = $trend_data;
     }
+
+    // Statistiche per stato ordine (per confronto)
+    $stats_per_stato = [];
+    $result = $conn->query("
+        SELECT 
+            o.stato_ordine,
+            COUNT(DISTINCT o.id_ordine) as count_ordini,
+            COALESCE(SUM(
+                COALESCE(
+                    c.totale,
+                    (SELECT c2.totale 
+                     FROM carrello c2 
+                     WHERE c2.fk_utente = o.fk_utente 
+                     AND c2.stato IN ('checkout', 'completato')
+                     AND c2.data_creazione <= o.data_ordine
+                     ORDER BY c2.data_creazione DESC
+                     LIMIT 1
+                    ),
+                    0
+                )
+            ), 0) as totale_valore,
+            CASE 
+                WHEN o.stato_ordine = 0 THEN 'In Elaborazione'
+                WHEN o.stato_ordine = 1 THEN 'Spedito'
+                WHEN o.stato_ordine = 2 THEN 'Consegnato'
+                WHEN o.stato_ordine = 3 THEN 'Annullato'
+                WHEN o.stato_ordine = 4 THEN 'Rimborsato'
+                ELSE 'Sconosciuto'
+            END as stato_nome
+        FROM ordine o
+        LEFT JOIN carrello c ON o.fk_carrello = c.id_carrello
+        WHERE DATE_FORMAT(o.data_ordine, '%Y-%m') = '$currentMonth'
+        GROUP BY o.stato_ordine
+        ORDER BY o.stato_ordine
+    ");
+    while ($row = $result->fetch_assoc()) {
+        $stats_per_stato[] = $row;
+    }
+
+    // Fatturato "in transito" (ordini spediti ma non ancora consegnati)
+    $stmt = $conn->prepare("
+        SELECT COALESCE(SUM(
+            COALESCE(
+                c.totale,
+                (SELECT c2.totale 
+                 FROM carrello c2 
+                 WHERE c2.fk_utente = o.fk_utente 
+                 AND c2.stato IN ('checkout', 'completato')
+                 AND c2.data_creazione <= o.data_ordine
+                 ORDER BY c2.data_creazione DESC
+                 LIMIT 1
+                ),
+                0
+            )
+        ), 0) as total 
+        FROM ordine o
+        LEFT JOIN carrello c ON o.fk_carrello = c.id_carrello
+        WHERE DATE_FORMAT(o.data_ordine, '%Y-%m') = ?
+        AND o.stato_ordine = 1
+    ");
+    $stmt->bind_param("s", $currentMonth);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $stats['fatturato_in_transito'] = $result->fetch_assoc()['total'];
+    $stmt->close();
 
 } catch (Exception $e) {
     error_log("Dashboard stats error: " . $e->getMessage());
@@ -185,11 +276,13 @@ try {
             'fatturato_mensile' => 0,
             'prodotti_attivi' => 0,
             'admin_attivi' => 0,
-            'valore_medio_ordine' => 0
+            'valore_medio_ordine' => 0,
+            'fatturato_in_transito' => 0
     ];
     $ordini_recenti = [];
     $prodotti_top = [];
     $trend_vendite = [];
+    $stats_per_stato = [];
 }
 
 $conn->close();
@@ -297,7 +390,7 @@ $conn->close();
             <div class="position-sticky pt-3">
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link" href="dashboard.php">
+                        <a class="nav-link active" href="dashboard.php">
                             <i class="bi bi-speedometer2"></i> Dashboard
                         </a>
                     </li>
@@ -312,7 +405,7 @@ $conn->close();
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="#">
+                        <a class="nav-link" href="#">
                             <i class="bi bi-tags"></i> Gestione Categorie
                         </a>
                     </li>
@@ -324,6 +417,34 @@ $conn->close();
                     <li class="nav-item">
                         <a class="nav-link" href="gestione_supporto.php">
                             <i class="bi bi-headset"></i> Supporto Clienti
+                            <?php
+                            // Mostra il numero di richieste aperte - con connessione separata
+                            try {
+                                $db_config = $config['dbms']['localhost'];
+                                $conn_sidebar = new mysqli(
+                                        $db_config['host'],
+                                        $db_config['user'],
+                                        $db_config['passwd'],
+                                        $db_config['dbname']
+                                );
+
+                                if (!$conn_sidebar->connect_error) {
+                                    $stmt = $conn_sidebar->prepare("SELECT COUNT(*) as count FROM richieste_supporto WHERE stato IN ('aperta', 'in_corso')");
+                                    $stmt->execute();
+                                    $result = $stmt->get_result();
+                                    $open_requests = $result->fetch_assoc()['count'];
+                                    $stmt->close();
+                                    $conn_sidebar->close();
+
+                                    if ($open_requests > 0) {
+                                        echo '<span class="badge bg-warning text-dark ms-2">' . $open_requests . '</span>';
+                                    }
+                                }
+                            } catch (Exception $e) {
+                                // Ignora errori per non bloccare la dashboard
+                                error_log("Errore conteggio richieste supporto: " . $e->getMessage());
+                            }
+                            ?>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -336,39 +457,6 @@ $conn->close();
                             <i class="bi bi-pencil-fill"></i> Gestisci contenuti
                         </a>
                     </li>
-<li class="nav-item">
-    <a class="nav-link" href="gestione_supporto.php">
-        <i class="bi bi-headset"></i> Supporto Clienti
-        <?php
-        // Mostra il numero di richieste aperte - con connessione separata
-        try {
-            $db_config = $config['dbms']['localhost'];
-            $conn_sidebar = new mysqli(
-                $db_config['host'],
-                $db_config['user'],
-                $db_config['passwd'],
-                $db_config['dbname']
-            );
-            
-            if (!$conn_sidebar->connect_error) {
-                $stmt = $conn_sidebar->prepare("SELECT COUNT(*) as count FROM richieste_supporto WHERE stato IN ('aperta', 'in_corso')");
-                $stmt->execute();
-                $result = $stmt->get_result();
-                $open_requests = $result->fetch_assoc()['count'];
-                $stmt->close();
-                $conn_sidebar->close();
-                
-                if ($open_requests > 0) {
-                    echo '<span class="badge bg-warning text-dark ms-2">' . $open_requests . '</span>';
-                }
-            }
-        } catch (Exception $e) {
-            // Ignora errori per non bloccare la dashboard
-            error_log("Errore conteggio richieste supporto: " . $e->getMessage());
-        }
-        ?>
-    </a>
-</li>
                 </ul>
             </div>
         </nav>
@@ -380,7 +468,7 @@ $conn->close();
                 <small class="text-muted">Ultimo accesso: <?php echo date('d/m/Y H:i'); ?></small>
             </div>
 
-            <!-- ✅ STATISTICHE PRINCIPALI CORRETTE -->
+            <!-- STATISTICHE PRINCIPALI CORRETTE -->
             <div class="row g-4 mb-4">
                 <div class="col-sm-6 col-lg-3">
                     <div class="card stats-card text-center">
@@ -403,14 +491,7 @@ $conn->close();
                             </div>
                             <h3 class="fw-bold text-success"><?php echo number_format($stats['ordini_oggi']); ?></h3>
                             <p class="text-muted mb-0">Ordini Oggi</p>
-                            <!-- Assicuriamo che ci sia sempre un piccolo testo -->
-                            <small class="text-muted">
-                                <?php if ($stats['valore_medio_ordine'] > 0): ?>
-                                    Media: €<?php echo number_format($stats['valore_medio_ordine'], 2); ?>
-                                <?php else: ?>
-                                    Nessuna media disponibile
-                                <?php endif; ?>
-                            </small>
+                            <small class="text-muted">Tutti gli stati</small>
                         </div>
                     </div>
                 </div>
@@ -423,7 +504,7 @@ $conn->close();
                             </div>
                             <h3 class="fw-bold text-warning">€<?php echo number_format($stats['fatturato_mensile'], 2); ?></h3>
                             <p class="text-muted mb-0">Fatturato <?php echo date('M Y'); ?></p>
-                            <small class="text-muted">Solo ordini completati</small>
+                            <small class="text-muted">Solo ordini consegnati</small>
                         </div>
                     </div>
                 </div>
@@ -432,11 +513,70 @@ $conn->close();
                     <div class="card stats-card text-center">
                         <div class="card-body">
                             <div class="stats-icon bg-info bg-opacity-10">
-                                <i class="bi bi-box-seam text-info fs-2"></i>
+                                <i class="bi bi-hourglass-split text-info fs-2"></i>
                             </div>
-                            <h3 class="fw-bold text-info"><?php echo number_format($stats['prodotti_attivi']); ?></h3>
-                            <p class="text-muted mb-0">Prodotti Attivi</p>
-                            <small class="text-muted">Disponibili e prezzati</small>
+                            <h3 class="fw-bold text-info">€<?php echo number_format($stats['fatturato_in_transito'], 2); ?></h3>
+                            <p class="text-muted mb-0">In Transito</p>
+                            <small class="text-muted">Ordini spediti</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fatturato per Stato Ordine -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card insight-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="bi bi-bar-chart me-2"></i>
+                                Fatturato per Stato Ordine - <?php echo date('F Y'); ?>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <?php if (!empty($stats_per_stato)): ?>
+                                    <?php foreach ($stats_per_stato as $stato): ?>
+                                        <div class="col-md-6 col-lg-3 mb-2">
+                                            <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+                                                <div>
+                                                    <?php
+                                                    $badge_class = match($stato['stato_ordine']) {
+                                                        0 => 'bg-warning text-dark',
+                                                        1 => 'bg-info',
+                                                        2 => 'bg-success',
+                                                        3 => 'bg-danger',
+                                                        4 => 'bg-secondary',
+                                                        default => 'bg-secondary'
+                                                    };
+                                                    ?>
+                                                    <span class="badge <?php echo $badge_class; ?>">
+                                                        <?php echo $stato['stato_nome']; ?>
+                                                    </span>
+                                                    <br>
+                                                    <small class="text-muted"><?php echo $stato['count_ordini']; ?> ordini</small>
+                                                </div>
+                                                <div class="text-end">
+                                                    <strong>€<?php echo number_format($stato['totale_valore'], 2); ?></strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <div class="col-12 text-center text-muted">
+                                        Nessun ordine nel mese corrente
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+
+                            <div class="mt-3 p-3 bg-light rounded">
+                                <small class="text-muted">
+                                    <i class="bi bi-lightbulb me-1"></i>
+                                    <strong>Nota:</strong> Il fatturato nella dashboard principale mostra solo gli ordini con stato "Consegnato"
+                                    per riflettere il reale incasso. Gli ordini "In Elaborazione" e "Spediti" non contribuiscono al fatturato
+                                    fino alla conferma di consegna.
+                                </small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -450,7 +590,7 @@ $conn->close();
                             <div class="card-header">
                                 <h5 class="mb-0">
                                     <i class="bi bi-graph-up me-2"></i>
-                                    Trend Vendite Ultimi 7 Giorni
+                                    Trend Vendite Ultimi 7 Giorni (Solo Consegnati)
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -464,7 +604,7 @@ $conn->close();
                                         $totale_ordini_7g = array_sum(array_column($trend_vendite, 'ordini'));
                                         $totale_fatturato_7g = array_sum(array_column($trend_vendite, 'fatturato'));
                                         ?>
-                                        <p class="mb-1"><strong><?php echo $totale_ordini_7g; ?></strong> ordini totali</p>
+                                        <p class="mb-1"><strong><?php echo $totale_ordini_7g; ?></strong> ordini consegnati</p>
                                         <p class="mb-1"><strong>€<?php echo number_format($totale_fatturato_7g, 2); ?></strong> fatturato</p>
                                         <p class="mb-0 text-muted">Media: €<?php echo $totale_ordini_7g > 0 ? number_format($totale_fatturato_7g / $totale_ordini_7g, 2) : '0.00'; ?>/ordine</p>
                                     </div>
@@ -475,7 +615,7 @@ $conn->close();
                 </div>
             <?php endif; ?>
 
-            <!-- ✅ AZIONI RAPIDE -->
+            <!-- AZIONI RAPIDE -->
             <h2 class="h4 mb-3">Azioni Rapide</h2>
             <div class="row g-3 mb-4">
                 <div class="col-md-6 col-lg-3">
@@ -523,7 +663,7 @@ $conn->close();
                 </div>
             </div>
 
-            <!-- ✅ SEZIONE ORDINI RECENTI E PRODOTTI TOP -->
+            <!-- SEZIONE ORDINI RECENTI E PRODOTTI TOP -->
             <div class="row">
                 <div class="col-md-8">
                     <div class="card">
@@ -587,7 +727,7 @@ $conn->close();
                     <?php if (!empty($prodotti_top)): ?>
                         <div class="card mb-3">
                             <div class="card-header">
-                                <h6 class="mb-0"><i class="bi bi-trophy"></i> Top Prodotti del Mese</h6>
+                                <h6 class="mb-0"><i class="bi bi-trophy"></i> Top Prodotti del Mese (Consegnati)</h6>
                             </div>
                             <div class="card-body">
                                 <?php foreach ($prodotti_top as $index => $prodotto): ?>
@@ -608,6 +748,34 @@ $conn->close();
                             </div>
                         </div>
                     <?php endif; ?>
+
+                    <!-- Statistiche Extra -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="bi bi-graph-up"></i> Metriche Mensili</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span>Valore Medio Ordine:</span>
+                                <span class="fw-bold text-success">€<?php echo number_format($stats['valore_medio_ordine'], 2); ?></span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span>Prodotti Attivi:</span>
+                                <span class="badge bg-info"><?php echo $stats['prodotti_attivi']; ?></span>
+                            </div>
+                            <?php if ($stats['fatturato_in_transito'] > 0): ?>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span>Da Incassare:</span>
+                                    <span class="fw-bold text-warning">€<?php echo number_format($stats['fatturato_in_transito'], 2); ?></span>
+                                </div>
+                            <?php endif; ?>
+                            <hr>
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle"></i>
+                                I calcoli si basano solo su ordini effettivamente consegnati
+                            </small>
+                        </div>
+                    </div>
 
                     <!-- Info Sistema -->
                     <div class="card">
@@ -703,7 +871,7 @@ $conn->close();
                     labels: labels,
                     datasets: [
                         {
-                            label: 'Ordini',
+                            label: 'Ordini Consegnati',
                             data: ordiniData,
                             borderColor: 'rgb(75, 192, 192)',
                             backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -773,7 +941,7 @@ $conn->close();
             const now = new Date();
             const timeString = now.toLocaleString('it-IT');
             const timeElement = document.querySelector('small.text-muted');
-            if (timeElement) {
+            if (timeElement && timeElement.textContent.includes('Ultimo accesso:')) {
                 timeElement.textContent = `Ultimo accesso: ${timeString}`;
             }
         }, 60000);
