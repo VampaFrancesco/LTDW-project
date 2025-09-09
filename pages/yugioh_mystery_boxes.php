@@ -135,11 +135,11 @@ $conn->close();
         <div class="row" id="mysteryBoxGrid">
             <?php if ($no_boxes): ?>
                 <div class="col-12">
-                    <div class="alert alert-info text-center" role="alert">
-                        <i class="bi bi-info-circle me-2"></i>
-                        <h4>Nessuna Mystery Box disponibile</h4>
-                        <p>Al momento non ci sono Mystery Box nel catalogo. Torna più tardi per nuove sorprese!</p>
-                    </div>
+                    <div class="avviso-info">
+    <div class="icona-avviso">i</div>
+    <h2 class="titolo-avviso">Nessun prodotto trovato</h2>
+    <p class="messaggio-avviso">Nessun articolo corrisponde ai filtri selezionati</p>
+</div>
                 </div>
             <?php else: ?>
                 <?php foreach ($mystery_boxes as $box): ?>
@@ -325,12 +325,12 @@ $conn->close();
                 const noItemsMessage = document.createElement('div');
                 noItemsMessage.className = 'col-12';
                 noItemsMessage.innerHTML = `
-                    <div class="alert alert-info text-center" role="alert">
-                        <i class="bi bi-info-circle me-2"></i>
-                        <h4>Nessun elemento trovato</h4>
-                        <p>Nessun articolo corrisponde ai filtri selezionati.</p>
-                    </div>
-                `;
+    <div class="avviso-info">
+        <div class="icona-avviso">i</div>
+        <h2 class="titolo-avviso">Nessun prodotto trovato</h2>
+        <p class="messaggio-avviso">Nessun articolo corrisponde ai filtri selezionati</p>
+    </div>
+`;
                 grid.appendChild(noItemsMessage);
             }
         }

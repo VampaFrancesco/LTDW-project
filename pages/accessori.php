@@ -167,8 +167,12 @@ $conn->close();
                             <?php endforeach; ?>
                         <?php else: ?>
                             <div class="col-12 empty-category-message">
-                                <p>Nessun accessorio di questo tipo disponibile</p>
-                            </div>
+    <div class="avviso-info">
+        <div class="icona-avviso">i</div>
+        <h2 class="titolo-avviso">Nessun prodotto trovato</h2>
+        <p class="messaggio-avviso">Nessun articolo corrisponde ai filtri selezionati</p>
+    </div>
+</div>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -280,7 +284,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     const emptyMessage = document.createElement('div');
                     emptyMessage.classList.add('col-12', 'empty-category-message');
-                    emptyMessage.innerHTML = '<p>Nessun accessorio trovato in questa categoria</p>';
+                    emptyMessage.innerHTML = `
+    <div class="avviso-info">
+        <div class="icona-avviso">i</div>
+        <h2 class="titolo-avviso">Nessun prodotto trovato</h2>
+        <p class="messaggio-avviso">Nessun articolo corrisponde ai filtri selezionati</p>
+    </div>
+`;
                     itemsContainer.appendChild(emptyMessage);
                 }
             }
@@ -290,7 +300,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (activeCategoryFilter === 'tutti' && totalResults === 0) {
             const emptyMessage = document.createElement('div');
             emptyMessage.classList.add('col-12', 'empty-category-message', 'mt-4');
-            emptyMessage.innerHTML = '<p>Nessun accessorio trovato per i filtri selezionati</p>';
+            emptyMessage.innerHTML = `
+    <div class="avviso-info">
+        <div class="icona-avviso">i</div>
+        <h2 class="titolo-avviso">Nessun prodotto trovato</h2>
+        <p class="messaggio-avviso">Nessun articolo corrisponde ai filtri selezionati</p>
+    </div>
+`;
             container.appendChild(emptyMessage);
         }
     }

@@ -121,11 +121,11 @@ $conn->close();
         <div class="row" id="funkoPopGrid">
             <?php if ($no_funko_pops): ?>
                 <div class="col-12">
-                    <div class="alert alert-info text-center" role="alert">
-                        <i class="bi bi-info-circle me-2"></i>
-                        <h4>Nessun Funko Pop disponibile</h4>
-                        <p>Al momento non ci sono Funko Pop nel catalogo. Torna più tardi!</p>
-                    </div>
+                    <div class="avviso-info">
+    <div class="icona-avviso">i</div>
+    <h2 class="titolo-avviso">Nessun prodotto trovato</h2>
+    <p class="messaggio-avviso">Nessun articolo corrisponde ai filtri selezionati</p>
+</div>
                 </div>
             <?php else: ?>
                 <?php foreach ($funko_pops as $funko): ?>
@@ -306,12 +306,12 @@ $conn->close();
                 const noItemsMessage = document.createElement('div');
                 noItemsMessage.className = 'col-12 no-items-message';
                 noItemsMessage.innerHTML = `
-                    <div class="alert alert-info text-center mt-4" role="alert">
-                        <i class="bi bi-info-circle me-2"></i>
-                        <h4>Nessun elemento trovato</h4>
-                        <p>Nessun articolo corrisponde ai filtri selezionati.</p>
-                    </div>
-                `;
+    <div class="avviso-info">
+        <div class="icona-avviso">i</div>
+        <h2 class="titolo-avviso">Nessun prodotto trovato</h2>
+        <p class="messaggio-avviso">Nessun articolo corrisponde ai filtri selezionati</p>
+    </div>
+`;
                 grid.appendChild(noItemsMessage);
             }
         }
