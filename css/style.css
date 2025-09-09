@@ -4309,20 +4309,149 @@ img {
 }
 
 /* Input di ricerca */
-.scambi-search-input {
-    border: 2px solid var(--scambi-accent-color);
-    border-radius: var(--scambi-border-radius);
+.search-input {
+    border: 2px solid var(--accent-color);
+    border-radius: var(--border-radius);
     padding: 0.75rem 1rem;
     font-size: 1rem;
-    transition: all var(--scambi-transition-speed) ease;
+    transition: all var(--transition-speed) ease;
     background: rgba(255, 255, 255, 0.9);
 }
 
-.scambi-search-input:focus {
-    border-color: var(--scambi-primary-color);
+.search-input:focus {
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 0.2rem rgba(63, 81, 181, 0.25);
     outline: none;
     background: white;
+}
+
+.search-form {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-button {
+    background: var(--accent-color);
+    border: 2px solid var(--accent-color);
+    color: white;
+    border-radius: var(--border-radius);
+    padding: 0.75rem 1rem;
+    transition: all var(--transition-speed) ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-button:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.search-button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(63, 81, 181, 0.25);
+    outline: none;
+}
+
+/* Variante con effetto glassmorphism */
+.search-form-glass {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius);
+    padding: 5px;
+}
+
+.search-input-glass {
+    border: none;
+    border-radius: calc(var(--border-radius) - 5px);
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all var(--transition-speed) ease;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+    color: var(--text-color);
+}
+
+.search-input-glass::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.search-input-glass:focus {
+    background: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+    outline: none;
+}
+
+.search-button-glass {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    border-radius: calc(var(--border-radius) - 5px);
+    padding: 0.75rem 1rem;
+    transition: all var(--transition-speed) ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+.search-button-glass:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+/* Media Queries per searchbar */
+@media (max-width: 768px) {
+    .search-form {
+        gap: 8px;
+    }
+
+    .search-input {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .search-button {
+        padding: 0.6rem 0.8rem;
+    }
+
+    .search-input-glass {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .search-button-glass {
+        padding: 0.6rem 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-form,
+    .search-form-glass {
+        gap: 5px;
+    }
+
+    .search-input,
+    .search-input-glass {
+        padding: 0.5rem 0.7rem;
+        font-size: 0.85rem;
+    }
+
+    .search-button,
+    .search-button-glass {
+        padding: 0.5rem 0.7rem;
+    }
 }
 
 /* Griglia delle carte */
