@@ -6,9 +6,7 @@ include __DIR__ . '/header.php';
 <!-- Metodi di Pagamento Disponibili -->
  <main class="section-box">
         <div >
-    <h1 class="fashion-taital mb-5">
-        💰 Metodi di Pagamento Disponibili
-    </h1>
+    <h1 class="fashion_taital mb-5">Metodi di Pagamento Disponibili</h1>
     
     <div class="payment-methods-grid">
         <!-- Carte di Credito/Debito -->

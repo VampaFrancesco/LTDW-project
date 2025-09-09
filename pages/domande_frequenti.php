@@ -69,7 +69,7 @@ function getContenuto($chiave, $contenuti) {
 
             <!-- Header -->
             <div class="page-header">
-                <h1 class="fashion-taital mb-5"><?= getContenuto('faq_titolo_pagina', $contenuti); ?></h1>
+                <h1 class="fashion_taital mb-5"><?= getContenuto('faq_titolo_pagina', $contenuti); ?></h1>
             </div>
 
             <!-- FAQ Container -->
