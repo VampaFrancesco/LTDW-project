@@ -1,5 +1,5 @@
 <?php
-// pages/dashboard/dashboard.php
+
 require_once __DIR__ . '/admin_check.php';
 require_once __DIR__ . '/../../include/config.inc.php';
 
@@ -40,20 +40,12 @@ try {
     $stmt->close();
 
     // 3. Fatturato mensile REALE - SOLO ORDINI CONSEGNATI (stato = 2)
-    $stmt = $conn->prepare("
-    SELECT COALESCE(SUM(user_totals.total_user), 0) as total
-    FROM ordine,(
-        SELECT 
-            o.fk_utente,
-            SUM(c.totale) as total_user
-        FROM ordine o
-        JOIN carrello c ON c.fk_utente = o.fk_utente
-        WHERE o.stato_ordine = 2
-        AND DATE_FORMAT(o.data_ordine, '%Y-%m') = ?
-        AND c.stato IN ('completato', 'checkout')
-        AND c.data_creazione <= DATE_ADD(o.data_ordine, INTERVAL 1 DAY)
-        GROUP BY o.fk_utente, DATE(o.data_ordine)
-    ) user_totals
+  $stmt = $conn->prepare("
+    SELECT COALESCE(SUM(io.totale_ordine), 0) as total
+    FROM ordine o
+    JOIN info_ordine io ON io.fk_ordine = o.id_ordine
+    WHERE o.stato_ordine = 2
+    AND DATE_FORMAT(o.data_ordine, '%Y-%m') = ?
 ");
     $stmt->bind_param("s", $currentMonth);
     $stmt->execute();
@@ -126,13 +118,12 @@ try {
 
     // 7. Statistiche aggiuntive per insight migliori
 
-    // Valore medio ordine - SOLO ORDINI CONSEGNATI
+  // Valore medio ordine - SOLO ORDINI CONSEGNATI
     $result = $conn->query("
-        SELECT COALESCE(AVG(c.totale), 0) as media
-        FROM carrello c
-        JOIN ordine o ON c.id_carrello = o.fk_carrello
-        WHERE c.stato IN ('completato', 'checkout')
-        AND o.stato_ordine = 2
+        SELECT COALESCE(AVG(io.totale_ordine), 0) as media
+        FROM ordine o
+        JOIN info_ordine io ON io.fk_ordine = o.id_ordine
+        WHERE o.stato_ordine = 2
         AND DATE_FORMAT(o.data_ordine, '%Y-%m') = '$currentMonth'
     ");
     $stats['valore_medio_ordine'] = $result ? $result->fetch_assoc()['media'] : 0;
@@ -167,29 +158,51 @@ try {
     for ($i = 6; $i >= 0; $i--) {
         $data = date('Y-m-d', strtotime("-$i days"));
         $result = $conn->query("
-            SELECT 
-                COUNT(DISTINCT o.id_ordine) as ordini,
-                COALESCE(SUM(
-                    COALESCE(
-                        c.totale,
-                        (SELECT c2.totale 
-                         FROM carrello c2 
-                         WHERE c2.fk_utente = o.fk_utente 
-                         AND c2.stato IN ('checkout', 'completato')
-                         AND c2.data_creazione <= o.data_ordine
-                         ORDER BY c2.data_creazione DESC
-                         LIMIT 1
-                        ),
-                        0
+        SELECT 
+            COUNT(DISTINCT o.id_ordine) as ordini,
+            COALESCE(SUM(
+                CASE 
+                    WHEN c.totale IS NOT NULL THEN c.totale
+                    ELSE (
+                        SELECT c2.totale 
+                        FROM carrello c2 
+                        WHERE c2.id_carrello = (
+                            SELECT MAX(c3.id_carrello)
+                            FROM carrello c3
+                            WHERE c3.fk_utente = o.fk_utente
+                            AND c3.stato IN ('checkout', 'completato')
+                            AND c3.data_creazione <= o.data_ordine
+                        )
                     )
-                ), 0) as fatturato
-            FROM ordine o
-            LEFT JOIN carrello c ON o.fk_carrello = c.id_carrello
-            WHERE DATE(o.data_ordine) = '$data'
-            AND o.stato_ordine = 2
-        ");
-        $trend_data = $result ? $result->fetch_assoc() : ['ordini' => 0, 'fatturato' => 0];
-        $trend_vendite[date('d/m', strtotime($data))] = $trend_data;
+                END
+            ), 0) as fatturato
+        FROM ordine o
+        LEFT JOIN carrello c ON o.fk_carrello = c.id_carrello
+        WHERE DATE(o.data_ordine) = '$data'
+    ");
+
+        $row = $result->fetch_assoc();
+        $giorno = date('D', strtotime($data));
+
+        // Traduci il giorno in italiano
+        $giorni_it = [
+                'Mon' => 'Lun',
+                'Tue' => 'Mar',
+                'Wed' => 'Mer',
+                'Thu' => 'Gio',
+                'Fri' => 'Ven',
+                'Sat' => 'Sab',
+                'Sun' => 'Dom'
+        ];
+
+        $giorno_it = $giorni_it[$giorno];
+
+        $trend_vendite[] = [
+                'giorno' => $giorno_it,
+                'data' => $data,
+                'ordini' => (int)$row['ordini'],
+                'fatturato' => (float)$row['fatturato']
+        ];
     }
 
     // Statistiche per stato ordine (per confronto)
@@ -512,66 +525,6 @@ $conn->close();
                     </div>
                 </div>
             </div>
-
-            <!-- Fatturato per Stato Ordine -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card insight-card">
-                        <div class="card-header">
-                            <h5 class="mb-0">
-                                <i class="bi bi-bar-chart me-2"></i>
-                                Fatturato per Stato Ordine - <?php echo date('F Y'); ?>
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <?php if (!empty($stats_per_stato)): ?>
-                                    <?php foreach ($stats_per_stato as $stato): ?>
-                                        <div class="col-md-6 col-lg-3 mb-2">
-                                            <div class="d-flex justify-content-between align-items-center p-2 border rounded">
-                                                <div>
-                                                    <?php
-                                                    $badge_class = match($stato['stato_ordine']) {
-                                                        0 => 'bg-warning text-dark',
-                                                        1 => 'bg-info',
-                                                        2 => 'bg-success',
-                                                        3 => 'bg-danger',
-                                                        4 => 'bg-secondary',
-                                                        default => 'bg-secondary'
-                                                    };
-                                                    ?>
-                                                    <span class="badge <?php echo $badge_class; ?>">
-                                                        <?php echo $stato['stato_nome']; ?>
-                                                    </span>
-                                                    <br>
-                                                    <small class="text-muted"><?php echo $stato['count_ordini']; ?> ordini</small>
-                                                </div>
-                                                <div class="text-end">
-                                                    <strong>€<?php echo number_format($stato['totale_valore'], 2); ?></strong>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <div class="col-12 text-center text-muted">
-                                        Nessun ordine nel mese corrente
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-
-                            <div class="mt-3 p-3 bg-light rounded">
-                                <small class="text-muted">
-                                    <i class="bi bi-lightbulb me-1"></i>
-                                    <strong>Nota:</strong> Il fatturato nella dashboard principale mostra solo gli ordini con stato "Consegnato"
-                                    per riflettere il reale incasso. Gli ordini "In Elaborazione" e "Spediti" non contribuiscono al fatturato
-                                    fino alla conferma di consegna.
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Trend Vendite degli ultimi 7 giorni -->
             <?php if (!empty($trend_vendite)): ?>
                 <div class="row mb-4">
@@ -738,35 +691,6 @@ $conn->close();
                             </div>
                         </div>
                     <?php endif; ?>
-
-                    <!-- Statistiche Extra -->
-                    <div class="card mb-3">
-                        <div class="card-header">
-                            <h6 class="mb-0"><i class="bi bi-graph-up"></i> Metriche Mensili</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span>Valore Medio Ordine:</span>
-                                <span class="fw-bold text-success">€<?php echo number_format($stats['valore_medio_ordine'], 2); ?></span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span>Prodotti Attivi:</span>
-                                <span class="badge bg-info"><?php echo $stats['prodotti_attivi']; ?></span>
-                            </div>
-                            <?php if ($stats['fatturato_in_transito'] > 0): ?>
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <span>Da Incassare:</span>
-                                    <span class="fw-bold text-warning">€<?php echo number_format($stats['fatturato_in_transito'], 2); ?></span>
-                                </div>
-                            <?php endif; ?>
-                            <hr>
-                            <small class="text-muted">
-                                <i class="bi bi-info-circle"></i>
-                                I calcoli si basano solo su ordini effettivamente consegnati
-                            </small>
-                        </div>
-                    </div>
-
                     <!-- Info Sistema -->
                     <div class="card">
                         <div class="card-header">

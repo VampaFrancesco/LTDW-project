@@ -115,56 +115,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'update_order') {
 
                 @mail($order_data['email'], $subject, $message, "From: noreply@boxomnia.com");
             }
+            SessionManager::setFlashMessage('Ordine aggiornato con successo!', 'success');
 
-            // Se ordine passa a "consegnato", crea fattura
-            if ($newStatus == 2 && $old_status != 2) {
-                // Controlla se esiste già una fattura per questo ordine
-                $stmt = $conn->prepare("SELECT id_fattura FROM fattura WHERE fk_ordine = ?");
-                $stmt->bind_param("i", $orderId);
-                $stmt->execute();
-                $result = $stmt->get_result();
-                $fattura_esistente = $result->fetch_assoc();
-                $stmt->close();
-
-                if (!$fattura_esistente) {
-                    // Genera numero fattura
-                    $anno_corrente = date('Y');
-                    $stmt = $conn->prepare("
-                        SELECT COALESCE(MAX(CAST(SUBSTRING_INDEX(numero_fattura, '/', 1) AS UNSIGNED)), 0) + 1 as prossimo
-                        FROM fattura 
-                        WHERE YEAR(data_emissione) = ?
-                    ");
-                    $stmt->bind_param("i", $anno_corrente);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-                    $prossimo_numero = $result->fetch_assoc()['prossimo'];
-                    $numero_fattura = str_pad($prossimo_numero, 4, '0', STR_PAD_LEFT) . '/' . $anno_corrente;
-                    $stmt->close();
-
-                    // Calcola totale carrello
-                    $totale_ordine = 0;
-                    $carrello_id = $order_data['fk_carrello'];
-
-                    if ($carrello_id) {
-                        $stmt = $conn->prepare("SELECT COALESCE(totale, 0) as totale FROM carrello WHERE id_carrello = ?");
-                        $stmt->bind_param("i", $carrello_id);
-                        $stmt->execute();
-                        $result = $stmt->get_result();
-                        $carrello = $result->fetch_assoc();
-                        $totale_ordine = $carrello['totale'] ?? 0;
-                        $stmt->close();
-                    }
-
-                    SessionManager::setFlashMessage(
-                            "Ordine consegnato e fattura #{$numero_fattura} creata automaticamente!",
-                            'success'
-                    );
-                } else {
-                    SessionManager::setFlashMessage('Ordine aggiornato (fattura già esistente)', 'info');
-                }
-            } else {
-                SessionManager::setFlashMessage('Ordine aggiornato con successo!', 'success');
-            }
 
             $conn->commit();
 
@@ -295,25 +247,18 @@ $stats['ordini_oggi'] = $result->fetch_assoc()['total'];
 
 // Fatturato mensile
 $currentMonth = date('Y-m');
+// Query per calcolare il fatturato mensile
 $stmt = $conn->prepare("
-    SELECT COALESCE(SUM(user_totals.total_user), 0) as total
-    FROM ordine,(
-        SELECT 
-            o.fk_utente,
-            SUM(c.totale) as total_user
-        FROM ordine o
-        JOIN carrello c ON c.fk_utente = o.fk_utente
-        WHERE o.stato_ordine = 2
-        AND DATE_FORMAT(o.data_ordine, '%Y-%m') = ?
-        AND c.stato IN ('completato', 'checkout')
-        AND c.data_creazione <= DATE_ADD(o.data_ordine, INTERVAL 1 DAY)
-        GROUP BY o.fk_utente, DATE(o.data_ordine)
-    ) user_totals
-");
+    SELECT SUM(c.totale) as totale_ordini
+    FROM ordine o
+    JOIN carrello c ON o.fk_carrello = c.id_carrello
+    WHERE DATE_FORMAT(o.data_ordine, '%Y-%m') = ?
+    AND o.stato_ordine NOT IN (3, 4)");
 $stmt->bind_param("s", $currentMonth);
 $stmt->execute();
 $result = $stmt->get_result();
-$stats['fatturato_mese'] = $result->fetch_assoc()['total'];
+$row = $result->fetch_assoc();
+$stats['fatturato_mese'] = $row['totale_ordini'] ?? 0;
 $stmt->close();
 // Statistiche carrelli per stato
 $result = $conn->query("
@@ -582,146 +527,6 @@ $conn->close();
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
-
-            <!-- Statistiche -->
-            <div class="row mb-4">
-                <div class="col-md-3">
-                    <div class="card stats-card-enhanced text-center">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center justify-content-center mb-2">
-                                <i class="bi bi-hourglass-split text-warning fs-2 me-2"></i>
-                                <div>
-                                    <h4 class="fw-bold mb-0"><?php echo $stats['in_elaborazione']; ?></h4>
-                                    <small class="text-muted">In Elaborazione</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card stats-card-enhanced text-center">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center justify-content-center mb-2">
-                                <i class="bi bi-calendar-check text-success fs-2 me-2"></i>
-                                <div>
-                                    <h4 class="fw-bold mb-0"><?php echo $stats['ordini_oggi']; ?></h4>
-                                    <small class="text-muted">Ordini Oggi</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card stats-card-enhanced text-center">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center justify-content-center mb-2">
-                                <i class="bi bi-currency-euro text-primary fs-2 me-2"></i>
-                                <div>
-                                    <h4 class="fw-bold mb-0">€<?php echo number_format($stats['fatturato_mese'], 2); ?></h4>
-                                    <small class="text-muted">Fatturato <?php echo date('M Y'); ?></small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card stats-card-enhanced text-center">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center justify-content-center mb-2">
-                                <i class="bi bi-people text-info fs-2 me-2"></i>
-                                <div>
-                                    <h4 class="fw-bold mb-0"><?php echo $stats['clienti_unici'] ?? 0; ?></h4>
-                                    <small class="text-muted">Clienti Unici</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Statistiche aggiuntive -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card order-card">
-                        <div class="card-header">
-                            <h6 class="mb-0">
-                                <i class="bi bi-graph-up me-2"></i>
-                                Riepilogo Mensile - <?php echo date('F Y'); ?>
-                            </h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="row text-center">
-                                <div class="col-md-3">
-                                    <div class="border-end">
-                                        <h5 class="text-primary mb-1"><?php echo $stats['ordini_totali'] ?? 0; ?></h5>
-                                        <small class="text-muted">Ordini Totali</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="border-end">
-                                        <h5 class="text-success mb-1">€<?php echo number_format($stats['valore_medio'] ?? 0, 2); ?></h5>
-                                        <small class="text-muted">Valore Medio Ordine</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="border-end">
-                                        <h5 class="text-warning mb-1">€<?php echo number_format($stats['ordine_massimo'] ?? 0, 2); ?></h5>
-                                        <small class="text-muted">Ordine Massimo</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <h5 class="text-info mb-1"><?php echo ($stats['carrelli_per_stato']['attivo']['count'] ?? 0); ?></h5>
-                                    <small class="text-muted">Carrelli Attivi</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Statistiche Carrelli Dettagliate -->
-            <?php if (!empty($stats['carrelli_per_stato'])): ?>
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="card order-card">
-                            <div class="card-header">
-                                <h6 class="mb-0">Stato Carrelli</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <?php foreach ($stats['carrelli_per_stato'] as $stato => $dati): ?>
-                                        <div class="col-md-3 mb-2">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <span>
-                                                    <?php
-                                                    $badge_class = '';
-                                                    switch($stato) {
-                                                        case 'attivo': $badge_class = 'bg-success'; break;
-                                                        case 'checkout': $badge_class = 'bg-warning'; break;
-                                                        case 'completato': $badge_class = 'bg-primary'; break;
-                                                        case 'abbandonato': $badge_class = 'bg-danger'; break;
-                                                        default: $badge_class = 'bg-secondary';
-                                                    }
-                                                    ?>
-                                                    <span class="badge <?php echo $badge_class; ?>">
-                                                        <?php echo ucfirst($stato); ?>
-                                                    </span>
-                                                </span>
-                                                <span>
-                                                    <strong><?php echo $dati['count']; ?></strong> carrelli
-                                                    <br>
-                                                    <small>€<?php echo number_format($dati['totale'], 2); ?></small>
-                                                </span>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <?php endif; ?>
-
             <?php if ($action === 'detail' && $dettaglio_ordine): ?>
                 <!-- Dettaglio Ordine -->
                 <div class="card order-card mb-4">
