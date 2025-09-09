@@ -295,16 +295,26 @@ $stats['ordini_oggi'] = $result->fetch_assoc()['total'];
 
 // Fatturato mensile
 $currentMonth = date('Y-m');
-$result = $conn->query("
-    SELECT COALESCE(SUM(c.totale), 0) as total 
-    FROM carrello c
-    JOIN ordine o ON c.id_carrello = o.fk_carrello
-    WHERE c.stato IN ('completato', 'checkout')
-    AND DATE_FORMAT(o.data_ordine, '%Y-%m') = '$currentMonth'
-    AND o.stato_ordine NOT IN (3, 4)
+$stmt = $conn->prepare("
+    SELECT COALESCE(SUM(user_totals.total_user), 0) as total
+    FROM ordine,(
+        SELECT 
+            o.fk_utente,
+            SUM(c.totale) as total_user
+        FROM ordine o
+        JOIN carrello c ON c.fk_utente = o.fk_utente
+        WHERE o.stato_ordine = 2
+        AND DATE_FORMAT(o.data_ordine, '%Y-%m') = ?
+        AND c.stato IN ('completato', 'checkout')
+        AND c.data_creazione <= DATE_ADD(o.data_ordine, INTERVAL 1 DAY)
+        GROUP BY o.fk_utente, DATE(o.data_ordine)
+    ) user_totals
 ");
+$stmt->bind_param("s", $currentMonth);
+$stmt->execute();
+$result = $stmt->get_result();
 $stats['fatturato_mese'] = $result->fetch_assoc()['total'];
-
+$stmt->close();
 // Statistiche carrelli per stato
 $result = $conn->query("
     SELECT 

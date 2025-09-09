@@ -5,6 +5,7 @@ require_once __DIR__ . '/../../include/config.inc.php';
 
 $adminName = SessionManager::get('user_nome', 'Admin');
 $adminEmail = SessionManager::get('user_email', '');
+$currentMonth = date('Y-m');
 
 // Connessione database per recuperare statistiche
 $db_config = $config['dbms']['localhost'];
@@ -39,37 +40,26 @@ try {
     $stmt->close();
 
     // 3. Fatturato mensile REALE - SOLO ORDINI CONSEGNATI (stato = 2)
-    $currentMonth = date('Y-m');
     $stmt = $conn->prepare("
-        SELECT COALESCE(SUM(c.totale), 0) as total 
-        FROM carrello c
-        JOIN ordine o ON c.id_carrello = o.fk_carrello
-        WHERE c.stato IN ('completato', 'checkout')
+    SELECT COALESCE(SUM(user_totals.total_user), 0) as total
+    FROM ordine,(
+        SELECT 
+            o.fk_utente,
+            SUM(c.totale) as total_user
+        FROM ordine o
+        JOIN carrello c ON c.fk_utente = o.fk_utente
+        WHERE o.stato_ordine = 2
         AND DATE_FORMAT(o.data_ordine, '%Y-%m') = ?
-        AND o.stato_ordine = 2
-    ");
+        AND c.stato IN ('completato', 'checkout')
+        AND c.data_creazione <= DATE_ADD(o.data_ordine, INTERVAL 1 DAY)
+        GROUP BY o.fk_utente, DATE(o.data_ordine)
+    ) user_totals
+");
     $stmt->bind_param("s", $currentMonth);
     $stmt->execute();
     $result = $stmt->get_result();
     $stats['fatturato_mensile'] = $result->fetch_assoc()['total'];
     $stmt->close();
-
-    // Fallback: se non ci sono carrelli collegati, calcola da fatture (solo ordini consegnati)
-    if ($stats['fatturato_mensile'] <= 0) {
-        $stmt = $conn->prepare("
-            SELECT COALESCE(SUM(f.totale_fattura), 0) as total 
-            FROM fattura f
-            JOIN ordine o ON f.fk_ordine = o.id_ordine
-            WHERE DATE_FORMAT(f.data_emissione, '%Y-%m') = ?
-            AND o.stato_ordine = 2
-        ");
-        $stmt->bind_param("s", $currentMonth);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $stats['fatturato_mensile'] = $result->fetch_assoc()['total'];
-        $stmt->close();
-    }
-
     // 4. Prodotti effettivamente disponibili
     $result1 = $conn->query("
         SELECT COUNT(*) as total 
