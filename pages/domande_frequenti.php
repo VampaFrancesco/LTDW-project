@@ -175,12 +175,12 @@ function getContenuto($chiave, $contenuti) {
                     <p class="contact-text">
                         <?= getContenuto('faq_contatti_testo', $contenuti); ?>
                     </p>
-                    <a href="contatti.php" class="btn-contact">💬 Contattataci</a>
+                    <a href="contatti.php" class="btn btn-filter-nav">💬 Contattaci</a>
                 </div>
 
                 <!-- Back Link -->
                 <div class="back-link">
-                    <a href="home_utente.php" class="btn-back">← Torna alla home</a>
+                    <a href="home_utente.php" class="btn btn-filter-nav">← Torna alla home</a>
                 </div>
 
             </div>
