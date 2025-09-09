@@ -3,13 +3,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6 mb-4">
-                <h5>Iscriviti alla newsletter</h5>
-                <form class="form-inline">
-                    <label>
-                        <input type="email" class="form-control mr-2 mb-2" placeholder="La tua email">
-                    </label>
-                    <button type="submit" class="btn btn-primary mb-2">Iscriviti</button>
-                </form>
+                <img src="../images/boxomnia.png">
                 <p class="small mt-3 text-footer">Box Omnia è il punto di riferimento ufficiale per tutti i veri Collezionisti di carte! Scopri un mondo di Carte Originali, Giochi, Accessori esclusivi e tanto altro.</p>
             </div>
             <div class="col-md-3 mb-4">
