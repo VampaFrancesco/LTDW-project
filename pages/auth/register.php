@@ -55,7 +55,7 @@ SessionManager::remove('register_form_data');
         <form action="<?php echo BASE_URL; ?>/action/register_action.php" method="POST" id="registerForm" novalidate>
             <div class="form-group mb-3">
                 <label for="nome" class="form-label">
-                    <i class="bi bi-person me-2"></i>Nome:
+                    Nome:
                 </label>
                 <input type="text"
                        class="form-control"
@@ -70,7 +70,7 @@ SessionManager::remove('register_form_data');
 
             <div class="form-group mb-3">
                 <label for="cognome" class="form-label">
-                    <i class="bi bi-person me-2"></i>Cognome:
+                    Cognome:
                 </label>
                 <input type="text"
                        class="form-control"
@@ -84,7 +84,7 @@ SessionManager::remove('register_form_data');
 
             <div class="form-group mb-3">
                 <label for="email" class="form-label">
-                    <i class="bi bi-envelope me-2"></i>Email:
+                    Email:
                 </label>
                 <input type="email"
                        class="form-control"
@@ -103,7 +103,7 @@ SessionManager::remove('register_form_data');
 
             <div class="form-group mb-3">
                 <label for="password" class="form-label">
-                    <i class="bi bi-lock me-2"></i>Password:
+                    Password:
                 </label>
                 <input type="password"
                        class="form-control"
@@ -114,14 +114,13 @@ SessionManager::remove('register_form_data');
                 <div class="invalid-feedback">La password non soddisfa i requisiti</div>
                 <!-- ✅ INDICAZIONI SICUREZZA PASSWORD -->
                 <div class="password-requirements" id="passwordRequirements">
-                    <i class="bi bi-info-circle me-1"></i>
                     La password deve contenere almeno 6 caratteri
                 </div>
             </div>
 
             <div class="form-group mb-4">
                 <label for="confirm_password" class="form-label">
-                    <i class="bi bi-lock-fill me-2"></i>Conferma Password:
+                    Conferma Password:
                 </label>
                 <input type="password"
                        class="form-control"
@@ -133,7 +132,7 @@ SessionManager::remove('register_form_data');
             </div>
 
             <button type="submit" class="btn btn-primary w-100 mb-3">
-                <i class="bi bi-person-plus me-2"></i>Registrati
+                Registrati
             </button>
         </form>
 

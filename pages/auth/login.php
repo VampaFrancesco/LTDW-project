@@ -51,7 +51,7 @@ SessionManager::remove('login_form_data');
         <form action="<?php echo BASE_URL; ?>/action/login_action.php" method="POST" id="loginForm">
             <div class="form-group mb-3">
                 <label for="email" class="form-label">
-                    <i class="bi bi-envelope me-2"></i>Email:
+                    Email:
                 </label>
                 <input type="email"
                        class="form-control"
@@ -65,7 +65,7 @@ SessionManager::remove('login_form_data');
 
             <div class="form-group mb-4">
                 <label for="password" class="form-label">
-                    <i class="bi bi-lock me-2"></i>Password:
+                    Password:
                 </label>
                 <input type="password"
                        class="form-control"
