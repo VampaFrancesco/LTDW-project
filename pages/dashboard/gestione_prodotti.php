@@ -272,7 +272,7 @@ $conn->close();
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="#">
+                        <a class="nav-link active" href="gestione_categorie.php">
                             <i class="bi bi-tags"></i> Gestione Categorie
                         </a>
                     </li>
