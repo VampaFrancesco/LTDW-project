@@ -1,6 +1,6 @@
 <?php
 /**
- * pages/cart.php - Pagina carrello con sistema robusto
+ * pages/cart.php - Pagina carrello con sistema robusto - VERSIONE CORRETTA
  */
 
 require_once __DIR__.'/../include/session_manager.php';
@@ -9,10 +9,12 @@ require_once __DIR__.'/../include/Cart.php';
 
 // Inizializza variabili con valori di default sicuri
 $cart_items = [];
+$array_prodotti = []; // Inizializzazione esplicita
 $total_items = 0;
 $subtotal = 0;
 $shipping_cost = 5.00;
 $total = 5.00;
+$cart_error = false;
 
 // Inizializza carrello con configurazione database
 try {
@@ -20,18 +22,24 @@ try {
     // Ottieni dati carrello
     $cart_data = $cart->getTotals();
 
+
     // Valida e assegna solo se la struttura è corretta
+    if (isset($cart_data['items']) && is_array($cart_data['items'])) {
         $cart_items = $cart_data['items'];
-        $array_prodotti = $cart_items;
+        $array_prodotti = $cart_items; // Assegnazione esplicita
         $total_items = intval($cart_data['total_items'] ?? 0);
         $subtotal = floatval($cart_data['subtotal'] ?? 0);
         $shipping_cost = floatval($cart_data['shipping'] ?? 5.00);
         $total = floatval($cart_data['total'] ?? 5.00);
+
+    } else {
+        $cart_error = true;
+    }
 } catch (Exception $e) {
     error_log("Errore inizializzazione carrello: " . $e->getMessage());
+    $cart_error = true;
     // I valori di default sono già impostati sopra
 }
-
 include __DIR__.'/header.php';
 ?>
 
@@ -41,14 +49,26 @@ include __DIR__.'/header.php';
         <!-- Alert container per messaggi dinamici -->
         <div id="alert-container"></div>
 
-        <?php if (empty($array_prodotti)): ?>
+        <?php if ($cart_error): ?>
+            <!-- Errore carrello -->
+            <div class="alert alert-danger text-center py-4">
+                <i class="bi bi-exclamation-triangle fa-2x mb-3"></i>
+                <h4>Errore nel caricamento del carrello</h4>
+                <p>Si è verificato un problema nel caricamento dei dati del carrello.</p>
+                <a href="<?php echo BASE_URL; ?>/pages/home_utente.php" class="btn btn-primary">
+                    <i class="bi bi-house"></i> Torna alla Home
+                </a>
+            </div>
+
+        <?php elseif (count($array_prodotti) === 0): ?>
             <!-- Carrello vuoto -->
-            <div class="alert alert-info text-center py-5">
-                <i class="bi bi-shopping-cart fa-3x mb-3 text-muted"></i>
-                <h3>Il tuo carrello è vuoto</h3>
-                <p class="mb-4">Aggiungi alcuni prodotti per iniziare il tuo shopping!</p>
-                <a href="<?php echo BASE_URL; ?>/pages/home_utente.php" class="btn btn-primary btn-lg">
-                    <i class="bi bi-shopping-bag"></i> Vai allo Shop
+            <div style="background: #d1ecf1; border: 1px solid #bee5eb; border-radius: 8px; padding: 40px; margin: 20px 0; text-align: center; color: #0c5460;">
+                <div style="font-size: 48px; margin-bottom: 20px;">🛒</div>
+                <h3 style="margin-bottom: 15px; color: #0c5460;">Il tuo carrello è vuoto</h3>
+                <p style="margin-bottom: 25px; color: #0c5460;">Aggiungi alcuni prodotti per iniziare il tuo shopping!</p>
+                <a href="<?php echo BASE_URL; ?>/pages/home_utente.php"
+                   style="display: inline-block; background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+                    🛍️ Vai allo Shop
                 </a>
             </div>
 
@@ -305,7 +325,7 @@ include __DIR__.'/header.php';
                 });
         }
 
-        // Rimuovi prodotto dal carrello
+        // Rimuovi prodotto dal carrello - VERSIONE MIGLIORATA
         function removeFromCart(itemKey) {
             if (!confirm('Sei sicuro di voler rimuovere questo prodotto dal carrello?')) {
                 return;
@@ -334,9 +354,14 @@ include __DIR__.'/header.php';
                         // Aggiorna totali
                         updateCartTotals(data.totals);
 
-                        // Se carrello vuoto, ricarica pagina
+                        // Se carrello vuoto, ricarica pagina dopo breve pausa
+                        console.log('Total items after removal:', data.totals.total_items);
                         if (data.totals.total_items === 0) {
-                            setTimeout(() => location.reload(), 1000);
+                            showAlert('Carrello vuoto - ricaricamento pagina...', 'info');
+                            setTimeout(() => {
+                                console.log('Reloading page due to empty cart');
+                                window.location.reload();
+                            }, 2000);
                         }
                     } else {
                         throw new Error(data.message || 'Errore nella rimozione');
@@ -351,6 +376,8 @@ include __DIR__.'/header.php';
 
         // Aggiorna totali carrello nel DOM
         function updateCartTotals(totals) {
+            console.log('Updating cart totals:', totals);
+
             // Aggiorna subtotale
             const subtotalEl = document.getElementById('cart-subtotal');
             if (subtotalEl) {
