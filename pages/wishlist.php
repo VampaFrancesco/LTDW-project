@@ -198,9 +198,6 @@ include __DIR__ . '/header.php';
                     <div class="icon"><i class="bi bi-emoji-frown"></i></div>
                     <h3 class="mt-4">La tua wishlist è ancora vuota.</h3>
                     <p class="text-muted">Nessun problema! Inizia ad esplorare i nostri prodotti e aggiungi qui i tuoi preferiti.</p>
-                    <a href="<?php echo BASE_URL; ?>/pages/home_utente.php" class="btn btn-primary mt-3">
-                        <i class="bi bi-shop"></i> Inizia lo Shopping
-                    </a>
                 </div>
             <?php else: ?>
                 <div class="wishlist-page-container">

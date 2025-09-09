@@ -194,11 +194,6 @@ include __DIR__.'/header.php';
                                         Procedi al Checkout
                                     </button>
                                 </form>
-
-                                <a href="<?php echo BASE_URL; ?>/pages/home_utente.php"
-                                   class="btn btn-outline-secondary">
-                                    <i class="bi bi-arrow-left"></i> Continua Shopping
-                                </a>
                             </div>
                         </div>
                     </div>

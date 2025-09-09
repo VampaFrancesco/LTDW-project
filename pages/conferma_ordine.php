@@ -459,10 +459,6 @@ include __DIR__ . '/header.php';
                             <a href="<?php echo BASE_URL; ?>/pages/ordini.php" class="btn-custom btn-primary-custom">
                                 <i class="bi bi-list-ul me-2"></i>I Miei Ordini
                             </a>
-                            <a href="<?php echo BASE_URL; ?>/" class="btn-custom btn-outline-custom">
-                                <i class="bi bi-house me-2"></i>Continua Shopping
-                            </a>
-
                             <div class="mt-4">
                                 <div class="alert alert-success">
                                     <i class="bi bi-check-circle me-2"></i>
