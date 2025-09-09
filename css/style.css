@@ -2337,6 +2337,7 @@ img {
     width: 180px !important;
     text-align: right !important;
     justify-content: flex-end !important;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
 }
 
 .margin_top90 {

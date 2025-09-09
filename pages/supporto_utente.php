@@ -133,7 +133,7 @@ function getConversazioneCompleta($conn, $richiesta_id, $user_id) {
                 </div>
                 <h3>Nessuna richiesta di supporto</h3>
                 <p>Non hai ancora inviato alcuna richiesta di supporto. Quando ne invierai una, apparirà qui.</p>
-                <a href="<?php echo BASE_URL; ?>/pages/contatti.php" class="btn btn-support-primary">
+                <a href="<?php echo BASE_URL; ?>/pages/contatti.php" class="btn btn-filter-nav">
                     Invia la tua prima richiesta
                 </a>
             </div>
