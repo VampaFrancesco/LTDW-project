@@ -463,7 +463,6 @@ img {
     border-radius: 2px;
 
     /* Effetti visivi */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
     overflow: hidden;
     transition: all var(--transition-speed, 0.3s) ease;
 
