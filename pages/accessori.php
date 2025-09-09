@@ -97,7 +97,7 @@ $conn->close();
         <div class="d-flex justify-content-start align-items-start mb-4">
             <div class="d-flex flex-column align-items-end ms-auto">
                 <div class="dropdown mb-2">
-                    <button class="btn btn-secondary dropdown-toggle filtro-uniforme" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn btn-secondary dropdown-toggle filtro-uniforme" type="button" id="categoryFilterButton" data-bs-toggle="dropdown" aria-expanded="false">
                         Filtra per categoria
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" id="category-filter-menu">
@@ -108,7 +108,7 @@ $conn->close();
                     </ul>
                 </div>
                 <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle filtro-uniforme" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn btn-secondary dropdown-toggle filtro-uniforme" type="button" id="priceFilterButton" data-bs-toggle="dropdown" aria-expanded="false">
                         Filtra per prezzo
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" id="price-filter-menu">
@@ -200,8 +200,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const accessorySections = document.querySelectorAll('.accessory-category-section');
     const allAccessoryItems = document.querySelectorAll('.accessory-item');
 
+    // Riferimenti ai bottoni dropdown
+    const categoryDropdownButton = document.getElementById('categoryFilterButton');
+    const priceDropdownButton = document.getElementById('priceFilterButton');
+
     let activeCategoryFilter = 'tutti';
     let activePriceFilter = 'all';
+
+    // Funzioni per aggiornare il testo dei bottoni
+    function updateCategoryButtonText(selectedText) {
+        if (selectedText === 'Tutti') {
+            categoryDropdownButton.textContent = 'Filtra per categoria';
+        } else {
+            categoryDropdownButton.textContent = selectedText;
+        }
+    }
+
+    function updatePriceButtonText(selectedText) {
+        if (selectedText === 'Tutti') {
+            priceDropdownButton.textContent = 'Filtra per prezzo';
+        } else {
+            priceDropdownButton.textContent = selectedText;
+        }
+    }
 
     function applyFilters() {
         const container = document.getElementById('all-accessories-container');
@@ -279,14 +300,17 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const filterType = this.dataset.filterType;
             const filterValue = this.dataset.filterValue;
+            const selectedText = this.textContent.trim();
 
             document.querySelectorAll(`.filter-link[data-filter-type="${filterType}"]`).forEach(el => el.classList.remove('active-filter'));
             this.classList.add('active-filter');
 
             if (filterType === 'category') {
                 activeCategoryFilter = filterValue;
+                updateCategoryButtonText(selectedText);
             } else if (filterType === 'price') {
                 activePriceFilter = filterValue;
+                updatePriceButtonText(selectedText);
             }
 
             applyFilters();
