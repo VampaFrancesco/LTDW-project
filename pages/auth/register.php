@@ -49,7 +49,6 @@ SessionManager::remove('register_form_data');
             <div class="alert alert-<?php echo htmlspecialchars($flash_message['type']); ?> alert-dismissible fade show" role="alert">
                 <i class="bi bi-<?php echo $flash_message['type'] === 'danger' ? 'exclamation-triangle' : ($flash_message['type'] === 'success' ? 'check-circle' : 'info-circle'); ?> me-2"></i>
                 <?php echo htmlspecialchars($flash_message['content']); ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         <?php endif; ?>
 

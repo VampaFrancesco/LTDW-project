@@ -20,8 +20,6 @@ $hideNav = false;
 include __DIR__ . '/header.php';
 ?>
 
-<link rel="stylesheet" href="styles.css">
-
 <main class="background-custom">
     <div class="container py-5">
         <h1 class="fashion_taital mb-5">Traccia il tuo ordine</h1>

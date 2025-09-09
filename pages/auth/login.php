@@ -45,7 +45,6 @@ SessionManager::remove('login_form_data');
             <div class="alert alert-<?php echo htmlspecialchars($flash_message['type']); ?> alert-dismissible fade show" role="alert">
                 <i class="bi bi-<?php echo $flash_message['type'] === 'danger' ? 'exclamation-triangle' : 'check-circle'; ?> me-2"></i>
                 <?php echo htmlspecialchars($flash_message['content']); ?>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         <?php endif; ?>
 

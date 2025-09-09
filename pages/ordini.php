@@ -594,7 +594,7 @@ include __DIR__ . '/header.php';
             </div>
 
             <?php if (empty($orders)): ?>
-                <div class="empty-orders">
+                <div class="empty-orders" style="">
                     <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;">🛒</div>
                     <h3>Nessun ordine trovato</h3>
                     <p>Non hai ancora effettuato nessun ordine. Inizia a esplorare il nostro catalogo!</p>

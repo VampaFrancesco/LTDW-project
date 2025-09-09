@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Creato il: Set 07, 2025 alle 14:16
--- Versione del server: 10.4.32-MariaDB
--- Versione PHP: 8.2.12
+-- Host: localhost:8889
+-- Creato il: Set 09, 2025 alle 10:38
+-- Versione del server: 8.0.40
+-- Versione PHP: 8.3.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -53,6 +53,24 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `report_vendite` (IN `data_inizio` D
     ORDER BY data DESC;
 END$$
 
+--
+-- Funzioni
+--
+CREATE DEFINER=`root`@`localhost` FUNCTION `genera_numero_fattura` (`anno` INT) RETURNS VARCHAR(50) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci DETERMINISTIC READS SQL DATA BEGIN
+    DECLARE ultimo_numero INT DEFAULT 0;
+    DECLARE nuovo_numero VARCHAR(50);
+    
+    SELECT COALESCE(MAX(CAST(SUBSTRING_INDEX(numero_fattura, '/', 1) AS UNSIGNED)), 0)
+    INTO ultimo_numero
+    FROM fattura 
+    WHERE YEAR(data_emissione) = anno;
+    
+    SET ultimo_numero = ultimo_numero + 1;
+    SET nuovo_numero = CONCAT(LPAD(ultimo_numero, 4, '0'), '/', anno);
+    
+    RETURN nuovo_numero;
+END$$
+
 DELIMITER ;
 
 -- --------------------------------------------------------
@@ -62,11 +80,11 @@ DELIMITER ;
 --
 
 CREATE TABLE `admin` (
-  `id_admin` int(11) NOT NULL,
-  `fk_utente` int(11) NOT NULL,
-  `livello_admin` varchar(50) NOT NULL DEFAULT 'admin',
-  `data_creazione` datetime NOT NULL DEFAULT current_timestamp(),
-  `creato_da` int(11) DEFAULT NULL
+  `id_admin` int NOT NULL,
+  `fk_utente` int NOT NULL,
+  `livello_admin` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'admin',
+  `data_creazione` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `creato_da` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -76,7 +94,8 @@ CREATE TABLE `admin` (
 INSERT INTO `admin` (`id_admin`, `fk_utente`, `livello_admin`, `data_creazione`, `creato_da`) VALUES
 (2, 2, 'super_admin', '2025-08-06 17:11:58', 2),
 (3, 6, 'super_admin', '2025-08-06 17:33:24', NULL),
-(4, 9, 'super_admin', '2025-09-07 12:13:46', 2);
+(4, 9, 'super_admin', '2025-09-07 12:13:46', 2),
+(5, 16, 'admin', '2025-09-09 12:34:54', 2);
 
 -- --------------------------------------------------------
 
@@ -85,11 +104,11 @@ INSERT INTO `admin` (`id_admin`, `fk_utente`, `livello_admin`, `data_creazione`,
 --
 
 CREATE TABLE `box_oggetto` (
-  `fk_box` int(11) NOT NULL,
-  `fk_oggetto` int(11) NOT NULL,
+  `fk_box` int NOT NULL,
+  `fk_oggetto` int NOT NULL,
   `probabilita` float NOT NULL,
-  `quantita_min` int(11) NOT NULL DEFAULT 1,
-  `quantita_max` int(11) NOT NULL DEFAULT 1
+  `quantita_min` int NOT NULL DEFAULT '1',
+  `quantita_max` int NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -106,15 +125,15 @@ INSERT INTO `box_oggetto` (`fk_box`, `fk_oggetto`, `probabilita`, `quantita_min`
 --
 
 CREATE TABLE `carrello` (
-  `id_carrello` int(11) NOT NULL,
-  `totale` decimal(10,2) NOT NULL DEFAULT 0.00,
-  `fk_utente` int(11) NOT NULL,
-  `data_creazione` datetime NOT NULL DEFAULT current_timestamp(),
-  `data_ultima_modifica` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `quantita` bigint(20) NOT NULL,
-  `stato` enum('attivo','checkout','completato','abbandonato') DEFAULT 'attivo',
-  `fk_mystery_box` int(11) DEFAULT NULL,
-  `fk_oggetto` int(11) DEFAULT NULL
+  `id_carrello` int NOT NULL,
+  `totale` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `fk_utente` int NOT NULL,
+  `data_creazione` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `data_ultima_modifica` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `quantita` bigint NOT NULL,
+  `stato` enum('attivo','checkout','completato','abbandonato') COLLATE utf8mb4_unicode_ci DEFAULT 'attivo',
+  `fk_mystery_box` int DEFAULT NULL,
+  `fk_oggetto` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -155,7 +174,17 @@ INSERT INTO `carrello` (`id_carrello`, `totale`, `fk_utente`, `data_creazione`, 
 (55, 15.00, 7, '2025-09-05 16:11:49', '2025-09-05 16:12:00', 1, 'completato', NULL, 89),
 (56, 16.00, 7, '2025-09-05 16:11:52', '2025-09-05 16:12:00', 1, 'completato', NULL, 88),
 (57, 63.75, 7, '2025-09-05 16:25:10', '2025-09-05 16:32:58', 1, 'completato', 13, NULL),
-(58, 32.00, 7, '2025-09-05 23:26:02', '2025-09-05 23:26:02', 1, 'attivo', 5, NULL);
+(62, 10.85, 10, '2025-09-08 14:35:53', '2025-09-08 14:37:15', 1, 'completato', NULL, 38),
+(63, 10.00, 10, '2025-09-08 14:36:13', '2025-09-08 14:37:15', 1, 'completato', 8, NULL),
+(64, 16.00, 10, '2025-09-08 14:36:21', '2025-09-08 14:37:15', 1, 'completato', NULL, 32),
+(65, 15.00, 10, '2025-09-08 14:36:26', '2025-09-08 14:37:15', 1, 'completato', NULL, 33),
+(66, 15.00, 2, '2025-09-08 17:46:19', '2025-09-08 17:46:51', 1, 'completato', NULL, 89),
+(67, 15.00, 2, '2025-09-08 17:46:20', '2025-09-08 17:46:51', 1, 'completato', NULL, 90),
+(68, 10.00, 2, '2025-09-09 01:00:15', '2025-09-09 01:00:30', 1, 'completato', 8, NULL),
+(69, 20.00, 2, '2025-09-09 01:00:17', '2025-09-09 01:00:30', 1, 'completato', 9, NULL),
+(70, 30.00, 2, '2025-09-09 01:00:18', '2025-09-09 01:00:30', 1, 'completato', 10, NULL),
+(71, 75.00, 2, '2025-09-09 01:00:20', '2025-09-09 01:00:30', 1, 'completato', 13, NULL),
+(72, 63.75, 14, '2025-09-09 10:39:18', '2025-09-09 10:39:18', 1, 'attivo', 13, NULL);
 
 --
 -- Trigger `carrello`
@@ -174,9 +203,9 @@ DELIMITER ;
 --
 
 CREATE TABLE `carrello_utente` (
-  `fk_carrello` int(11) NOT NULL,
-  `fk_utente` int(11) NOT NULL,
-  `quantita` int(11) NOT NULL DEFAULT 1
+  `fk_carrello` int NOT NULL,
+  `fk_utente` int NOT NULL,
+  `quantita` int NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -186,9 +215,9 @@ CREATE TABLE `carrello_utente` (
 --
 
 CREATE TABLE `categoria_oggetto` (
-  `id_categoria` int(11) NOT NULL,
-  `nome_categoria` varchar(50) NOT NULL,
-  `tipo_oggetto` varchar(100) NOT NULL
+  `id_categoria` int NOT NULL,
+  `nome_categoria` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tipo_oggetto` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -206,7 +235,8 @@ INSERT INTO `categoria_oggetto` (`id_categoria`, `nome_categoria`, `tipo_oggetto
 (8, 'Yu-Gi-Oh!', 'Mystery Box'),
 (9, 'Pokémon', 'Funko Pop'),
 (10, 'Yu-Gi-Oh!', 'Funko Pop'),
-(11, 'Pokémon', 'Bustina Singola - Astri Lucenti');
+(11, 'Pokémon', 'Bustina Singola - Astri Lucenti'),
+(12, 'Peluche', 'Pupazzo');
 
 -- --------------------------------------------------------
 
@@ -215,10 +245,10 @@ INSERT INTO `categoria_oggetto` (`id_categoria`, `nome_categoria`, `tipo_oggetto
 --
 
 CREATE TABLE `classifica` (
-  `id_classifica` int(11) NOT NULL,
-  `nome_classifica` varchar(100) NOT NULL,
-  `tipo_classifica` varchar(50) NOT NULL,
-  `desc_classifica` text NOT NULL
+  `id_classifica` int NOT NULL,
+  `nome_classifica` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tipo_classifica` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `desc_classifica` text COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -228,9 +258,9 @@ CREATE TABLE `classifica` (
 --
 
 CREATE TABLE `contenuti_modificabili` (
-  `id_contenuto` varchar(50) NOT NULL,
-  `testo_contenuto` mediumtext NOT NULL,
-  `data_modifica` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id_contenuto` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `testo_contenuto` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `data_modifica` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -248,13 +278,13 @@ INSERT INTO `contenuti_modificabili` (`id_contenuto`, `testo_contenuto`, `data_m
 ('about_titolo_principale', 'Chi Siamo', '2025-09-06 15:56:04'),
 ('about_valori_testo', 'Offriamo solo prodotti originali, con attenzione alla qualità, alla sicurezza e al servizio clienti. Crediamo che ogni box debba raccontare una storia… e che la <em>sorpresa</em> sia metà del divertimento!', '2025-09-06 15:56:04'),
 ('about_valori_titolo', 'I NOSTRI VALORI', '2025-09-06 15:56:04'),
-('avviso_promozioni', 'È possibile visionare e approfittare degli sconti solamente nelle novità essendo promozioni a tempo limitate', '2025-09-06 16:20:31'),
-('community_classifica_desc', 'Sfida gli altri collezionisti e scala la classifica per diventare il numero uno!', '2025-09-06 16:20:31'),
-('community_classifica_titolo', 'Classifica', '2025-09-06 16:20:31'),
-('community_collezione_desc', 'Gestisci e mostra le tue carte Pokémon e Yu-Gi-Oh! alla community.', '2025-09-06 16:20:31'),
-('community_collezione_titolo', 'La Mia Collezione', '2025-09-06 16:20:31'),
-('community_scambi_desc', 'Scambia le tue carte doppie e completa la tua collezione con altri appassionati.', '2025-09-06 16:20:31'),
-('community_scambi_titolo', 'Scambi di Carte', '2025-09-06 16:20:31'),
+('avviso_promozioni', 'È possibile visionare e approfittare degli sconti solamente nelle novità essendo promozioni a tempo limitate', '2025-09-09 12:35:41'),
+('community_classifica_desc', 'Sfida gli altri collezionisti e scala la classifica per diventare il numero uno!', '2025-09-09 12:35:41'),
+('community_classifica_titolo', 'Classifica', '2025-09-09 12:35:41'),
+('community_collezione_desc', 'Gestisci e mostra le tue carte Pokémon e Yu-Gi-Oh! alla community.', '2025-09-09 12:35:41'),
+('community_collezione_titolo', 'La Mia Collezione', '2025-09-09 12:35:41'),
+('community_scambi_desc', 'Scambia le tue carte doppie e completa la tua collezione con altri appassionati.', '2025-09-09 12:35:41'),
+('community_scambi_titolo', 'Scambi di Carte', '2025-09-09 12:35:41'),
 ('faq_a1', '<strong>Assolutamente sì!</strong> La sicurezza dei tuoi dati è la nostra priorità assoluta. Non memorizziamo mai i dati delle tue carte di credito sui nostri server. Tutti i pagamenti vengono elaborati tramite gateway sicuri certificati PCI DSS con crittografia SSL 256-bit. Inoltre, utilizziamo tecnologie di protezione antifrode e monitoraggio 24/7 per garantire la massima sicurezza delle transazioni.', '2025-09-06 15:56:04'),
 ('faq_a2', 'Una volta confermato l\'ordine e processato il pagamento, <strong>non è possibile modificare il metodo di pagamento</strong>. Tuttavia, se l\'ordine è ancora in fase di elaborazione (entro 30 minuti dall\'acquisto), puoi contattare immediatamente il nostro supporto clienti che valuterà la possibilità di assistenza. Per ordini futuri, assicurati di selezionare il metodo di pagamento preferito prima di confermare l\'acquisto.', '2025-09-06 15:56:04'),
 ('faq_a3', 'In caso di pagamento non riuscito, <strong>riceverai una notifica immediata</strong> via email con i dettagli dell\'errore. Il tuo ordine rimarrà in sospeso per 24 ore, durante le quali potrai accedere al tuo account e riprovare il pagamento con lo stesso o un diverso metodo. Se il problema persiste, verifica i dati della carta, il saldo disponibile o contatta la tua banca. Il nostro supporto è sempre disponibile per assistenza.', '2025-09-06 15:56:04'),
@@ -277,10 +307,10 @@ INSERT INTO `contenuti_modificabili` (`id_contenuto`, `testo_contenuto`, `data_m
 ('faq_q8', 'Come posso richiedere un rimborso?', '2025-09-06 15:56:04'),
 ('faq_sottotitolo_pagina', 'Domande Frequenti sui Metodi di Pagamento', '2025-09-06 15:56:04'),
 ('faq_titolo_pagina', 'FAQ Pagamenti', '2025-09-06 15:56:04'),
-('testo_benvenuto', 'Esplora l\'universo delle Mystery Box, Funko Pop e Carte da Collezione. Trova il tuo prossimo tesoro e unisciti alla community più appassionata del web.', '2025-09-06 16:20:31'),
-('titolo_community', '🤝 La Community di BoxOmnia', '2025-09-06 16:20:31'),
-('titolo_funko_pop', '🎉 Novità Funko POP', '2025-09-06 16:20:31'),
-('titolo_mystery_box', '✨ Nuove Mystery Box', '2025-09-06 16:20:31');
+('testo_benvenuto', 'Esplora l\'universo delle Mystery Box, Funko Pop e Carte da Collezione. Trova il tuo prossimo tesoro e unisciti alla community più appassionata del web.', '2025-09-09 12:35:41'),
+('titolo_community', '🤝 La Community di BoxOmnia', '2025-09-09 12:35:41'),
+('titolo_funko_pop', '🎉 Novità Funko POP', '2025-09-09 12:35:41'),
+('titolo_mystery_box', '✨ Nuove Mystery Box', '2025-09-09 12:35:41');
 
 -- --------------------------------------------------------
 
@@ -289,12 +319,12 @@ INSERT INTO `contenuti_modificabili` (`id_contenuto`, `testo_contenuto`, `data_m
 --
 
 CREATE TABLE `immagine` (
-  `id_immagine` int(11) NOT NULL,
-  `nome_img` varchar(100) DEFAULT NULL,
-  `descrizione_img` varchar(100) DEFAULT NULL,
-  `dimensione` int(11) DEFAULT NULL,
-  `fk_oggetto` int(11) DEFAULT NULL,
-  `fk_mystery_box` int(11) DEFAULT NULL
+  `id_immagine` int NOT NULL,
+  `nome_img` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `descrizione_img` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dimensione` int DEFAULT NULL,
+  `fk_oggetto` int DEFAULT NULL,
+  `fk_mystery_box` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -426,14 +456,14 @@ INSERT INTO `immagine` (`id_immagine`, `nome_img`, `descrizione_img`, `dimension
 --
 
 CREATE TABLE `indirizzo_spedizione` (
-  `id_indirizzo` int(11) NOT NULL,
-  `via` varchar(100) NOT NULL,
-  `civico` bigint(20) NOT NULL,
-  `cap` bigint(20) NOT NULL,
-  `citta` varchar(100) NOT NULL,
-  `nazione` varchar(100) NOT NULL,
-  `provincia` varchar(100) NOT NULL,
-  `fk_utente` int(11) NOT NULL
+  `id_indirizzo` int NOT NULL,
+  `via` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `civico` bigint NOT NULL,
+  `cap` bigint NOT NULL,
+  `citta` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nazione` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `provincia` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fk_utente` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -441,7 +471,10 @@ CREATE TABLE `indirizzo_spedizione` (
 --
 
 INSERT INTO `indirizzo_spedizione` (`id_indirizzo`, `via`, `civico`, `cap`, `citta`, `nazione`, `provincia`, `fk_utente`) VALUES
-(6, 'Abruzzo', 89, 64028, 'Silvi', 'Italia', 'TE', 7);
+(6, 'Abruzzo', 89, 64028, 'Silvi', 'Italia', 'TE', 7),
+(10, 'aswed', 12, 3100, 'fr', 'Italia', 'FR', 10),
+(11, 'Abruzzo', 89, 55440, 'w', 'Italia', 'DD', 2),
+(12, 'Sorprese', 123, 12345, 'ROma', 'Italia', 'RM', 15);
 
 -- --------------------------------------------------------
 
@@ -450,13 +483,13 @@ INSERT INTO `indirizzo_spedizione` (`id_indirizzo`, `via`, `civico`, `cap`, `cit
 --
 
 CREATE TABLE `info_ordine` (
-  `id_info_ordine` int(11) NOT NULL,
-  `fk_ordine` int(11) NOT NULL,
-  `fk_box` int(11) DEFAULT NULL,
-  `fk_oggetto` int(11) DEFAULT NULL,
-  `quantita_ordine` int(11) NOT NULL,
+  `id_info_ordine` int NOT NULL,
+  `fk_ordine` int NOT NULL,
+  `fk_box` int DEFAULT NULL,
+  `fk_oggetto` int DEFAULT NULL,
+  `quantita_ordine` int NOT NULL,
   `totale_ordine` decimal(10,2) NOT NULL,
-  `note_ordine` text DEFAULT NULL
+  `note_ordine` text COLLATE utf8mb4_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -467,7 +500,17 @@ INSERT INTO `info_ordine` (`id_info_ordine`, `fk_ordine`, `fk_box`, `fk_oggetto`
 (15, 26, NULL, 10, 1, 4.50, NULL),
 (16, 26, NULL, 89, 1, 15.00, NULL),
 (17, 26, NULL, 88, 1, 16.00, NULL),
-(18, 27, 13, NULL, 1, 63.75, NULL);
+(18, 27, 13, NULL, 1, 63.75, NULL),
+(19, 28, NULL, 38, 1, 10.85, NULL),
+(20, 28, 8, NULL, 1, 10.00, NULL),
+(21, 28, NULL, 32, 1, 16.00, NULL),
+(22, 28, NULL, 33, 1, 15.00, NULL),
+(23, 29, NULL, 89, 1, 15.00, NULL),
+(24, 29, NULL, 90, 1, 15.00, NULL),
+(25, 30, 8, NULL, 1, 10.00, NULL),
+(26, 30, 9, NULL, 1, 20.00, NULL),
+(27, 30, 10, NULL, 1, 30.00, NULL),
+(28, 30, 13, NULL, 1, 75.00, NULL);
 
 -- --------------------------------------------------------
 
@@ -476,13 +519,13 @@ INSERT INTO `info_ordine` (`id_info_ordine`, `fk_ordine`, `fk_box`, `fk_oggetto`
 --
 
 CREATE TABLE `mystery_box` (
-  `id_box` int(11) NOT NULL,
-  `nome_box` varchar(100) NOT NULL,
-  `desc_box` text NOT NULL,
+  `id_box` int NOT NULL,
+  `nome_box` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `desc_box` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `prezzo_box` decimal(10,2) NOT NULL,
-  `quantita_box` int(11) NOT NULL,
-  `fk_rarita` int(11) NOT NULL,
-  `fk_categoria_oggetto` int(11) NOT NULL
+  `quantita_box` int NOT NULL,
+  `fk_rarita` int NOT NULL,
+  `fk_categoria_oggetto` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -510,13 +553,13 @@ INSERT INTO `mystery_box` (`id_box`, `nome_box`, `desc_box`, `prezzo_box`, `quan
 --
 
 CREATE TABLE `notifiche_utente` (
-  `id_notifica` int(11) NOT NULL,
-  `fk_utente` int(11) NOT NULL,
-  `fk_richiesta` int(11) NOT NULL,
-  `titolo` varchar(255) NOT NULL,
-  `messaggio` text NOT NULL,
-  `letta` tinyint(1) DEFAULT 0,
-  `data_notifica` timestamp NOT NULL DEFAULT current_timestamp()
+  `id_notifica` int NOT NULL,
+  `fk_utente` int NOT NULL,
+  `fk_richiesta` int NOT NULL,
+  `titolo` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `messaggio` text COLLATE utf8mb4_general_ci NOT NULL,
+  `letta` tinyint(1) DEFAULT '0',
+  `data_notifica` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -526,7 +569,10 @@ CREATE TABLE `notifiche_utente` (
 INSERT INTO `notifiche_utente` (`id_notifica`, `fk_utente`, `fk_richiesta`, `titolo`, `messaggio`, `letta`, `data_notifica`) VALUES
 (1, 1, 1, 'Risposta ricevuta: Richiesta di supporto da Davide Blasioli', 'Hai ricevuto una risposta alla tua richiesta di supporto da Francesco', 1, '2025-09-06 20:31:28'),
 (2, 1, 2, 'Risposta ricevuta: Richiesta di supporto da Davide Blasioli', 'Hai ricevuto una risposta alla tua richiesta di supporto da Francesco', 1, '2025-09-06 21:18:24'),
-(3, 1, 3, 'Risposta ricevuta: Richiesta di supporto da Davide Blasioli', 'Hai ricevuto una risposta alla tua richiesta di supporto da Davide', 1, '2025-09-07 10:15:03');
+(3, 1, 3, 'Risposta ricevuta: Richiesta di supporto da Davide Blasioli', 'Hai ricevuto una risposta alla tua richiesta di supporto da Davide', 1, '2025-09-07 10:15:03'),
+(4, 10, 5, 'Risposta ricevuta: Richiesta di supporto da gul stirpe', 'Hai ricevuto una risposta alla tua richiesta di supporto da Francesco', 0, '2025-09-08 12:38:34'),
+(5, 10, 5, 'Risposta ricevuta: Richiesta di supporto da gul stirpe', 'Hai ricevuto una risposta alla tua richiesta di supporto da Francesco', 0, '2025-09-08 12:38:50'),
+(6, 7, 4, 'Risposta ricevuta: Richiesta di supporto da Francesco Vampa', 'Hai ricevuto una risposta alla tua richiesta di supporto da Francesco', 1, '2025-09-08 15:46:02');
 
 -- --------------------------------------------------------
 
@@ -535,9 +581,9 @@ INSERT INTO `notifiche_utente` (`id_notifica`, `fk_utente`, `fk_richiesta`, `tit
 --
 
 CREATE TABLE `novita_box` (
-  `fk_mystery_box` int(11) NOT NULL,
+  `fk_mystery_box` int NOT NULL,
   `data_novita` datetime NOT NULL,
-  `desc_novita` varchar(100) DEFAULT NULL,
+  `desc_novita` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sconto_novita` decimal(10,0) DEFAULT NULL,
   `fine_novita` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -561,9 +607,9 @@ INSERT INTO `novita_box` (`fk_mystery_box`, `data_novita`, `desc_novita`, `scont
 --
 
 CREATE TABLE `novita_oggetto` (
-  `fk_oggetto` int(11) NOT NULL,
+  `fk_oggetto` int NOT NULL,
   `novita_data` datetime NOT NULL,
-  `novita_desc` varchar(100) DEFAULT NULL,
+  `novita_desc` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `novita_sconto` decimal(10,0) DEFAULT NULL,
   `novita_fine` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -590,14 +636,14 @@ INSERT INTO `novita_oggetto` (`fk_oggetto`, `novita_data`, `novita_desc`, `novit
 --
 
 CREATE TABLE `oggetto` (
-  `id_oggetto` int(11) NOT NULL,
-  `nome_oggetto` varchar(100) NOT NULL,
-  `desc_oggetto` text NOT NULL,
+  `id_oggetto` int NOT NULL,
+  `nome_oggetto` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `desc_oggetto` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `prezzo_oggetto` decimal(10,2) DEFAULT NULL,
-  `quant_oggetto` int(11) DEFAULT NULL,
-  `punto` int(11) DEFAULT NULL,
-  `fk_categoria_oggetto` int(11) NOT NULL,
-  `fk_rarita` int(11) DEFAULT NULL
+  `quant_oggetto` int DEFAULT NULL,
+  `punto` int DEFAULT NULL,
+  `fk_categoria_oggetto` int NOT NULL,
+  `fk_rarita` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -718,8 +764,8 @@ INSERT INTO `oggetto` (`id_oggetto`, `nome_oggetto`, `desc_oggetto`, `prezzo_ogg
 --
 
 CREATE TABLE `oggetto_collezione` (
-  `fk_oggetto` int(11) NOT NULL,
-  `numero_carta` varchar(100) NOT NULL,
+  `fk_oggetto` int NOT NULL,
+  `numero_carta` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `valore_stimato` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -778,9 +824,9 @@ INSERT INTO `oggetto_collezione` (`fk_oggetto`, `numero_carta`, `valore_stimato`
 --
 
 CREATE TABLE `oggetto_utente` (
-  `fk_utente` int(11) NOT NULL,
-  `fk_oggetto` int(11) NOT NULL,
-  `quantita_ogg` int(11) NOT NULL DEFAULT 1
+  `fk_utente` int NOT NULL,
+  `fk_oggetto` int NOT NULL,
+  `quantita_ogg` int NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -790,20 +836,23 @@ CREATE TABLE `oggetto_utente` (
 INSERT INTO `oggetto_utente` (`fk_utente`, `fk_oggetto`, `quantita_ogg`) VALUES
 (1, 1, 7),
 (1, 2, 6),
-(1, 48, 6),
+(1, 48, 5),
 (1, 53, 1),
 (1, 65, 25),
+(1, 66, 1),
 (1, 85, 1),
 (1, 86, 1),
 (7, 1, 4),
 (7, 2, 5),
-(7, 48, 1),
+(7, 48, 2),
 (7, 53, 3),
 (7, 65, 75),
-(7, 66, 50),
+(7, 66, 49),
 (7, 67, 1),
 (7, 76, 1),
-(7, 85, 1);
+(7, 85, 1),
+(14, 67, 3),
+(15, 66, 1);
 
 -- --------------------------------------------------------
 
@@ -812,13 +861,13 @@ INSERT INTO `oggetto_utente` (`fk_utente`, `fk_oggetto`, `quantita_ogg`) VALUES
 --
 
 CREATE TABLE `ordine` (
-  `id_ordine` int(11) NOT NULL,
-  `data_ordine` datetime NOT NULL DEFAULT current_timestamp(),
-  `tracking` varchar(100) DEFAULT NULL,
+  `id_ordine` int NOT NULL,
+  `data_ordine` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `tracking` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `stato_ordine` tinyint(1) NOT NULL,
-  `fk_utente` int(11) NOT NULL,
-  `fk_indirizzo` int(11) NOT NULL,
-  `fk_carrello` int(11) DEFAULT NULL
+  `fk_utente` int NOT NULL,
+  `fk_indirizzo` int NOT NULL,
+  `fk_carrello` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -826,8 +875,11 @@ CREATE TABLE `ordine` (
 --
 
 INSERT INTO `ordine` (`id_ordine`, `data_ordine`, `tracking`, `stato_ordine`, `fk_utente`, `fk_indirizzo`, `fk_carrello`) VALUES
-(26, '2025-09-05 16:12:00', NULL, 0, 7, 6, NULL),
-(27, '2025-09-05 16:32:58', NULL, 0, 7, 6, NULL);
+(26, '2025-09-05 16:12:00', '', 2, 7, 6, NULL),
+(27, '2025-09-05 16:32:58', '', 2, 7, 6, NULL),
+(28, '2025-09-08 14:37:15', '', 2, 10, 10, NULL),
+(29, '2025-09-08 17:46:51', '', 2, 2, 11, NULL),
+(30, '2025-09-09 01:00:30', '', 2, 2, 11, NULL);
 
 -- --------------------------------------------------------
 
@@ -836,13 +888,13 @@ INSERT INTO `ordine` (`id_ordine`, `data_ordine`, `tracking`, `stato_ordine`, `f
 --
 
 CREATE TABLE `ordine_log` (
-  `id_log` int(11) NOT NULL,
-  `fk_ordine` int(11) NOT NULL,
+  `id_log` int NOT NULL,
+  `fk_ordine` int NOT NULL,
   `stato_precedente` tinyint(1) DEFAULT NULL,
   `stato_nuovo` tinyint(1) NOT NULL,
-  `note` text DEFAULT NULL,
-  `modificato_da` int(11) DEFAULT NULL,
-  `data_modifica` datetime DEFAULT current_timestamp()
+  `note` text COLLATE utf8mb4_unicode_ci,
+  `modificato_da` int DEFAULT NULL,
+  `data_modifica` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -851,7 +903,15 @@ CREATE TABLE `ordine_log` (
 
 INSERT INTO `ordine_log` (`id_log`, `fk_ordine`, `stato_precedente`, `stato_nuovo`, `note`, `modificato_da`, `data_modifica`) VALUES
 (23, 26, NULL, 0, 'Ordine ORD-68baefb0759373.79004227 creato - 3 articoli (0 Mystery Box, 3 oggetti) - Totale: €40.50 - Pagamento: carta_credito', NULL, '2025-09-05 16:12:00'),
-(24, 27, NULL, 0, 'Ordine ORD-68baf49a1ee451.93783038 creato - 1 articoli (1 Mystery Box, 0 oggetti) - Totale: €63.75 - Pagamento: carta_credito', NULL, '2025-09-05 16:32:58');
+(24, 27, NULL, 0, 'Ordine ORD-68baf49a1ee451.93783038 creato - 1 articoli (1 Mystery Box, 0 oggetti) - Totale: €63.75 - Pagamento: carta_credito', NULL, '2025-09-05 16:32:58'),
+(25, 28, NULL, 0, 'Ordine ORD-68becdfb5b1557.72565962 creato - 4 articoli (1 Mystery Box, 3 oggetti) - Totale: €51.85 - Pagamento: carta_credito', NULL, '2025-09-08 14:37:15'),
+(26, 28, 0, 2, '', NULL, '2025-09-08 17:31:02'),
+(27, 29, NULL, 0, 'Ordine ORD-68befa6b1bc4f2.18448167 creato - 2 articoli (0 Mystery Box, 2 oggetti) - Totale: €35.00 - Pagamento: carta_credito', NULL, '2025-09-08 17:46:51'),
+(28, 29, 0, 2, '', NULL, '2025-09-08 23:51:17'),
+(29, 27, 0, 2, '', NULL, '2025-09-08 23:51:27'),
+(30, 26, 0, 2, '', NULL, '2025-09-08 23:51:33'),
+(31, 30, NULL, 0, 'Ordine ORD-68bf600eccf2b9.25915593 creato - 4 articoli (4 Mystery Box, 0 oggetti) - Totale: €135.00 - Pagamento: carta_credito', NULL, '2025-09-09 01:00:30'),
+(32, 30, 0, 2, '', NULL, '2025-09-09 01:00:51');
 
 -- --------------------------------------------------------
 
@@ -860,10 +920,10 @@ INSERT INTO `ordine_log` (`id_log`, `fk_ordine`, `stato_precedente`, `stato_nuov
 --
 
 CREATE TABLE `rarita` (
-  `id_rarita` int(11) NOT NULL,
-  `nome_rarita` varchar(100) NOT NULL,
-  `colore` varchar(100) DEFAULT NULL,
-  `ordine` int(11) DEFAULT NULL,
+  `id_rarita` int NOT NULL,
+  `nome_rarita` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `colore` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ordine` int DEFAULT NULL,
   `probabilita` float DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -886,14 +946,14 @@ INSERT INTO `rarita` (`id_rarita`, `nome_rarita`, `colore`, `ordine`, `probabili
 --
 
 CREATE TABLE `richieste_supporto` (
-  `id_richiesta` int(11) NOT NULL,
-  `fk_utente` int(11) NOT NULL,
-  `oggetto` varchar(255) NOT NULL,
-  `messaggio` text NOT NULL,
-  `stato` enum('aperta','in_corso','chiusa') DEFAULT 'aperta',
-  `data_creazione` timestamp NOT NULL DEFAULT current_timestamp(),
-  `data_aggiornamento` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `priorita` enum('bassa','normale','alta') DEFAULT 'normale'
+  `id_richiesta` int NOT NULL,
+  `fk_utente` int NOT NULL,
+  `oggetto` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `messaggio` text COLLATE utf8mb4_general_ci NOT NULL,
+  `stato` enum('aperta','in_corso','chiusa') COLLATE utf8mb4_general_ci DEFAULT 'aperta',
+  `data_creazione` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `data_aggiornamento` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `priorita` enum('bassa','normale','alta') COLLATE utf8mb4_general_ci DEFAULT 'normale'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -903,7 +963,9 @@ CREATE TABLE `richieste_supporto` (
 INSERT INTO `richieste_supporto` (`id_richiesta`, `fk_utente`, `oggetto`, `messaggio`, `stato`, `data_creazione`, `data_aggiornamento`, `priorita`) VALUES
 (1, 1, 'Richiesta di supporto da Davide Blasioli', 'Nome: Davide Blasioli\nEmail: db@gmail.com\n\nMessaggio:\nHo un problema con un pagamento', 'chiusa', '2025-09-06 20:26:44', '2025-09-06 20:31:28', 'normale'),
 (2, 1, 'Richiesta di supporto da Davide Blasioli', 'Nome: Davide Blasioli\nEmail: db@gmail.com\n\nMessaggio:\nSecondo problema', 'chiusa', '2025-09-06 21:17:46', '2025-09-06 21:18:24', 'normale'),
-(3, 1, 'Richiesta di supporto da Davide Blasioli', 'Nome: Davide Blasioli\nEmail: db@gmail.com\n\nMessaggio:\nTerzo problema!', 'chiusa', '2025-09-07 10:14:38', '2025-09-07 10:15:03', 'normale');
+(3, 1, 'Richiesta di supporto da Davide Blasioli', 'Nome: Davide Blasioli\nEmail: db@gmail.com\n\nMessaggio:\nTerzo problema!', 'chiusa', '2025-09-07 10:14:38', '2025-09-07 10:15:03', 'normale'),
+(4, 7, 'Richiesta di supporto da Francesco Vampa', 'Nome: Francesco Vampa\nEmail: fv@gmail.com\n\nMessaggio:\nNon riesco a ordinare i deck box', 'chiusa', '2025-09-08 10:28:59', '2025-09-08 15:46:02', 'normale'),
+(5, 10, 'Richiesta di supporto da gul stirpe', 'Nome: gul stirpe\nEmail: gug@gmail.com\n\nMessaggio:\naiuto', 'chiusa', '2025-09-08 12:37:51', '2025-09-08 12:38:50', 'normale');
 
 -- --------------------------------------------------------
 
@@ -912,11 +974,11 @@ INSERT INTO `richieste_supporto` (`id_richiesta`, `fk_utente`, `oggetto`, `messa
 --
 
 CREATE TABLE `risposte_supporto` (
-  `id_risposta` int(11) NOT NULL,
-  `fk_richiesta` int(11) NOT NULL,
-  `fk_admin` int(11) NOT NULL,
-  `messaggio` text NOT NULL,
-  `data_risposta` timestamp NOT NULL DEFAULT current_timestamp()
+  `id_risposta` int NOT NULL,
+  `fk_richiesta` int NOT NULL,
+  `fk_admin` int NOT NULL,
+  `messaggio` text COLLATE utf8mb4_general_ci NOT NULL,
+  `data_risposta` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -926,7 +988,10 @@ CREATE TABLE `risposte_supporto` (
 INSERT INTO `risposte_supporto` (`id_risposta`, `fk_richiesta`, `fk_admin`, `messaggio`, `data_risposta`) VALUES
 (1, 1, 2, 'Problema risolto!', '2025-09-06 20:31:28'),
 (2, 2, 2, 'Secondo problema risolto!', '2025-09-06 21:18:24'),
-(3, 3, 9, 'Problema risolto!', '2025-09-07 10:15:03');
+(3, 3, 9, 'Problema risolto!', '2025-09-07 10:15:03'),
+(4, 5, 2, 'nbsnd', '2025-09-08 12:38:34'),
+(5, 5, 2, 'a', '2025-09-08 12:38:50'),
+(6, 4, 2, 'x', '2025-09-08 15:46:02');
 
 -- --------------------------------------------------------
 
@@ -935,12 +1000,12 @@ INSERT INTO `risposte_supporto` (`id_risposta`, `fk_richiesta`, `fk_admin`, `mes
 --
 
 CREATE TABLE `scambi` (
-  `id_scambio` int(11) NOT NULL,
-  `fk_utente_richiedente` int(11) NOT NULL,
-  `fk_utente_offerente` int(11) DEFAULT NULL,
-  `stato_scambio` enum('in_corso','in_attesa','concluso','annullato') DEFAULT 'in_corso',
-  `data_creazione` timestamp NOT NULL DEFAULT current_timestamp(),
-  `data_modifica` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id_scambio` int NOT NULL,
+  `fk_utente_richiedente` int NOT NULL,
+  `fk_utente_offerente` int DEFAULT NULL,
+  `stato_scambio` enum('in_corso','in_attesa','concluso','annullato') COLLATE utf8mb4_unicode_ci DEFAULT 'in_corso',
+  `data_creazione` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `data_modifica` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -954,15 +1019,20 @@ INSERT INTO `scambi` (`id_scambio`, `fk_utente_richiedente`, `fk_utente_offerent
 (4, 1, 7, 'concluso', '2025-09-04 20:49:07', '2025-09-04 20:50:05'),
 (5, 1, 7, 'concluso', '2025-09-04 20:55:04', '2025-09-04 20:55:55'),
 (6, 7, 1, 'concluso', '2025-09-04 21:01:35', '2025-09-04 21:02:31'),
-(7, 1, 7, 'concluso', '2025-09-04 21:40:31', '2025-09-07 12:14:50'),
-(8, 7, 1, 'concluso', '2025-09-04 21:43:24', '2025-09-07 12:14:53'),
-(9, 7, 1, 'concluso', '2025-09-04 21:45:28', '2025-09-07 12:14:56'),
-(11, 1, 7, 'concluso', '2025-09-05 08:12:32', '2025-09-07 12:15:01'),
-(17, 7, 1, 'concluso', '2025-09-06 14:07:15', '2025-09-07 12:15:14'),
-(18, 1, 7, 'concluso', '2025-09-06 14:09:41', '2025-09-07 12:15:16'),
-(19, 1, 7, 'concluso', '2025-09-07 10:37:21', '2025-09-07 12:15:18'),
-(20, 1, 7, 'concluso', '2025-09-07 12:06:50', '2025-09-07 12:15:20'),
-(21, 1, 7, 'concluso', '2025-09-07 12:12:16', '2025-09-07 12:14:14');
+(7, 1, NULL, 'concluso', '2025-09-04 21:40:31', '2025-09-04 21:40:53'),
+(8, 7, NULL, 'concluso', '2025-09-04 21:43:24', '2025-09-04 21:43:40'),
+(9, 7, NULL, 'concluso', '2025-09-04 21:45:28', '2025-09-05 13:40:02'),
+(10, 1, NULL, 'in_corso', '2025-09-05 08:12:22', '2025-09-05 08:12:22'),
+(11, 1, NULL, 'concluso', '2025-09-05 08:12:32', '2025-09-05 08:13:39'),
+(12, 7, NULL, 'in_corso', '2025-09-05 12:20:24', '2025-09-05 12:20:24'),
+(13, 7, NULL, 'in_corso', '2025-09-05 12:23:23', '2025-09-05 12:23:23'),
+(14, 7, NULL, 'in_corso', '2025-09-05 21:01:46', '2025-09-05 21:01:46'),
+(15, 1, NULL, 'in_corso', '2025-09-06 13:50:46', '2025-09-06 13:50:46'),
+(16, 7, NULL, 'in_corso', '2025-09-06 14:06:01', '2025-09-06 14:06:01'),
+(17, 7, NULL, 'concluso', '2025-09-06 14:07:15', '2025-09-06 14:07:47'),
+(18, 1, NULL, 'concluso', '2025-09-06 14:09:41', '2025-09-07 17:37:48'),
+(19, 7, NULL, 'in_corso', '2025-09-07 17:37:43', '2025-09-07 17:37:43'),
+(20, 7, NULL, 'concluso', '2025-09-08 20:55:05', '2025-09-08 20:56:13');
 
 -- --------------------------------------------------------
 
@@ -971,11 +1041,11 @@ INSERT INTO `scambi` (`id_scambio`, `fk_utente_richiedente`, `fk_utente_offerent
 --
 
 CREATE TABLE `scambio_offerte` (
-  `id_offerta` int(11) NOT NULL,
-  `fk_scambio` int(11) NOT NULL,
-  `fk_oggetto` int(11) NOT NULL,
-  `quantita_offerta` int(11) NOT NULL,
-  `fk_utente_offerente` int(11) NOT NULL
+  `id_offerta` int NOT NULL,
+  `fk_scambio` int NOT NULL,
+  `fk_oggetto` int NOT NULL,
+  `quantita_offerta` int NOT NULL,
+  `fk_utente_offerente` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -992,12 +1062,17 @@ INSERT INTO `scambio_offerte` (`id_offerta`, `fk_scambio`, `fk_oggetto`, `quanti
 (7, 7, 48, 1, 1),
 (8, 8, 1, 1, 7),
 (9, 9, 48, 1, 7),
+(10, 10, 48, 1, 1),
 (11, 11, 48, 1, 1),
+(12, 12, 48, 1, 7),
+(13, 13, 48, 1, 7),
+(14, 14, 66, 1, 7),
+(15, 15, 48, 1, 1),
+(16, 16, 66, 25, 7),
 (17, 17, 65, 25, 7),
 (18, 18, 48, 1, 1),
-(19, 19, 48, 1, 1),
-(20, 20, 48, 1, 1),
-(21, 21, 48, 1, 1);
+(19, 19, 66, 1, 7),
+(20, 20, 66, 1, 7);
 
 -- --------------------------------------------------------
 
@@ -1006,10 +1081,10 @@ INSERT INTO `scambio_offerte` (`id_offerta`, `fk_scambio`, `fk_oggetto`, `quanti
 --
 
 CREATE TABLE `scambio_richieste` (
-  `id_richiesta` int(11) NOT NULL,
-  `fk_scambio` int(11) NOT NULL,
-  `fk_oggetto` int(11) NOT NULL,
-  `quantita_richiesta` int(11) NOT NULL
+  `id_richiesta` int NOT NULL,
+  `fk_scambio` int NOT NULL,
+  `fk_oggetto` int NOT NULL,
+  `quantita_richiesta` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -1026,12 +1101,17 @@ INSERT INTO `scambio_richieste` (`id_richiesta`, `fk_scambio`, `fk_oggetto`, `qu
 (7, 7, 53, 1),
 (8, 8, 2, 1),
 (9, 9, 2, 1),
+(10, 10, 86, 1),
 (11, 11, 86, 1),
+(12, 12, 63, 1),
+(13, 13, 63, 1),
+(14, 14, 63, 1),
+(15, 15, 68, 1),
+(16, 16, 68, 1),
 (17, 17, 2, 1),
 (18, 18, 48, 1),
-(19, 19, 48, 1),
-(20, 20, 48, 1),
-(21, 21, 48, 1);
+(19, 19, 63, 2),
+(20, 20, 48, 1);
 
 -- --------------------------------------------------------
 
@@ -1040,12 +1120,12 @@ INSERT INTO `scambio_richieste` (`id_richiesta`, `fk_scambio`, `fk_oggetto`, `qu
 --
 
 CREATE TABLE `utente` (
-  `id_utente` int(11) NOT NULL,
-  `nome` varchar(100) NOT NULL,
-  `cognome` varchar(100) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `telefono` varchar(20) DEFAULT NULL,
-  `password` varchar(100) NOT NULL
+  `id_utente` int NOT NULL,
+  `nome` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cognome` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `telefono` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `password` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -1058,7 +1138,14 @@ INSERT INTO `utente` (`id_utente`, `nome`, `cognome`, `email`, `telefono`, `pass
 (6, 'Admin', 'Box Omnia', 'admin@boxomnia.it', NULL, '$2y$10$GcEqvT2f6DNgRx39AKAfxOZhHVhPsHfu827tVcun2E7DT38XL4H4K'),
 (7, 'Francesco', 'Vampa', 'fv@gmail.com', NULL, '$2y$10$jnyMvJzqLNgYpDiTsjS30uKgnlxjevXomBIgSzv88BdmkTMacuk2e'),
 (8, 'Miriam', 'De Vincentiis', 'md@gmail.com', NULL, '$2y$10$y3mqDs1zMhL/Vq7anyGt6O5L7PWY1cqliPs8aCi04akzjqvoTXQYO'),
-(9, 'Davide', 'Blasioli', 'db@boxomnia.it', NULL, '$2y$10$MfqKLsQrTmapI2DNPcb00OQRvmcDRCW6Ko4qWow3k1qxEwDLGOk/G');
+(9, 'Davide', 'Balisco', 'db@boxomnia.it', NULL, '$2y$10$MfqKLsQrTmapI2DNPcb00OQRvmcDRCW6Ko4qWow3k1qxEwDLGOk/G'),
+(10, 'gul', 'stirpe', 'gug@gmail.com', NULL, '$2y$10$rNea9Mu.fk0utFtp4VM4.uJ7UJFP5.x8tBtzcsGirbhjQXBJKD4vm'),
+(11, 'Giam', 'Giam', 'gu@gmail.com', NULL, '$2y$10$olMk.SjQrecENaanokN3Pu22HcMh7rZMoRd4R21A.Dpw2EP8Mb4kO'),
+(12, 'fe', 'fvvv', 'tr@gmail.com', NULL, '$2y$10$M3BdP0MzrGuO8QCIdbSZZeteXuqUZJo.UIyN2kaTSmEVSLMRDH196'),
+(13, 'Alessia', 'Disp', 'ad@gmail.com', NULL, '$2y$10$FrsfIvq/Va3TdS/oGvdznu.J4oYe1wa6OmjfyRn1osDIG9/0MojOK'),
+(14, 'tommaso', 'cesarone', 'pippo@gmail.com', NULL, '$2y$10$AGcHvw8Jod1VLaQtbh8Rpu5bHJfdQ657ZAs6/WrvqDEj.TmITcLHS'),
+(15, 'prova', 'prova', 'pp@gmail.com', NULL, '$2y$10$AD.EzIe7bvzLqI4xpJuQvepKlz.hLzAShRebSClnM/ayMIg5CTxAG'),
+(16, 'Guglielmo', 'Stirpe', 'gs@boxomnia.it', NULL, '$2y$10$eXr4PDmUEn8rvciGTLJvJOWlm3gSJwail652WGQlBIJIq.vLmelpm');
 
 -- --------------------------------------------------------
 
@@ -1067,20 +1154,20 @@ INSERT INTO `utente` (`id_utente`, `nome`, `cognome`, `email`, `telefono`, `pass
 -- (Vedi sotto per la vista effettiva)
 --
 CREATE TABLE `vista_ordini_completi` (
-`id_ordine` int(11)
-,`data_ordine` datetime
-,`tracking` varchar(100)
-,`stato_ordine` tinyint(1)
-,`stato_nome` varchar(15)
-,`id_utente` int(11)
+`cliente_email` varchar(100)
 ,`cliente_nome` varchar(201)
-,`cliente_email` varchar(100)
 ,`cliente_telefono` varchar(20)
-,`totale_ordine` decimal(10,2)
-,`quantita_articoli` bigint(20)
-,`stato_carrello` enum('attivo','checkout','completato','abbandonato')
+,`data_ordine` datetime
+,`id_ordine` int
+,`id_utente` int
 ,`indirizzo_completo` varchar(351)
 ,`nazione` varchar(100)
+,`quantita_articoli` bigint
+,`stato_carrello` enum('attivo','checkout','completato','abbandonato')
+,`stato_nome` varchar(15)
+,`stato_ordine` tinyint(1)
+,`totale_ordine` decimal(10,2)
+,`tracking` varchar(100)
 );
 
 -- --------------------------------------------------------
@@ -1090,14 +1177,14 @@ CREATE TABLE `vista_ordini_completi` (
 -- (Vedi sotto per la vista effettiva)
 --
 CREATE TABLE `vista_statistiche_dashboard` (
-`utenti_totali` bigint(21)
-,`ordini_oggi` bigint(21)
-,`ordini_in_elaborazione` bigint(21)
+`carrelli_attivi` bigint
 ,`fatturato_mese` decimal(32,2)
-,`carrelli_attivi` bigint(21)
+,`mystery_box_disponibili` bigint
+,`oggetti_disponibili` bigint
+,`ordini_in_elaborazione` bigint
+,`ordini_oggi` bigint
+,`utenti_totali` bigint
 ,`valore_carrelli_attivi` decimal(32,2)
-,`mystery_box_disponibili` bigint(21)
-,`oggetti_disponibili` bigint(21)
 );
 
 -- --------------------------------------------------------
@@ -1107,12 +1194,20 @@ CREATE TABLE `vista_statistiche_dashboard` (
 --
 
 CREATE TABLE `wishlist` (
-  `id_wishlist` int(11) NOT NULL,
-  `fk_utente` int(11) NOT NULL,
-  `fk_oggetto` int(11) DEFAULT NULL,
-  `fk_box` int(11) DEFAULT NULL,
-  `data_aggiunta` timestamp NULL DEFAULT current_timestamp()
+  `id_wishlist` int NOT NULL,
+  `fk_utente` int NOT NULL,
+  `fk_oggetto` int DEFAULT NULL,
+  `fk_box` int DEFAULT NULL,
+  `data_aggiunta` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dump dei dati per la tabella `wishlist`
+--
+
+INSERT INTO `wishlist` (`id_wishlist`, `fk_utente`, `fk_oggetto`, `fk_box`, `data_aggiunta`) VALUES
+(21, 10, 32, NULL, '2025-09-08 12:36:20'),
+(22, 10, 33, NULL, '2025-09-08 12:36:24');
 
 -- --------------------------------------------------------
 
@@ -1121,7 +1216,7 @@ CREATE TABLE `wishlist` (
 --
 DROP TABLE IF EXISTS `vista_ordini_completi`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_ordini_completi`  AS SELECT `o`.`id_ordine` AS `id_ordine`, `o`.`data_ordine` AS `data_ordine`, `o`.`tracking` AS `tracking`, `o`.`stato_ordine` AS `stato_ordine`, CASE WHEN `o`.`stato_ordine` = 0 THEN 'In elaborazione' WHEN `o`.`stato_ordine` = 1 THEN 'Spedito' WHEN `o`.`stato_ordine` = 2 THEN 'Consegnato' WHEN `o`.`stato_ordine` = 3 THEN 'Annullato' WHEN `o`.`stato_ordine` = 4 THEN 'Rimborsato' ELSE 'Sconosciuto' END AS `stato_nome`, `u`.`id_utente` AS `id_utente`, concat(`u`.`nome`,' ',`u`.`cognome`) AS `cliente_nome`, `u`.`email` AS `cliente_email`, `u`.`telefono` AS `cliente_telefono`, `c`.`totale` AS `totale_ordine`, `c`.`quantita` AS `quantita_articoli`, `c`.`stato` AS `stato_carrello`, concat('Via ',`i`.`via`,' ',`i`.`civico`,', ',`i`.`cap`,' ',`i`.`citta`,' (',`i`.`provincia`,')') AS `indirizzo_completo`, `i`.`nazione` AS `nazione` FROM (((`ordine` `o` join `utente` `u` on(`o`.`fk_utente` = `u`.`id_utente`)) left join `carrello` `c` on(`o`.`fk_carrello` = `c`.`id_carrello`)) join `indirizzo_spedizione` `i` on(`o`.`fk_indirizzo` = `i`.`id_indirizzo`)) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_ordini_completi`  AS SELECT `o`.`id_ordine` AS `id_ordine`, `o`.`data_ordine` AS `data_ordine`, `o`.`tracking` AS `tracking`, `o`.`stato_ordine` AS `stato_ordine`, (case when (`o`.`stato_ordine` = 0) then 'In elaborazione' when (`o`.`stato_ordine` = 1) then 'Spedito' when (`o`.`stato_ordine` = 2) then 'Consegnato' when (`o`.`stato_ordine` = 3) then 'Annullato' when (`o`.`stato_ordine` = 4) then 'Rimborsato' else 'Sconosciuto' end) AS `stato_nome`, `u`.`id_utente` AS `id_utente`, concat(`u`.`nome`,' ',`u`.`cognome`) AS `cliente_nome`, `u`.`email` AS `cliente_email`, `u`.`telefono` AS `cliente_telefono`, `c`.`totale` AS `totale_ordine`, `c`.`quantita` AS `quantita_articoli`, `c`.`stato` AS `stato_carrello`, concat('Via ',`i`.`via`,' ',`i`.`civico`,', ',`i`.`cap`,' ',`i`.`citta`,' (',`i`.`provincia`,')') AS `indirizzo_completo`, `i`.`nazione` AS `nazione` FROM (((`ordine` `o` join `utente` `u` on((`o`.`fk_utente` = `u`.`id_utente`))) left join `carrello` `c` on((`o`.`fk_carrello` = `c`.`id_carrello`))) join `indirizzo_spedizione` `i` on((`o`.`fk_indirizzo` = `i`.`id_indirizzo`))) ;
 
 -- --------------------------------------------------------
 
@@ -1130,7 +1225,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `vista_statistiche_dashboard`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_statistiche_dashboard`  AS SELECT (select count(0) from `utente`) AS `utenti_totali`, (select count(0) from `ordine` where cast(`ordine`.`data_ordine` as date) = curdate()) AS `ordini_oggi`, (select count(0) from `ordine` where `ordine`.`stato_ordine` = 0) AS `ordini_in_elaborazione`, (select ifnull(sum(`c`.`totale`),0) from (`ordine` `o` left join `carrello` `c` on(`o`.`fk_carrello` = `c`.`id_carrello`)) where date_format(`o`.`data_ordine`,'%Y-%m') = date_format(current_timestamp(),'%Y-%m')) AS `fatturato_mese`, (select count(0) from `carrello` where `carrello`.`stato` = 'attivo') AS `carrelli_attivi`, (select ifnull(sum(`carrello`.`totale`),0) from `carrello` where `carrello`.`stato` = 'attivo') AS `valore_carrelli_attivi`, (select count(0) from `mystery_box` where `mystery_box`.`quantita_box` > 0) AS `mystery_box_disponibili`, (select count(0) from `oggetto` where `oggetto`.`quant_oggetto` > 0 or `oggetto`.`quant_oggetto` is null) AS `oggetti_disponibili` ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_statistiche_dashboard`  AS SELECT (select count(0) from `utente`) AS `utenti_totali`, (select count(0) from `ordine` where (cast(`ordine`.`data_ordine` as date) = curdate())) AS `ordini_oggi`, (select count(0) from `ordine` where (`ordine`.`stato_ordine` = 0)) AS `ordini_in_elaborazione`, (select ifnull(sum(`c`.`totale`),0) from (`ordine` `o` left join `carrello` `c` on((`o`.`fk_carrello` = `c`.`id_carrello`))) where (date_format(`o`.`data_ordine`,'%Y-%m') = date_format(now(),'%Y-%m'))) AS `fatturato_mese`, (select count(0) from `carrello` where (`carrello`.`stato` = 'attivo')) AS `carrelli_attivi`, (select ifnull(sum(`carrello`.`totale`),0) from `carrello` where (`carrello`.`stato` = 'attivo')) AS `valore_carrelli_attivi`, (select count(0) from `mystery_box` where (`mystery_box`.`quantita_box` > 0)) AS `mystery_box_disponibili`, (select count(0) from `oggetto` where ((`oggetto`.`quant_oggetto` > 0) or (`oggetto`.`quant_oggetto` is null))) AS `oggetti_disponibili` ;
 
 --
 -- Indici per le tabelle scaricate
@@ -1354,121 +1449,121 @@ ALTER TABLE `wishlist`
 -- AUTO_INCREMENT per la tabella `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `id_admin` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_admin` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT per la tabella `carrello`
 --
 ALTER TABLE `carrello`
-  MODIFY `id_carrello` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
+  MODIFY `id_carrello` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
 
 --
 -- AUTO_INCREMENT per la tabella `categoria_oggetto`
 --
 ALTER TABLE `categoria_oggetto`
-  MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id_categoria` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT per la tabella `classifica`
 --
 ALTER TABLE `classifica`
-  MODIFY `id_classifica` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_classifica` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT per la tabella `immagine`
 --
 ALTER TABLE `immagine`
-  MODIFY `id_immagine` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=158;
+  MODIFY `id_immagine` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=158;
 
 --
 -- AUTO_INCREMENT per la tabella `indirizzo_spedizione`
 --
 ALTER TABLE `indirizzo_spedizione`
-  MODIFY `id_indirizzo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_indirizzo` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT per la tabella `info_ordine`
 --
 ALTER TABLE `info_ordine`
-  MODIFY `id_info_ordine` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id_info_ordine` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT per la tabella `mystery_box`
 --
 ALTER TABLE `mystery_box`
-  MODIFY `id_box` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id_box` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT per la tabella `notifiche_utente`
 --
 ALTER TABLE `notifiche_utente`
-  MODIFY `id_notifica` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_notifica` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT per la tabella `oggetto`
 --
 ALTER TABLE `oggetto`
-  MODIFY `id_oggetto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=106;
+  MODIFY `id_oggetto` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=107;
 
 --
 -- AUTO_INCREMENT per la tabella `ordine`
 --
 ALTER TABLE `ordine`
-  MODIFY `id_ordine` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id_ordine` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT per la tabella `ordine_log`
 --
 ALTER TABLE `ordine_log`
-  MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id_log` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT per la tabella `rarita`
 --
 ALTER TABLE `rarita`
-  MODIFY `id_rarita` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_rarita` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT per la tabella `richieste_supporto`
 --
 ALTER TABLE `richieste_supporto`
-  MODIFY `id_richiesta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_richiesta` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT per la tabella `risposte_supporto`
 --
 ALTER TABLE `risposte_supporto`
-  MODIFY `id_risposta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_risposta` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT per la tabella `scambi`
 --
 ALTER TABLE `scambi`
-  MODIFY `id_scambio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id_scambio` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT per la tabella `scambio_offerte`
 --
 ALTER TABLE `scambio_offerte`
-  MODIFY `id_offerta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id_offerta` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT per la tabella `scambio_richieste`
 --
 ALTER TABLE `scambio_richieste`
-  MODIFY `id_richiesta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id_richiesta` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT per la tabella `utente`
 --
 ALTER TABLE `utente`
-  MODIFY `id_utente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_utente` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT per la tabella `wishlist`
 --
 ALTER TABLE `wishlist`
-  MODIFY `id_wishlist` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id_wishlist` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- Limiti per le tabelle scaricate

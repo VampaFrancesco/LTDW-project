@@ -673,7 +673,6 @@ $conn->close();
         alert.innerHTML = `
             <i class="bi bi-${getIconaAlert(tipo)} me-2"></i>
             ${escHtml(messaggio)}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         `;
         alert.style.cssText = `
             position: fixed;

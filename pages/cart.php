@@ -66,10 +66,6 @@ include __DIR__.'/header.php';
                 <div style="font-size: 48px; margin-bottom: 20px;">🛒</div>
                 <h3 style="margin-bottom: 15px; color: #0c5460;">Il tuo carrello è vuoto</h3>
                 <p style="margin-bottom: 25px; color: #0c5460;">Aggiungi alcuni prodotti per iniziare il tuo shopping!</p>
-                <a href="<?php echo BASE_URL; ?>/pages/home_utente.php"
-                   style="display: inline-block; background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
-                    🛍️ Vai allo Shop
-                </a>
             </div>
 
         <?php else: ?>
@@ -228,7 +224,6 @@ include __DIR__.'/header.php';
             alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
             alertDiv.innerHTML = `
         ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
             alertContainer.appendChild(alertDiv);
 

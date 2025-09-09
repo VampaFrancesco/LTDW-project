@@ -80,7 +80,6 @@ SessionManager::set('notifications_count', $notifications_count);
     <div class="alert alert-<?php echo htmlspecialchars($flash_message['type']); ?> alert-dismissible fade show"
          role="alert">
         <?php echo htmlspecialchars($flash_message['content']); ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 <?php endif; ?>
 
