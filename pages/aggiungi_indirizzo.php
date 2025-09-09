@@ -192,7 +192,7 @@ include __DIR__ . '/header.php';
                     </form>
                 </div>
 
-                <div style="background:#fff; padding:20px; border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+                <div style="background:#fff; padding:20px; border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,0.08); margin-bottom:50px;">
                     <p style="color:#6c757d; margin:0;">
                         I campi contrassegnati con * sono obbligatori. I dati verranno usati esclusivamente per la spedizione dei tuoi ordini.
                     </p>

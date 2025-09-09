@@ -765,9 +765,10 @@ img {
 
 /* CSS PERSONALIZZATO PER GLI ORDINI - ALTO CONTRASTO */
 .orders-container {
-    max-width: 1200px;
+    max-width: 1290px;
     margin: 0 auto;
-    padding: 20px;
+    margin-bottom: 50px;
+
 }
 
 .orders-header {
@@ -6528,7 +6529,7 @@ body {
     border-left: 5px solid #007bff !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
     transition: all 0.3s ease !important;
-    margin: 20px auto !important;
+    margin: 50px auto !important;
 }
 
 .avviso-info:hover {
@@ -6601,4 +6602,97 @@ body {
        height: 25px;
        font-size: 14px;
    }
+}
+
+/* Nuovo alert carrello vuoto*/
+.avviso-carrello-vuoto {
+    width: 1290px !important;
+    height: 300px !important;
+    max-width: none !important;
+    padding: 30px 40px !important;
+    border-radius: 15px !important;
+    text-align: center !important;
+    position: relative !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-left: 5px solid #007bff !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.3s ease !important;
+    margin: 20px auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-direction: column !important;
+}
+
+.icona-carrello-shopping-vuoto {
+    font-size: 48px !important;
+    color: #6c757d !important;
+    margin-bottom: 10px !important;
+    margin-top: 0 !important;
+    padding: 0 !important;
+}
+
+.titolo-carrello-vuoto {
+    font-size: 2.2rem !important;
+    font-weight: 600 !important;
+    color: #2c3e50 !important;
+    margin-bottom: 8px !important;
+    margin-top: 0 !important;
+    padding: 0 !important;
+    line-height: 1.2 !important;
+}
+
+.messaggio-carrello-vuoto {
+    font-size: 1.1rem !important;
+    color: #6c757d !important;
+    font-weight: 400 !important;
+    line-height: 1.4 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Nuovo alert ordini vuoto */
+.avviso-ordini-vuoti {
+    width: 1290px !important;
+    height: 300px !important;
+    max-width: none !important;
+    padding: 30px 40px !important;
+    border-radius: 15px !important;
+    text-align: center !important;
+    position: relative !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-left: 5px solid #007bff !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.3s ease !important;
+    margin: 20px auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-direction: column !important;
+}
+
+.icona-carrello-vuoto {
+    font-size: 48px !important;
+    color: #6c757d !important;
+    margin-bottom: 10px !important;
+}
+
+.titolo-ordini-vuoti {
+    font-size: 2.2rem !important;
+    font-weight: 600 !important;
+    color: #2c3e50 !important;
+    margin-bottom: 8px !important;
+    margin-top: 0 !important;
+}
+
+.messaggio-ordini-vuoti {
+    font-size: 1.1rem !important;
+    color: #6c757d !important;
+    font-weight: 400 !important;
+    line-height: 1.4 !important;
+    margin: 0 !important;
 }

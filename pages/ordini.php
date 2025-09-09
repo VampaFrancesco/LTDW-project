@@ -247,9 +247,9 @@ include __DIR__ . '/header.php';
 
     <style>
         .orders-container {
-            max-width: 1200px;
+            max-width: 1290px;
             margin: 0 auto;
-            padding: 20px;
+            margin-bottom: 50px;
         }
 
         .orders-header {
@@ -588,20 +588,17 @@ include __DIR__ . '/header.php';
 
     <main class="background-custom">
         <div class="orders-container">
-            <div class="orders-header">
-                <h1 class="fashion_taital">I tuoi Ordini</h1>
-                <p class="text-muted mt-3">Clicca su un ordine per vedere i dettagli completi</p>
-            </div>
+                <h1 class="fashion_taital mb-5">I tuoi Ordini</h1>
+
 
             <?php if (empty($orders)): ?>
-                <div class="empty-orders" style="">
-                    <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;">🛒</div>
-                    <h3>Nessun ordine trovato</h3>
-                    <p>Non hai ancora effettuato nessun ordine. Inizia a esplorare il nostro catalogo!</p>
-                    <a href="<?php echo BASE_URL; ?>/pages/home_utente.php" class="btn-shop">
-                        Inizia a comprare
-                    </a>
-                </div>
+                <div class="avviso-ordini-vuoti">
+        <div class="icona-carrello-vuoto">🛒</div>
+        <h3 class="titolo-ordini-vuoti">Nessun ordine trovato</h3>
+        <p class="messaggio-ordini-vuoti">Non hai ancora effettuato nessun ordine. Inizia a esplorare il nostro catalogo!</p>
+        <div style="margin-top: 20px;">
+        </div>
+    </div>
             <?php else: ?>
                 <div class="orders-grid">
                     <?php foreach ($orders as $order): ?>

@@ -44,7 +44,7 @@ include __DIR__.'/header.php';
 ?>
 
     <div class="container my-5">
-        <h1 class="mb-4">Il Tuo Carrello</h1>
+        <h1 class="fashion_taital mb-5">Il Tuo Carrello</h1>
 
         <!-- Alert container per messaggi dinamici -->
         <div id="alert-container"></div>
@@ -62,11 +62,11 @@ include __DIR__.'/header.php';
 
         <?php elseif (count($array_prodotti) === 0): ?>
             <!-- Carrello vuoto -->
-            <div style="background: #d1ecf1; border: 1px solid #bee5eb; border-radius: 8px; padding: 40px; margin: 20px 0; text-align: center; color: #0c5460;">
-                <div style="font-size: 48px; margin-bottom: 20px;">🛒</div>
-                <h3 style="margin-bottom: 15px; color: #0c5460;">Il tuo carrello è vuoto</h3>
-                <p style="margin-bottom: 25px; color: #0c5460;">Aggiungi alcuni prodotti per iniziare il tuo shopping!</p>
-            </div>
+<div class="avviso-carrello-vuoto">
+    <div class="icona-carrello-shopping-vuoto">🛒</div>
+    <h2 class="titolo-carrello-vuoto">Il tuo carrello è vuoto</h2>
+    <p class="messaggio-carrello-vuoto">Aggiungi alcuni prodotti per iniziare il tuo shopping!</p>
+</div>
 
         <?php else: ?>
             <!-- Carrello con prodotti -->
@@ -179,14 +179,6 @@ include __DIR__.'/header.php';
                                 <?php endif; ?>
                             </span>
                             </div>
-
-                            <?php if ($subtotal < 50 && $subtotal > 0): ?>
-                                <div class="alert alert-info py-2 small" id="free-shipping-info">
-                                    <i class="bi bi-info-circle"></i>
-                                    Spendi altri €<span id="amount-for-free-shipping"><?php echo number_format(50 - $subtotal, 2, ',', '.'); ?></span>
-                                    per la spedizione gratuita!
-                                </div>
-                            <?php endif; ?>
 
                             <hr>
 
@@ -352,7 +344,6 @@ include __DIR__.'/header.php';
                         // Se carrello vuoto, ricarica pagina dopo breve pausa
                         console.log('Total items after removal:', data.totals.total_items);
                         if (data.totals.total_items === 0) {
-                            showAlert('Carrello vuoto - ricaricamento pagina...', 'info');
                             setTimeout(() => {
                                 console.log('Reloading page due to empty cart');
                                 window.location.reload();
