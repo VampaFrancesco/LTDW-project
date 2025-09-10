@@ -252,9 +252,11 @@ SessionManager::set('notifications_count', $notifications_count);
 
                 <!-- 2) Search bar -->
                 <div class="flex-fill px-3">
-                    <form class="search-form w-100" method="get" action="...">
-                        <input class="search-input flex-grow-1" type="search" name="q" placeholder="Cerca..." aria-label="Cerca">
-                        <button class="search-button" type="submit">
+                    <form class="form-inline w-100" method="get"
+                          action="<?php echo(defined('BASE_URL') ? BASE_URL : ''); ?>/action/search.php">
+                        <input class="form-control mr-2 flex-grow-1" type="search" name="q" placeholder="Cerca..."
+                               aria-label="Cerca">
+                        <button class="btn btn-outline-secondary" type="submit">
                             <i class="bi bi-search"></i>
                         </button>
                     </form>
