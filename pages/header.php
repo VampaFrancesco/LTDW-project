@@ -251,15 +251,8 @@ SessionManager::set('notifications_count', $notifications_count);
                 </a>
 
                 <!-- 2) Search bar -->
-                <div class="flex-fill px-3">
-                    <form class="form-inline w-100" method="get"
-                          action="#">
-                        <input class="form-control mr-2 flex-grow-1" type="search" name="q" placeholder="Cerca..."
-                               aria-label="Cerca">
-                        <button class="btn btn-outline-secondary" type="submit">
-                            <i class="bi bi-search"></i>
-                        </button>
-                    </form>
+                <div class="flex-fill px-3 align-content-center">
+                    <i><h2 style="color:#3f51b5; margin-top:20px; margin-left:20px ">La comunity più grande di collezionisti di carte</h2></i>
                 </div>
 
                 <!-- 3) Top-links a destra -->
