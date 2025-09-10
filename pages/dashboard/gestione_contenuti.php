@@ -585,7 +585,7 @@ $sezioni = getSezioniConfig($sezione_corrente);
                                     <div class="col-md-4">
                                         <div class="card text-center">
                                             <div class="card-body">
-                                                <i class="bi bi-collection text-warning fs-1"></i>
+                                                <i class="bi text-warning fs-1"></i>
                                                 <h6 id="preview-community-collezione-titolo" class="mt-2"><?= htmlspecialchars($contenuti_attuali['community_collezione_titolo']); ?></h6>
                                                 <p id="preview-community-collezione-desc" class="small text-muted"><?= htmlspecialchars($contenuti_attuali['community_collezione_desc']); ?></p>
                                             </div>
