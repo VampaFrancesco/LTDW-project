@@ -325,7 +325,7 @@ img {
     }
 }
 
-.dropdown-item {
+/*.dropdown-item {
     display: block;
     padding: 10px 16px;
     text-decoration: none;
@@ -341,7 +341,7 @@ img {
     background: var(--primary-color);
     color: white !important;
     transform: translateX(5px);
-}
+}*/
 
 /* FILTER BUTTONS */
 .filter-section {
@@ -6696,3 +6696,238 @@ body {
     line-height: 1.4 !important;
     margin: 0 !important;
 }
+
+/* CSS PERSONALIZZATO PER DROPDOWN NAVBAR */
+
+/* Container principale del dropdown navbar */
+.navbar-user-dropdown {
+    position: relative;
+}
+
+/* Toggle button del dropdown navbar */
+.navbar-dropdown-toggle {
+    display: flex !important;
+    align-items: center !important;
+    height: 40px !important;
+    padding: 0 12px !important;
+    background: rgba(0, 0, 0, 0.05) !important;
+    border-radius: 20px !important;
+    text-decoration: none !important;
+    color: inherit !important;
+    border: none !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    transition: background-color 0.3s ease !important;
+    cursor: pointer !important;
+}
+
+.navbar-dropdown-toggle:hover {
+    background: rgba(0, 0, 0, 0.1) !important;
+    text-decoration: none !important;
+    color: inherit !important;
+}
+
+.navbar-dropdown-toggle::after {
+    margin-left: 8px !important;
+    border: none !important;
+    content: "▼" !important;
+    font-size: 10px !important;
+    transition: transform 0.3s ease !important;
+}
+
+/* Animazione freccia dropdown */
+.navbar-dropdown-toggle[aria-expanded="true"]::after {
+    transform: rotate(180deg) !important;
+}
+
+/* Menu dropdown navbar */
+.navbar-dropdown-menu {
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    margin-top: 5px !important;
+    min-width: 220px !important;
+    background: white !important;
+    border: none !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+    padding: 8px 0 !important;
+    z-index: 1050 !important;
+    opacity: 0 !important;
+    transform: translateY(-10px) !important;
+    visibility: hidden !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Stato aperto del menu */
+.navbar-dropdown-menu.show {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    visibility: visible !important;
+}
+
+/* Voci del menu dropdown navbar */
+.navbar-dropdown-item {
+    display: flex !important;
+    align-items: center !important;
+    padding: 10px 16px !important;
+    text-decoration: none !important;
+    color: var(--text-color, #333) !important;
+    white-space: nowrap !important;
+    border-radius: 8px !important;
+    margin: 2px 8px !important;
+    font-size: 14px !important;
+    transition: all 0.3s ease !important;
+    gap: 10px !important;
+    border: none !important;
+    background: transparent !important;
+    width: calc(100% - 16px) !important;
+}
+
+.navbar-dropdown-item:hover,
+.navbar-dropdown-item:focus {
+    background: var(--primary-color, #007bff) !important;
+    color: white !important;
+    transform: translateX(5px) !important;
+    text-decoration: none !important;
+}
+
+/* Icone nelle voci del dropdown navbar */
+.navbar-dropdown-item i {
+    width: 16px !important;
+    font-size: 14px !important;
+    text-align: center !important;
+    flex-shrink: 0 !important;
+}
+
+/* Divider nel dropdown navbar */
+.navbar-dropdown-divider {
+    height: 1px !important;
+    background: rgba(0, 0, 0, 0.1) !important;
+    margin: 8px 12px !important;
+    border: none !important;
+}
+
+/* Badge admin nel toggle */
+.navbar-admin-badge {
+    background: #dc3545 !important;
+    color: white !important;
+    font-size: 10px !important;
+    padding: 2px 6px !important;
+    border-radius: 10px !important;
+    margin-left: 5px !important;
+    font-weight: bold !important;
+}
+
+/* Badge notifiche nelle voci */
+.navbar-notification-badge {
+    background: #ffc107 !important;
+    color: #000 !important;
+    font-size: 11px !important;
+    padding: 2px 6px !important;
+    border-radius: 10px !important;
+    margin-left: auto !important;
+    font-weight: bold !important;
+}
+
+/* Hover effect per il badge notifiche */
+.navbar-dropdown-item:hover .navbar-notification-badge {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+}
+
+/* Badge di stato generale */
+.navbar-status-badge {
+    margin-left: auto !important;
+    flex-shrink: 0 !important;
+    font-size: 11px !important;
+    padding: 2px 6px !important;
+    border-radius: 10px !important;
+    font-weight: bold !important;
+}
+
+/* Colori per diversi tipi di badge */
+.navbar-status-badge.warning {
+    background: #ffc107 !important;
+    color: #000 !important;
+}
+
+.navbar-status-badge.danger {
+    background: #dc3545 !important;
+    color: white !important;
+}
+
+.navbar-status-badge.success {
+    background: #28a745 !important;
+    color: white !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .navbar-dropdown-menu {
+        min-width: 200px !important;
+        margin-top: 2px !important;
+    }
+    
+    .navbar-dropdown-item {
+        padding: 8px 12px !important;
+        font-size: 13px !important;
+        margin: 2px 6px !important;
+        width: calc(100% - 12px) !important;
+    }
+    
+    .navbar-dropdown-item i {
+        font-size: 13px !important;
+    }
+    
+    .navbar-dropdown-toggle {
+        height: 36px !important;
+        padding: 0 10px !important;
+        font-size: 13px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-dropdown-menu {
+        min-width: 180px !important;
+        right: -10px !important;
+    }
+    
+    .navbar-dropdown-item {
+        font-size: 12px !important;
+    }
+}
+
+/* Assicurarsi che il dropdown sia sopra altri elementi */
+.navbar-user-dropdown {
+    z-index: 1000 !important;
+}
+
+/* Stile per quando il dropdown è attivo */
+.navbar-user-dropdown.active .navbar-dropdown-toggle {
+    background: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Animazione di entrata per le voci del menu */
+.navbar-dropdown-menu.show .navbar-dropdown-item {
+    animation: slideInFromRight 0.3s ease forwards;
+}
+
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Stagger animation per le voci */
+.navbar-dropdown-menu.show .navbar-dropdown-item:nth-child(1) { animation-delay: 0.05s; }
+.navbar-dropdown-menu.show .navbar-dropdown-item:nth-child(2) { animation-delay: 0.1s; }
+.navbar-dropdown-menu.show .navbar-dropdown-item:nth-child(3) { animation-delay: 0.15s; }
+.navbar-dropdown-menu.show .navbar-dropdown-item:nth-child(4) { animation-delay: 0.2s; }
+.navbar-dropdown-menu.show .navbar-dropdown-item:nth-child(5) { animation-delay: 0.25s; }
+.navbar-dropdown-menu.show .navbar-dropdown-item:nth-child(6) { animation-delay: 0.3s; }

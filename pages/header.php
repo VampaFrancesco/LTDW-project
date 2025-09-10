@@ -125,55 +125,6 @@ SessionManager::set('notifications_count', $notifications_count);
             margin-right: 5px;
         }
 
-        /* Dropdown User */
-        .user-dropdown {
-            position: relative;
-        }
-
-        .user-dropdown .dropdown-toggle {
-            display: flex;
-            align-items: center;
-            height: 40px;
-            padding: 0 12px;
-            background: rgba(0, 0, 0, 0.05);
-            border-radius: 20px;
-            text-decoration: none;
-            color: inherit;
-            border: none;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .user-dropdown .dropdown-toggle::after {
-            margin-left: 8px;
-        }
-
-        .user-dropdown .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            margin-top: 5px;
-            min-width: 220px;
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            padding: 8px 0;
-            z-index: 1050;
-        }
-
-        .user-dropdown .dropdown-item {
-            padding: 10px 20px;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .user-dropdown .dropdown-item i {
-            width: 16px;
-            font-size: 14px;
-        }
-
         /* Badge per notifiche */
         .notification-badge {
             position: absolute;
@@ -189,16 +140,6 @@ SessionManager::set('notifications_count', $notifications_count);
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        .admin-badge {
-            background: #dc3545;
-            color: white;
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 10px;
-            margin-left: 5px;
-            font-weight: bold;
         }
 
         /* Responsive */
@@ -326,71 +267,63 @@ SessionManager::set('notifications_count', $notifications_count);
                     <?php if (SessionManager::isLoggedIn()): ?>
                         <!-- Utente loggato -->
                         <?php $isAdmin = SessionManager::get('user_is_admin', false); ?>
-                        <div class="dropdown">
-                            <a href="#" class="mx-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="navbar-user-dropdown">
+                            <a href="#" class="mx-2 navbar-dropdown-toggle" id="userDropdown" aria-expanded="false">
                                 <?php
                                 $nome = SessionManager::get('user_nome', 'Utente');
                                 echo htmlspecialchars($nome);
                                 if ($isAdmin) {
-                                    echo ' <span class="admin-badge">A.</span>';
+                                    echo ' <span class="navbar-admin-badge">ADMIN</span>';
                                 }
                                 ?>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
+                            <div class="navbar-dropdown-menu" id="userDropdownMenu">
                                 <?php if ($isAdmin): ?>
                                     <!-- Menu ADMIN -->
-                                    <li>
-                                        <a class="dropdown-item" href="<?php echo BASE_URL; ?>/pages/dashboard/dashboard.php">
-                                            <i class="bi bi-speedometer2"></i> Dashboard Admin
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="<?php echo BASE_URL; ?>/pages/dashboard/gestione_supporto.php">
-                                            <i class="bi bi-headset"></i> Supporto Clienti
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="<?php echo BASE_URL; ?>/pages/home_utente.php">
-                                            <i class="bi bi-house"></i> Area Utente
-                                        </a>
-                                    </li>
+                                    <a class="navbar-dropdown-item" href="<?php echo BASE_URL; ?>/pages/dashboard/dashboard.php">
+                                        <i class="bi bi-speedometer2"></i>
+                                        <span>Dashboard Admin</span>
+                                    </a>
+                                    <a class="navbar-dropdown-item" href="<?php echo BASE_URL; ?>/pages/dashboard/gestione_supporto.php">
+                                        <i class="bi bi-headset"></i>
+                                        <span>Supporto Clienti</span>
+                                    </a>
+                                    <a class="navbar-dropdown-item" href="<?php echo BASE_URL; ?>/pages/home_utente.php">
+                                        <i class="bi bi-house"></i>
+                                        <span>Area Utente</span>
+                                    </a>
                                 <?php else: ?>
                                     <!-- Menu UTENTE NORMALE -->
-                                    <li>
-                                        <a class="dropdown-item" href="<?php echo BASE_URL; ?>/pages/home_utente.php">
-                                            <i class="bi bi-house"></i> Homepage
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <a class="dropdown-item" href="<?php echo BASE_URL; ?>/pages/profilo.php">
-                                            <i class="bi bi-person-gear"></i> Profilo
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <a class="dropdown-item" href="<?php echo BASE_URL; ?>/pages/ordini.php">
-                                            <i class="bi bi-bag-check"></i> I miei Ordini
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <a class="dropdown-item" href="<?php echo BASE_URL; ?>/pages/supporto_utente.php">
-                                            <i class="bi bi-headset"></i> Supporto e Assistenza
-                                            <?php if ($notifications_count > 0): ?>
-                                                <span class="badge bg-warning text-dark ms-2"><?php echo $notifications_count; ?></span>
-                                            <?php endif; ?>
-                                        </a>
-                                    </li>
+                                    <a class="navbar-dropdown-item" href="<?php echo BASE_URL; ?>/pages/home_utente.php">
+                                        <i class="bi bi-house"></i>
+                                        <span>Homepage</span>
+                                    </a>
+                                    <div class="navbar-dropdown-divider"></div>
+                                    <a class="navbar-dropdown-item" href="<?php echo BASE_URL; ?>/pages/profilo.php">
+                                        <i class="bi bi-person-gear"></i>
+                                        <span>Profilo</span>
+                                    </a>
+                                    <div class="navbar-dropdown-divider"></div>
+                                    <a class="navbar-dropdown-item" href="<?php echo BASE_URL; ?>/pages/ordini.php">
+                                        <i class="bi bi-bag-check"></i>
+                                        <span>I miei Ordini</span>
+                                    </a>
+                                    <div class="navbar-dropdown-divider"></div>
+                                    <a class="navbar-dropdown-item" href="<?php echo BASE_URL; ?>/pages/supporto_utente.php">
+                                        <i class="bi bi-headset"></i>
+                                        <span>Supporto e Assistenza</span>
+                                        <?php if ($notifications_count > 0): ?>
+                                            <span class="navbar-notification-badge"><?php echo $notifications_count; ?></span>
+                                        <?php endif; ?>
+                                    </a>
                                 <?php endif; ?>
 
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item" href="<?php echo BASE_URL; ?>/pages/auth/logout.php">
-                                        <i class="bi bi-box-arrow-right"></i> Logout
-                                    </a>
-                                </li>
-                            </ul>
+                                <div class="navbar-dropdown-divider"></div>
+                                <a class="navbar-dropdown-item" href="<?php echo BASE_URL; ?>/pages/auth/logout.php">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    <span>Logout</span>
+                                </a>
+                            </div>
                         </div>
                     <?php else: ?>
                         <!-- Utente non loggato -->
@@ -423,7 +356,7 @@ SessionManager::set('notifications_count', $notifications_count);
     </header>
 <?php endif; ?>
 
-<!-- Script per il dropdown (Bootstrap 5) -->
+<!-- JavaScript per il dropdown personalizzato -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -435,5 +368,60 @@ SessionManager::set('notifications_count', $notifications_count);
                 bsAlert.close();
             }, 5000);
         });
+
+        // Gestione dropdown personalizzato
+        const dropdownToggle = document.getElementById('userDropdown');
+        const dropdownMenu = document.getElementById('userDropdownMenu');
+        const dropdownContainer = document.querySelector('.navbar-user-dropdown');
+
+        if (dropdownToggle && dropdownMenu) {
+            // Toggle dropdown al click
+            dropdownToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const isOpen = dropdownMenu.classList.contains('show');
+                
+                // Chiudi tutti i dropdown aperti
+                document.querySelectorAll('.navbar-dropdown-menu.show').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+                document.querySelectorAll('.navbar-dropdown-toggle[aria-expanded="true"]').forEach(toggle => {
+                    toggle.setAttribute('aria-expanded', 'false');
+                });
+                document.querySelectorAll('.navbar-user-dropdown.active').forEach(container => {
+                    container.classList.remove('active');
+                });
+                
+                if (!isOpen) {
+                    dropdownMenu.classList.add('show');
+                    dropdownToggle.setAttribute('aria-expanded', 'true');
+                    dropdownContainer.classList.add('active');
+                }
+            });
+
+            // Chiudi dropdown quando si clicca fuori
+            document.addEventListener('click', function(e) {
+                if (!dropdownContainer.contains(e.target)) {
+                    dropdownMenu.classList.remove('show');
+                    dropdownToggle.setAttribute('aria-expanded', 'false');
+                    dropdownContainer.classList.remove('active');
+                }
+            });
+
+            // Chiudi dropdown con ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    dropdownMenu.classList.remove('show');
+                    dropdownToggle.setAttribute('aria-expanded', 'false');
+                    dropdownContainer.classList.remove('active');
+                }
+            });
+
+            // Previeni la chiusura quando si clicca sul menu stesso
+            dropdownMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
     });
 </script>
